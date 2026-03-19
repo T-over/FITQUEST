@@ -1341,6 +1341,61 @@ body::after {
   letter-spacing:1px;
 }
 
+/* ===== NOUVELLES FONCTIONNALITÉS ===== */
+/* BOSS */
+.boss-card {
+  background: linear-gradient(135deg, rgba(255,60,172,0.1), rgba(168,85,247,0.1));
+  border: 1px solid rgba(255,60,172,0.4);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.boss-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.boss-icon { font-size:40px; }
+.boss-name { font-family:'Exo 2',sans-serif; font-weight:900; font-size:18px; color:var(--accent2); }
+.boss-desc { font-size:12px; color:var(--text2); margin-top:2px; }
+.boss-hp-bar { background:var(--bg3); border-radius:4px; height:12px; overflow:hidden; margin-bottom:8px; }
+.boss-hp-fill { height:100%; background:linear-gradient(90deg,var(--accent2),var(--xp-color)); border-radius:4px; transition:width 0.5s; }
+.boss-xp-badge { display:inline-block; background:rgba(168,85,247,0.2); color:var(--xp-color); border:1px solid rgba(168,85,247,0.4); border-radius:20px; padding:3px 10px; font-size:11px; font-weight:700; }
+/* SHOP */
+.shop-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.shop-item { background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:12px; text-align:center; cursor:pointer; transition:border-color 0.2s; }
+.shop-item.owned { border-color:var(--accent); }
+.shop-item.active-item { border-color:var(--accent3); background:rgba(255,215,0,0.05); }
+.shop-item-icon { font-size:32px; margin-bottom:6px; }
+.shop-item-name { font-size:12px; font-weight:700; margin-bottom:4px; }
+.shop-item-price { font-size:11px; color:var(--accent3); font-family:'Share Tech Mono',monospace; }
+.shop-xp-display { text-align:center; padding:10px; background:rgba(255,215,0,0.1); border:1px solid rgba(255,215,0,0.3); border-radius:var(--radius); margin-bottom:14px; font-family:'Share Tech Mono',monospace; color:var(--accent3); font-size:14px; }
+/* WEIGHT */
+.weight-log-item { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); }
+.weight-log-item:last-child { border-bottom:none; }
+.weight-val { font-size:18px; font-weight:700; color:var(--accent); font-family:'Share Tech Mono',monospace; }
+.weight-date { font-size:11px; color:var(--text2); }
+.weight-diff-up { color:var(--red); font-size:11px; }
+.weight-diff-down { color:var(--accent4); font-size:11px; }
+/* PROGRAM */
+.prog-card { background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:14px; margin-bottom:10px; cursor:pointer; }
+.prog-card.active-prog { border-color:var(--accent); background:rgba(0,245,255,0.05); }
+.prog-header { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+.prog-icon { font-size:28px; }
+.prog-name { font-family:'Exo 2',sans-serif; font-weight:700; font-size:15px; }
+.prog-desc { font-size:11px; color:var(--text2); margin-bottom:8px; }
+.prog-weeks { font-size:11px; color:var(--accent3); font-family:'Share Tech Mono',monospace; }
+.prog-day-card { background:var(--bg2); border-radius:6px; padding:10px; margin-top:8px; }
+.prog-day-title { font-size:13px; font-weight:700; color:var(--accent); margin-bottom:6px; }
+.prog-exercise { font-size:12px; color:var(--text2); padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+/* WEEKLY CHALLENGE */
+.wc-card { background:linear-gradient(135deg,rgba(0,245,255,0.08),rgba(57,255,20,0.08)); border:1px solid rgba(0,245,255,0.3); border-radius:var(--radius); padding:16px; margin-bottom:14px; }
+.wc-title { font-family:'Exo 2',sans-serif; font-weight:900; font-size:16px; color:var(--accent); margin-bottom:4px; }
+/* REST TIMER */
+.rest-timer-display { font-size:64px; font-family:'Share Tech Mono',monospace; text-align:center; color:var(--accent); margin:20px 0; }
+.rest-btn-row { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+.rest-preset-btn { padding:10px 16px; border:1px solid var(--border); background:var(--bg3); color:var(--text); border-radius:var(--radius); cursor:pointer; font-weight:700; font-size:13px; }
+.rest-preset-btn:hover { border-color:var(--accent); color:var(--accent); }
+/* EXERCISE HISTORY */
+.exo-history-filter { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+.exo-filter-btn { padding:6px 12px; border:1px solid var(--border); background:var(--bg3); color:var(--text2); border-radius:20px; cursor:pointer; font-size:11px; }
+.exo-filter-btn.active { border-color:var(--accent2); color:var(--accent2); }
 </style>
 </head>
 <body>
@@ -1424,6 +1479,37 @@ body::after {
     </div>
   </div>
 
+  <!-- BOSS HEBDO -->
+  <div class="boss-card" id="boss-section">
+    <div style="font-size:10px;letter-spacing:2px;color:var(--accent2);margin-bottom:8px;font-family:'Share Tech Mono',monospace">👹 BOSS DE LA SEMAINE</div>
+    <div class="boss-header">
+      <div class="boss-icon" id="boss-icon">👻</div>
+      <div>
+        <div class="boss-name" id="boss-name">Le Fantôme du Canapé</div>
+        <div class="boss-desc" id="boss-desc">3 entraînements cette semaine</div>
+      </div>
+    </div>
+    <div class="boss-hp-bar"><div class="boss-hp-fill" id="boss-hp-fill" style="width:0%"></div></div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span id="boss-progress-text" style="font-size:11px;color:var(--text2)">0 / 3</span>
+      <span class="boss-xp-badge" id="boss-xp-badge">+500 XP</span>
+    </div>
+    <div id="boss-defeated-msg" style="display:none;text-align:center;padding:8px;color:var(--accent4);font-weight:700;font-size:14px">✅ BOSS VAINCU ! Reviens lundi pour le prochain !</div>
+  </div>
+
+  <!-- DÉFI HEBDO -->
+  <div class="wc-card" id="wc-section">
+    <div style="font-size:10px;letter-spacing:2px;color:var(--accent);margin-bottom:6px;font-family:'Share Tech Mono',monospace">⚡ DÉFI DE LA SEMAINE</div>
+    <div class="wc-title" id="wc-name">Semaine Cardio</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:8px" id="wc-desc">Cours 15 km cette semaine</div>
+    <div class="quest-prog-bar"><div class="quest-prog-fill run" id="wc-prog-fill" style="width:0%"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:4px">
+      <span style="font-size:11px;color:var(--text2)" id="wc-prog-text">0 / 15</span>
+      <span style="font-size:11px;color:var(--accent3)" id="wc-xp-text">+300 XP</span>
+    </div>
+    <div id="wc-done-msg" style="display:none;text-align:center;padding:6px;color:var(--accent4);font-weight:700;font-size:13px">🎉 DÉFI ACCOMPLI !</div>
+  </div>
+
   <!-- RECENT WORKOUTS -->
   <div class="card">
     <div class="card-title"><span>📜</span> ACTIVITÉS RÉCENTES</div>
@@ -1454,6 +1540,8 @@ body::after {
     </div>
     <button class="session-stop" onclick="stopSession()">■ TERMINER</button>
   </div>
+
+  <button onclick="startSession()" style="width:100%;padding:14px;margin-bottom:16px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;font-weight:900;font-size:15px;letter-spacing:2px;border:none;border-radius:var(--radius);cursor:pointer;">⏱️ DÉMARRER UNE SESSION</button>
 
   <div class="workout-types">
     <div class="wtype-btn run-btn active" onclick="selectWType('run',this)" id="wtype-run">
@@ -1584,6 +1672,28 @@ body::after {
     <div class="card-title"><span>🏆</span> RECORDS PERSONNELS</div>
     <div id="records-list"></div>
   </div>
+
+  <!-- SUIVI POIDS -->
+  <div class="card">
+    <div class="card-title"><span>⚖️</span> SUIVI DU POIDS</div>
+    <div class="form-row" style="margin-bottom:10px">
+      <div class="form-group">
+        <label class="form-label">POIDS (KG)</label>
+        <input class="form-input" type="number" id="weight-input" placeholder="70.5" step="0.1" min="30" max="300">
+      </div>
+      <div style="display:flex;align-items:flex-end;padding-bottom:2px">
+        <button class="submit-btn run-color" style="padding:10px 16px;margin:0" onclick="logWeight()">+ AJOUTER</button>
+      </div>
+    </div>
+    <div id="weight-log-list"><div style="color:var(--text2);font-size:12px;text-align:center;padding:12px">Aucune mesure encore.</div></div>
+  </div>
+
+  <!-- HISTORIQUE PAR EXERCICE -->
+  <div class="card">
+    <div class="card-title"><span>📈</span> HISTORIQUE PAR EXERCICE</div>
+    <div class="exo-history-filter" id="exo-filter-row"></div>
+    <div id="exo-history-list"><div style="color:var(--text2);font-size:12px;text-align:center;padding:12px">Commence à t'entraîner pour voir ta progression.</div></div>
+  </div>
 </section>
 
 <!-- ======== PROFIL ======== -->
@@ -1604,6 +1714,36 @@ body::after {
     <button class="submit-btn run-color" onclick="saveProfile()" style="margin-top:8px">💾 SAUVEGARDER</button>
   </div>
 
+  <!-- SHOP -->
+  <div class="card">
+    <div class="card-title"><span>🛒</span> BOUTIQUE COSMÉTIQUE</div>
+    <div class="shop-xp-display">💰 XP Boutique : <span id="shop-xp-display">0</span></div>
+    <div class="shop-grid" id="shop-grid"></div>
+  </div>
+
+  <!-- PROGRAMMES -->
+  <div class="card">
+    <div class="card-title"><span>📋</span> PROGRAMMES D'ENTRAÎNEMENT</div>
+    <div id="programs-list"></div>
+  </div>
+
+  <!-- MINUTEUR REPOS -->
+  <div class="card">
+    <div class="card-title"><span>⏸️</span> MINUTEUR DE REPOS</div>
+    <div class="rest-timer-display" id="rest-timer-display">1:30</div>
+    <div class="rest-btn-row" style="margin-bottom:12px">
+      <button class="rest-preset-btn" onclick="setRestTimer(30)">30s</button>
+      <button class="rest-preset-btn" onclick="setRestTimer(60)">1min</button>
+      <button class="rest-preset-btn" onclick="setRestTimer(90)">1:30</button>
+      <button class="rest-preset-btn" onclick="setRestTimer(120)">2min</button>
+      <button class="rest-preset-btn" onclick="setRestTimer(180)">3min</button>
+    </div>
+    <div class="rest-btn-row">
+      <button class="submit-btn run-color" style="flex:1;margin:0" onclick="startRestTimer()">▶ DÉMARRER</button>
+      <button class="submit-btn" style="flex:1;margin:0;background:var(--bg3);color:var(--text)" onclick="resetRestTimer()">■ RESET</button>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-title"><span>🏅</span> SUCCÈS DÉBLOQUÉS</div>
     <div class="achievements-grid" id="achievements-grid"></div>
@@ -1611,6 +1751,12 @@ body::after {
 
   <div class="card" style="margin-top:14px">
     <div class="card-title"><span style="color:var(--red)">⚠️</span> DANGER ZONE</div>
+    <button class="submit-btn" style="background:var(--accent);color:#000;margin-top:0;margin-bottom:8px" onclick="requestNotificationPermission()">🔔 ACTIVER LES RAPPELS</button>
+    <button class="submit-btn" style="background:var(--accent4);color:#000;margin-top:0;margin-bottom:8px" onclick="exportData()">📥 EXPORTER MES DONNÉES</button>
+    <label class="submit-btn" style="background:var(--accent3);color:#000;margin-top:0;margin-bottom:8px;display:block;text-align:center;cursor:pointer">
+      📤 IMPORTER MES DONNÉES
+      <input type="file" accept=".json" style="display:none" onchange="importData(event)">
+    </label>
     <button class="submit-btn" style="background:var(--red);color:#fff;margin-top:0" onclick="confirmReset()">🗑️ REMETTRE À ZÉRO</button>
   </div>
 </section>
@@ -1664,16 +1810,21 @@ body::after {
 // ============================================================
 
 const LEVELS = [
-  {name:'Novice',    xp:0,    emoji:'🧗', class:'warrior', desc:'Le voyage commence ici.'},
-  {name:'Apprenti', xp:100,  emoji:'🥊', class:'warrior', desc:'Tu commences à trouver ton rythme.'},
-  {name:'Athlète',  xp:250,  emoji:'🏅', class:'warrior', desc:'Tes efforts portent leurs fruits.'},
-  {name:'Guerrier', xp:500,  emoji:'⚔️',  class:'warrior', desc:'Tu es un combattant confirmé.'},
-  {name:'Champion', xp:900,  emoji:'🏆', class:'warrior', desc:'Peu peuvent te suivre.'},
-  {name:'Titan',    xp:1400, emoji:'💪', class:'lifter',  desc:'Ta force est légendaire.'},
-  {name:'Faucon',   xp:2000, emoji:'🦅', class:'runner',  desc:'Tu cours comme le vent.'},
-  {name:'Légende',  xp:2800, emoji:'⚡', class:'warrior', desc:'Une force de la nature.'},
-  {name:'Demi-Dieu',xp:3800, emoji:'🌟', class:'warrior', desc:'Au-delà du commun des mortels.'},
-  {name:'Immortel', xp:5000, emoji:'🔱', class:'warrior', desc:'Inébranlable. Indépassable.'},
+  {name:'Novice',      xp:0,     emoji:'🧗',  class:'warrior',     desc:'Le voyage commence ici.'},
+  {name:'Apprenti',   xp:100,   emoji:'🥊',  class:'warrior',     desc:'Tu commences à trouver ton rythme.'},
+  {name:'Athlète',    xp:250,   emoji:'🏅',  class:'warrior',     desc:'Tes efforts portent leurs fruits.'},
+  {name:'Guerrier',   xp:500,   emoji:'⚔️',   class:'warrior',     desc:'Tu es un combattant confirmé.'},
+  {name:'Champion',   xp:900,   emoji:'🏆',  class:'warrior',     desc:'Peu peuvent te suivre.'},
+  {name:'Titan',      xp:1400,  emoji:'💪',  class:'powerlifter', desc:'Ta force est légendaire.'},
+  {name:'Powerlifter',xp:1900,  emoji:'🏋️',  class:'powerlifter', desc:'Tu soulèves ce que les autres regardent.'},
+  {name:'Faucon',     xp:2500,  emoji:'🦅',  class:'runner',      desc:'Tu cours comme le vent.'},
+  {name:'Marathon',   xp:3200,  emoji:'🏃',  class:'runner',      desc:'Tu enchaînes les km sans effort.'},
+  {name:'Hybride',    xp:4000,  emoji:'🌀',  class:'hybrid',      desc:'Force et endurance réunies.'},
+  {name:'Légende',    xp:5000,  emoji:'⚡',  class:'warrior',     desc:'Une force de la nature.'},
+  {name:'Demi-Dieu',  xp:6500,  emoji:'🌟',  class:'warrior',     desc:'Au-delà du commun des mortels.'},
+  {name:'Immortel',   xp:8500,  emoji:'🔱',  class:'warrior',     desc:'Inébranlable. Indépassable.'},
+  {name:'OVNI',       xp:11000, emoji:'👾',  class:'hybrid',      desc:'Hors-catégorie. Hors-norme.'},
+  {name:'Transcendé', xp:15000, emoji:'🌈',  class:'hybrid',      desc:'Tu as dépassé tes propres limites.'},
 ];
 
 const QUESTS_DATA = [
@@ -1735,9 +1886,63 @@ const DAILY_QUESTS = [
   {name:'Tractions ou dips x5 séries', icon:'🤸', xp:75, reward:'75 XP'},
 ];
 
-// ============================================================
-// STATE
-// ============================================================
+const WEEKLY_CHALLENGES = [
+  {id:'wc0', name:'Semaine Cardio', icon:'🏃', desc:'Cours 15 km cette semaine', type:'run', target:15, unit:'km', xp:300},
+  {id:'wc1', name:'Semaine Fer', icon:'🏋️', desc:'Fais 5 séances muscu cette semaine', type:'lift_sessions_week', target:5, unit:'séances', xp:350},
+  {id:'wc2', name:'Semaine Hybride', icon:'🌀', desc:'Cours 8 km ET fais 3 séances muscu', type:'hybrid_week', target:1, unit:'combo', xp:400},
+  {id:'wc3', name:'Semaine Endurance', icon:'🗺️', desc:'Cours 25 km cette semaine', type:'run', target:25, unit:'km', xp:500},
+  {id:'wc4', name:'Semaine Force', icon:'💪', desc:'10 séries de squats cette semaine', type:'squat_week', target:10, unit:'séries', xp:300},
+  {id:'wc5', name:'Semaine Régularité', icon:'🔥', desc:'Entraîne-toi 6 jours cette semaine', type:'days_week', target:6, unit:'jours', xp:450},
+  {id:'wc6', name:'Full Body Week', icon:'⚡', desc:'3 séances full body cette semaine', type:'lift_sessions_week', target:3, unit:'séances', xp:280},
+];
+
+const BOSS_DATA = [
+  {id:'b0', name:'Le Fantôme du Canapé', icon:'👻', desc:'3 entraînements cette semaine pour le vaincre', hp:300, xpReward:500, type:'total_week', target:3},
+  {id:'b1', name:'Baron Fatigue', icon:'🧟', desc:'Cours 10 km cette semaine', hp:400, xpReward:600, type:'run_week', target:10},
+  {id:'b2', name:'Seigneur Flemme', icon:'😴', desc:'5 séances de sport cette semaine', hp:500, xpReward:700, type:'total_week', target:5},
+  {id:'b3', name:'Titan de Fer', icon:'🤖', desc:'Fais 8 séances muscu cette semaine', hp:600, xpReward:900, type:'lift_week', target:8},
+  {id:'b4', name:'ULTRABOSS', icon:'💀', desc:'10 entraînements cette semaine', hp:999, xpReward:1500, type:'total_week', target:10},
+];
+
+const SHOP_ITEMS = [
+  {id:'avatar_fire', name:'Avatar Flamme', icon:'🔥', price:200, type:'avatar', desc:'Avatar enflammé'},
+  {id:'avatar_ice', name:'Avatar Glace', icon:'❄️', price:200, type:'avatar', desc:'Avatar glacial'},
+  {id:'avatar_thunder', name:'Avatar Foudre', icon:'⚡', price:300, type:'avatar', desc:'Avatar électrique'},
+  {id:'avatar_dragon', name:'Avatar Dragon', icon:'🐉', price:500, type:'avatar', desc:'Avatar légendaire'},
+  {id:'avatar_robot', name:'Avatar Robot', icon:'🤖', price:400, type:'avatar', desc:'Avatar futuriste'},
+  {id:'avatar_ninja', name:'Avatar Ninja', icon:'🥷', price:350, type:'avatar', desc:'Avatar furtif'},
+  {id:'title_beast', name:'Titre : BEAST', icon:'👹', price:300, type:'title', desc:'Pour les vrais'},
+  {id:'title_ghost', name:'Titre : Ghost', icon:'👻', price:250, type:'title', desc:'Invisible mais présent'},
+  {id:'title_elite', name:'Titre : ÉLITE', icon:'💎', price:500, type:'title', desc:'Le sommet'},
+  {id:'title_machine', name:'Titre : Machine', icon:'⚙️', price:400, type:'title', desc:'Implacable'},
+];
+
+const PROGRAMS = [
+  {
+    id:'ppl', name:'PPL — Push Pull Legs', icon:'🏋️', weeks:6, desc:'Programme 3 jours/semaine. Développe force et volume.',
+    days:[
+      {name:'PUSH 💪', exercises:['Développé couché 4×8','Développé militaire 3×10','Écarté haltères 3×12','Triceps poulie 3×15','Lateral raises 3×15']},
+      {name:'PULL 🔙', exercises:['Tractions 4×8','Rowing barre 4×8','Tirage poulie haute 3×10','Curl biceps 3×12','Face pulls 3×15']},
+      {name:'LEGS 🦵', exercises:['Squat 4×8','Leg press 3×10','Fentes 3×12','Soulevé de terre 3×8','Mollets 4×15']},
+    ]
+  },
+  {
+    id:'fullbody', name:'Full Body 3×/semaine', icon:'🌀', weeks:4, desc:'Idéal débutant. Corps entier à chaque séance.',
+    days:[
+      {name:'JOUR A 🅰️', exercises:['Squat 3×10','Développé couché 3×10','Tractions 3×8','Rowing haltère 3×10','Gainage 3×30s']},
+      {name:'JOUR B 🅱️', exercises:['Soulevé de terre 3×8','Développé militaire 3×10','Leg press 3×12','Curl biceps 3×12','Triceps 3×12']},
+    ]
+  },
+  {
+    id:'runner', name:'Plan Course 5km→10km', icon:'🏃', weeks:8, desc:'Progression graduelle pour doubler ta distance.',
+    days:[
+      {name:'ENDURANCE 🐢', exercises:['Footing lent 20-30min','Zone 2 — conversation possible','Récupération active']},
+      {name:'INTERVALLES ⚡', exercises:['Échauffement 5min','4×400m rapide, récup 90s','Retour au calme 5min']},
+      {name:'LONGUE SORTIE 🗺️', exercises:['Course longue +10% chaque semaine','Allure confortable','Hydratation obligatoire']},
+    ]
+  },
+];
+
 
 function loadState() {
   const defaults = {
@@ -1771,6 +1976,23 @@ function loadState() {
     dailyQuestDate: null,
     dailyQuestDone: false,
     records: { longestRun: 0, fastestPace: 0, heaviestLift: 0 },
+    // NOUVELLES FONCTIONNALITÉS
+    weightLog: [],
+    shopOwned: [],
+    activeAvatar: null,
+    shopXP: 0,
+    weeklyBossWeek: -1,
+    weeklyBossDefeated: false,
+    weeklyBossProgress: 0,
+    weeklyChallengeDone: false,
+    weeklyChallengeWeek: -1,
+    weeklyKmThisWeek: 0,
+    weeklyLiftsThisWeek: 0,
+    weeklyDaysThisWeek: 0,
+    weeklySquatsThisWeek: 0,
+    lastWeekReset: null,
+    activeProgram: null,
+    programDay: 0,
   };
   try {
     const saved = localStorage.getItem('fq_state');
@@ -2124,7 +2346,13 @@ function logRun() {
   // streak
   updateStreak();
 
-  const details = dist+'km' + (time ? ' · '+time+'min' : '') + ' · '+type;
+  // weekly tracking
+  checkWeeklyReset();
+  state.weeklyKmThisWeek = (state.weeklyKmThisWeek || 0) + dist;
+  state.weeklyDaysThisWeek = (state.weeklyDaysThisWeek || 0) + 1;
+  state.shopXP = (state.shopXP || 0) + Math.round(xp * 0.5);
+  updateBossProgress(state.weeklyDaysThisWeek, state.weeklyKmThisWeek, state.weeklyLiftsThisWeek || 0);
+  updateWeeklyChallenge(); + (time ? ' · '+time+'min' : '') + ' · '+type;
   state.workouts.push({
     type: 'run',
     name: 'Course ' + type,
@@ -2177,7 +2405,14 @@ function logLift() {
 
   updateStreak();
 
-  const details = sets+'×'+reps+(weight?' · '+weight+'kg':'');
+  // weekly tracking
+  checkWeeklyReset();
+  state.weeklyLiftsThisWeek = (state.weeklyLiftsThisWeek || 0) + 1;
+  state.weeklyDaysThisWeek = (state.weeklyDaysThisWeek || 0) + 1;
+  if(exoLow.includes('squat')) state.weeklySquatsThisWeek = (state.weeklySquatsThisWeek || 0) + sets;
+  state.shopXP = (state.shopXP || 0) + Math.round(xp * 0.5);
+  updateBossProgress(state.weeklyDaysThisWeek, state.weeklyKmThisWeek || 0, state.weeklyLiftsThisWeek);
+  updateWeeklyChallenge();
   state.workouts.push({
     type: 'lift',
     name: exo,
@@ -2449,17 +2684,112 @@ function showXPFloat(text) {
 let sessionStart = null;
 let sessionTimer = null;
 
+function startSession() {
+  if(sessionTimer) {
+    showToast('info', '⏱️ Une session est déjà en cours !');
+    return;
+  }
+  sessionStart = Date.now();
+  document.getElementById('active-session-banner').style.display = 'flex';
+  document.getElementById('session-timer').textContent = '00:00';
+  sessionTimer = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
+    const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+    const s = String(elapsed % 60).padStart(2, '0');
+    document.getElementById('session-timer').textContent = m + ':' + s;
+  }, 1000);
+  showToast('success', '⏱️ Session démarrée !');
+}
+
 function stopSession() {
+  if(!sessionTimer) return;
+  const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
+  const m = Math.floor(elapsed / 60);
   clearInterval(sessionTimer);
   sessionTimer = null;
   sessionStart = null;
   document.getElementById('active-session-banner').style.display = 'none';
-  showToast('success', '✅ Session terminée !');
+  showToast('success', '✅ Session terminée ! Durée : ' + m + ' min');
 }
 
 // ============================================================
-// RESET
+// NOTIFICATIONS
 // ============================================================
+function requestNotificationPermission() {
+  if(!('Notification' in window)) {
+    showToast('info', '⚠️ Notifications non supportées sur cet appareil');
+    return;
+  }
+  Notification.requestPermission().then(permission => {
+    if(permission === 'granted') {
+      showToast('success', '🔔 Notifications activées !');
+      scheduleReminderNotification();
+      localStorage.setItem('fq_notif', 'true');
+    } else {
+      showToast('info', '🔕 Notifications refusées');
+    }
+  });
+}
+
+function scheduleReminderNotification() {
+  if(Notification.permission !== 'granted') return;
+  // Notify every day at 18h if no workout logged today
+  const now = new Date();
+  const todayKey = now.toLocaleDateString('fr-FR');
+  const lastWorkout = state.workouts.length > 0 ? state.workouts[state.workouts.length-1].date : null;
+  if(lastWorkout !== todayKey) {
+    // Show reminder after 3 seconds (demo) — in real use would be a service worker
+    setTimeout(() => {
+      if(Notification.permission === 'granted') {
+        new Notification('💪 FitQuest', {
+          body: 'Tu n\'as pas encore fait de sport aujourd\'hui. Lance une quête !',
+          icon: '/FITQUEST/icon-192.png'
+        });
+      }
+    }, 3000);
+  }
+}
+
+// ============================================================
+// EXPORT / IMPORT
+// ============================================================
+function exportData() {
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toLocaleDateString('fr-FR').replace(/\//g, '-');
+  a.href = url;
+  a.download = 'fitquest-sauvegarde-' + date + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('success', '📥 Données exportées !');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if(typeof imported !== 'object' || !imported.xp === undefined) {
+        showToast('info', '⚠️ Fichier invalide');
+        return;
+      }
+      if(confirm('⚠️ Tes données actuelles seront remplacées. Continuer ?')) {
+        localStorage.setItem('fq_state', JSON.stringify(imported));
+        showToast('success', '✅ Données importées ! Rechargement...');
+        setTimeout(() => location.reload(), 1500);
+      }
+    } catch(err) {
+      showToast('info', '⚠️ Fichier corrompu ou invalide');
+    }
+  };
+  reader.readAsText(file);
+}
+
+
 function confirmReset() {
   if(confirm('⚠️ Es-tu sûr ? Toutes tes données seront effacées.')) {
     localStorage.removeItem('fq_state');
@@ -2468,13 +2798,339 @@ function confirmReset() {
 }
 
 // ============================================================
-// INIT
+// WEEKLY RESET
 // ============================================================
+function getWeekNumber() {
+  const d = new Date();
+  const onejan = new Date(d.getFullYear(), 0, 1);
+  return Math.ceil(((d - onejan) / 86400000 + onejan.getDay() + 1) / 7);
+}
+
+function checkWeeklyReset() {
+  const currentWeek = getWeekNumber();
+  if(state.lastWeekReset !== currentWeek) {
+    state.weeklyKmThisWeek = 0;
+    state.weeklyLiftsThisWeek = 0;
+    state.weeklyDaysThisWeek = 0;
+    state.weeklySquatsThisWeek = 0;
+    state.weeklyBossDefeated = false;
+    state.weeklyBossProgress = 0;
+    state.weeklyChallengeDone = false;
+    state.weeklyBossWeek = currentWeek;
+    state.weeklyChallengeWeek = currentWeek;
+    state.lastWeekReset = currentWeek;
+    saveState();
+  }
+}
+
+// ============================================================
+// BOSS HEBDO
+// ============================================================
+function getBoss() {
+  const w = getWeekNumber();
+  return BOSS_DATA[w % BOSS_DATA.length];
+}
+
+function renderBoss() {
+  checkWeeklyReset();
+  const boss = getBoss();
+  document.getElementById('boss-icon').textContent = boss.icon;
+  document.getElementById('boss-name').textContent = boss.name;
+  document.getElementById('boss-desc').textContent = boss.desc;
+  document.getElementById('boss-xp-badge').textContent = '+' + boss.xpReward + ' XP';
+
+  const prog = state.weeklyBossProgress;
+  const pct = Math.min(100, Math.round(prog / boss.target * 100));
+  document.getElementById('boss-hp-fill').style.width = pct + '%';
+  document.getElementById('boss-progress-text').textContent = prog + ' / ' + boss.target;
+
+  if(state.weeklyBossDefeated) {
+    document.getElementById('boss-defeated-msg').style.display = 'block';
+    document.getElementById('boss-hp-fill').style.background = 'var(--accent4)';
+  }
+}
+
+function updateBossProgress(sessions, kmRun, lifts) {
+  if(state.weeklyBossDefeated) return;
+  const boss = getBoss();
+  let prog = 0;
+  if(boss.type === 'total_week') prog = sessions;
+  else if(boss.type === 'run_week') prog = kmRun;
+  else if(boss.type === 'lift_week') prog = lifts;
+  state.weeklyBossProgress = prog;
+  if(prog >= boss.target && !state.weeklyBossDefeated) {
+    state.weeklyBossDefeated = true;
+    addXP(boss.xpReward, '👹 Boss vaincu !');
+    saveState();
+    setTimeout(() => showToast('success', '👹 BOSS VAINCU ! +'+ boss.xpReward +' XP !'), 800);
+  }
+  saveState();
+  renderBoss();
+}
+
+// ============================================================
+// DÉFI HEBDO
+// ============================================================
+function getWeeklyChallenge() {
+  const w = getWeekNumber();
+  return WEEKLY_CHALLENGES[w % WEEKLY_CHALLENGES.length];
+}
+
+function renderWeeklyChallenge() {
+  const wc = getWeeklyChallenge();
+  document.getElementById('wc-name').textContent = wc.icon + ' ' + wc.name;
+  document.getElementById('wc-desc').textContent = wc.desc;
+  document.getElementById('wc-xp-text').textContent = '+' + wc.xp + ' XP';
+
+  let prog = 0;
+  if(wc.type === 'run') prog = state.weeklyKmThisWeek;
+  else if(wc.type === 'lift_sessions_week') prog = state.weeklyLiftsThisWeek;
+  else if(wc.type === 'days_week') prog = state.weeklyDaysThisWeek;
+  else if(wc.type === 'squat_week') prog = state.weeklySquatsThisWeek;
+  else if(wc.type === 'hybrid_week') prog = (state.weeklyKmThisWeek >= 8 && state.weeklyLiftsThisWeek >= 3) ? 1 : 0;
+
+  const pct = Math.min(100, Math.round(prog / wc.target * 100));
+  document.getElementById('wc-prog-fill').style.width = pct + '%';
+  document.getElementById('wc-prog-text').textContent = prog + ' / ' + wc.target;
+
+  if(state.weeklyChallengeDone) {
+    document.getElementById('wc-done-msg').style.display = 'block';
+  }
+}
+
+function updateWeeklyChallenge() {
+  if(state.weeklyChallengeDone) return;
+  const wc = getWeeklyChallenge();
+  let prog = 0;
+  if(wc.type === 'run') prog = state.weeklyKmThisWeek;
+  else if(wc.type === 'lift_sessions_week') prog = state.weeklyLiftsThisWeek;
+  else if(wc.type === 'days_week') prog = state.weeklyDaysThisWeek;
+  else if(wc.type === 'squat_week') prog = state.weeklySquatsThisWeek;
+  else if(wc.type === 'hybrid_week') prog = (state.weeklyKmThisWeek >= 8 && state.weeklyLiftsThisWeek >= 3) ? 1 : 0;
+
+  if(prog >= wc.target && !state.weeklyChallengeDone) {
+    state.weeklyChallengeDone = true;
+    addXP(wc.xp, '⚡ Défi hebdo accompli !');
+    saveState();
+    setTimeout(() => showToast('success', '⚡ DÉFI HEBDO ACCOMPLI ! +' + wc.xp + ' XP !'), 1000);
+  }
+  renderWeeklyChallenge();
+}
+
+// ============================================================
+// SUIVI POIDS
+// ============================================================
+function logWeight() {
+  const val = parseFloat(document.getElementById('weight-input').value);
+  if(!val || val < 30 || val > 300) { showToast('info', '⚠️ Poids invalide'); return; }
+  state.weightLog.push({ date: new Date().toLocaleDateString('fr-FR'), weight: val });
+  saveState();
+  document.getElementById('weight-input').value = '';
+  renderWeightLog();
+  showToast('success', '⚖️ Poids enregistré : ' + val + ' kg');
+}
+
+function renderWeightLog() {
+  const el = document.getElementById('weight-log-list');
+  if(!el) return;
+  if(state.weightLog.length === 0) {
+    el.innerHTML = '<div style="color:var(--text2);font-size:12px;text-align:center;padding:12px">Aucune mesure encore.</div>';
+    return;
+  }
+  const recent = [...state.weightLog].reverse().slice(0, 10);
+  el.innerHTML = recent.map((w, i) => {
+    const prev = recent[i + 1];
+    let diff = '';
+    if(prev) {
+      const d = (w.weight - prev.weight).toFixed(1);
+      diff = d > 0 ? `<span class="weight-diff-up">▲ +${d}kg</span>` : `<span class="weight-diff-down">▼ ${d}kg</span>`;
+    }
+    return `<div class="weight-log-item">
+      <div><div class="weight-val">${w.weight} kg</div><div class="weight-date">${w.date}</div></div>
+      ${diff}
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// HISTORIQUE PAR EXERCICE
+// ============================================================
+function renderExoHistory(filter) {
+  const el = document.getElementById('exo-history-list');
+  if(!el) return;
+  const lifts = state.workouts.filter(w => w.type === 'lift');
+  if(lifts.length === 0) { el.innerHTML = '<div style="color:var(--text2);font-size:12px;text-align:center;padding:12px">Commence à t\'entraîner.</div>'; return; }
+  const exercises = [...new Set(lifts.map(w => w.name))];
+
+  // Render filter buttons
+  const filterRow = document.getElementById('exo-filter-row');
+  if(filterRow) {
+    const active = filter || exercises[0];
+    filterRow.innerHTML = exercises.map(e => `<button class="exo-filter-btn ${e===active?'active':''}" onclick="renderExoHistory('${e}')">${e}</button>`).join('');
+  }
+
+  const selected = filter || exercises[0];
+  const history = lifts.filter(w => w.name === selected).reverse().slice(0, 10);
+  el.innerHTML = history.map(w => `
+    <div class="weight-log-item">
+      <div><div style="font-weight:700;font-size:13px">${w.details}</div><div class="weight-date">${w.date}</div></div>
+      <span style="color:var(--xp-color);font-size:12px">+${w.xp} XP</span>
+    </div>`).join('');
+}
+
+// ============================================================
+// SHOP
+// ============================================================
+function renderShop() {
+  const el = document.getElementById('shop-grid');
+  const xpEl = document.getElementById('shop-xp-display');
+  if(!el) return;
+  if(xpEl) xpEl.textContent = state.shopXP || 0;
+  el.innerHTML = SHOP_ITEMS.map(item => {
+    const owned = state.shopOwned && state.shopOwned.includes(item.id);
+    const isActive = (item.type === 'avatar' && state.activeAvatar === item.id) ||
+                     (item.type === 'title' && state.activeTitle === item.id);
+    return `<div class="shop-item ${owned?'owned':''} ${isActive?'active-item':''}" onclick="buyShopItem('${item.id}')">
+      <div class="shop-item-icon">${item.icon}</div>
+      <div class="shop-item-name">${item.name}</div>
+      <div class="shop-item-price">${owned ? (isActive ? '✅ ACTIF' : '✓ ÉQUIPER') : '💰 ' + item.price + ' XP'}</div>
+    </div>`;
+  }).join('');
+}
+
+function buyShopItem(id) {
+  const item = SHOP_ITEMS.find(i => i.id === id);
+  if(!item) return;
+  if(!state.shopOwned) state.shopOwned = [];
+  if(state.shopOwned.includes(id)) {
+    // Equip
+    if(item.type === 'avatar') { state.activeAvatar = id; document.getElementById('p-avatar').textContent = item.icon; document.getElementById('h-avatar').textContent = item.icon; }
+    if(item.type === 'title') { state.activeTitle = id; if(!state.unlockedTitles.includes(id)) state.unlockedTitles.push(id); }
+    saveState(); renderShop(); showToast('success', '✅ ' + item.name + ' équipé !');
+    return;
+  }
+  if((state.shopXP || 0) < item.price) { showToast('info', '💰 Pas assez de XP Boutique ! Tu en gagnes en t\'entraînant.'); return; }
+  state.shopXP -= item.price;
+  state.shopOwned.push(id);
+  saveState(); renderShop();
+  showToast('success', '🎉 ' + item.name + ' débloqué ! Clique à nouveau pour l\'équiper.');
+}
+
+// ============================================================
+// PROGRAMMES
+// ============================================================
+function renderPrograms() {
+  const el = document.getElementById('programs-list');
+  if(!el) return;
+  el.innerHTML = PROGRAMS.map(p => {
+    const isActive = state.activeProgram === p.id;
+    const dayIdx = isActive ? (state.programDay % p.days.length) : 0;
+    const today = p.days[dayIdx];
+    return `<div class="prog-card ${isActive ? 'active-prog' : ''}" onclick="selectProgram('${p.id}')">
+      <div class="prog-header"><div class="prog-icon">${p.icon}</div><div><div class="prog-name">${p.name}</div><div class="prog-weeks">📅 ${p.weeks} semaines</div></div></div>
+      <div class="prog-desc">${p.desc}</div>
+      ${isActive ? `<div style="font-size:11px;color:var(--accent);margin-bottom:6px">▶ PROGRAMME ACTIF — Jour ${(state.programDay % p.days.length)+1}/${p.days.length}</div>
+      <div class="prog-day-card">
+        <div class="prog-day-title">${today.name}</div>
+        ${today.exercises.map(e => `<div class="prog-exercise">• ${e}</div>`).join('')}
+      </div>
+      <button class="submit-btn run-color" style="margin-top:10px;padding:10px" onclick="nextProgramDay(event)">✅ JOUR TERMINÉ → SUIVANT</button>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function selectProgram(id) {
+  if(state.activeProgram === id) return;
+  state.activeProgram = id;
+  state.programDay = 0;
+  saveState();
+  renderPrograms();
+  showToast('success', '📋 Programme activé !');
+}
+
+function nextProgramDay(e) {
+  e.stopPropagation();
+  state.programDay++;
+  saveState();
+  renderPrograms();
+  addXP(50, '📋 Jour de programme complété');
+  showToast('success', '💪 Jour suivant débloqué ! +50 XP');
+}
+
+// ============================================================
+// MINUTEUR DE REPOS
+// ============================================================
+let restSeconds = 90;
+let restCountdown = null;
+let restRemaining = 90;
+
+function setRestTimer(s) {
+  resetRestTimer();
+  restSeconds = s;
+  restRemaining = s;
+  updateRestDisplay();
+}
+
+function updateRestDisplay() {
+  const m = Math.floor(restRemaining / 60);
+  const s = restRemaining % 60;
+  const el = document.getElementById('rest-timer-display');
+  if(el) el.textContent = m + ':' + String(s).padStart(2, '0');
+}
+
+function startRestTimer() {
+  if(restCountdown) return;
+  restCountdown = setInterval(() => {
+    restRemaining--;
+    updateRestDisplay();
+    if(restRemaining <= 0) {
+      clearInterval(restCountdown);
+      restCountdown = null;
+      restRemaining = restSeconds;
+      updateRestDisplay();
+      showToast('success', '✅ Repos terminé ! C\'est reparti !');
+      if(Notification.permission === 'granted') {
+        new Notification('💪 FitQuest', { body: 'Repos terminé — à toi de jouer !' });
+      }
+    }
+  }, 1000);
+}
+
+function resetRestTimer() {
+  clearInterval(restCountdown);
+  restCountdown = null;
+  restRemaining = restSeconds;
+  updateRestDisplay();
+}
+
+
 function init() {
+  checkWeeklyReset();
   updateHeader();
   renderDashboard();
   renderWorkoutHistory();
   checkQuestProgress();
+  renderBoss();
+  renderWeeklyChallenge();
+  renderWeightLog();
+  renderExoHistory();
+  renderShop();
+  renderPrograms();
+
+  // Auto-schedule reminder if already granted
+  if(localStorage.getItem('fq_notif') === 'true' && Notification.permission === 'granted') {
+    scheduleReminderNotification();
+  }
+
+  // On stats page focus, refresh
+  document.querySelectorAll('.nav-btn')[3].addEventListener('click', () => {
+    setTimeout(() => { renderWeightLog(); renderExoHistory(); }, 50);
+  });
+
+  // On profile page focus, refresh shop & programs
+  document.querySelectorAll('.nav-btn')[4].addEventListener('click', () => {
+    setTimeout(() => { renderShop(); renderPrograms(); }, 50);
+  });
 
   // On workout page focus, refresh history
   document.querySelectorAll('.nav-btn')[2].addEventListener('click', () => {
