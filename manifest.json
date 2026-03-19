@@ -1,19 +1,20 @@
 {
-  "name": "Mon Application",
+  "name": "FITQUEST",
   "short_name": "FITQUEST",
+  "description": "App de sport en jeu",
   "start_url": "https://t-over.github.io/FITQUEST/",
   "scope": "https://t-over.github.io/FITQUEST/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "background_color": "#06060c",
+  "theme_color": "#00f5ff",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192",
+      "src": "https://raw.githubusercontent.com/T-over/FITQUEST/main/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://via.placeholder.com/512",
+      "src": "https://raw.githubusercontent.com/T-over/FITQUEST/main/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
