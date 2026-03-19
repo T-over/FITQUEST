@@ -1,7 +1,8 @@
 {
   "name": "Mon Application",
-  "short_name": "MonApp",
-  "start_url": "/mon-app/",
+  "short_name": "FITQUEST",
+  "start_url": "https://t-over.github.io/FITQUEST/",
+  "scope": "https://t-over.github.io/FITQUEST/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
