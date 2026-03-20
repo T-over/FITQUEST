@@ -1988,55 +1988,53 @@ body::after {
 </main>
 
 <!-- MODAL CAMÉRA IA POMPES -->
-<div id="pose-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:#000;flex-direction:column">
-  <div style="padding:16px;display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.8)">
+<div id="pose-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:#000;flex-direction:column;overflow:hidden">
+  <div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.9);flex-shrink:0">
     <div>
-      <div style="font-family:'Exo 2',sans-serif;font-weight:900;font-size:16px;color:var(--accent)">📷 ANALYSE IA — POMPES</div>
-      <div style="font-size:11px;color:var(--text2)">Positionne-toi de profil face à la caméra</div>
+      <div style="font-family:'Exo 2',sans-serif;font-weight:900;font-size:15px;color:var(--accent)">📷 ANALYSE IA — POMPES</div>
+      <div style="font-size:10px;color:var(--text2)">Positionne-toi de profil face à la caméra</div>
     </div>
     <button onclick="closePoseCamera()" style="background:var(--red);border:none;color:#fff;padding:8px 14px;border-radius:var(--radius);font-weight:700;cursor:pointer">✕ QUITTER</button>
   </div>
 
   <!-- VIDEO + CANVAS -->
-  <div style="position:relative;flex:1;overflow:hidden;display:flex;align-items:center;justify-content:center">
+  <div style="position:relative;flex:1;overflow:hidden;min-height:0">
     <video id="pose-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;transform:scaleX(-1)"></video>
     <canvas id="pose-canvas" style="position:absolute;inset:0;width:100%;height:100%;transform:scaleX(-1)"></canvas>
 
     <!-- HUD overlay -->
-    <div style="position:absolute;top:12px;left:12px;right:12px">
-      <!-- Compteur reps -->
-      <div style="background:rgba(0,0,0,0.7);border:2px solid var(--accent);border-radius:12px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <div style="position:absolute;top:8px;left:8px;right:8px">
+      <div style="background:rgba(0,0,0,0.75);border:2px solid var(--accent);border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
         <div style="text-align:center">
-          <div style="font-size:48px;font-weight:900;font-family:'Exo 2',sans-serif;color:var(--accent)" id="pose-rep-count">0</div>
-          <div style="font-size:10px;color:var(--text2);letter-spacing:2px">RÉPÉTITIONS</div>
+          <div style="font-size:44px;font-weight:900;font-family:'Exo 2',sans-serif;color:var(--accent)" id="pose-rep-count">0</div>
+          <div style="font-size:9px;color:var(--text2);letter-spacing:2px">RÉPÉTITIONS</div>
         </div>
         <div style="text-align:center">
-          <div style="font-size:28px;font-weight:900;color:var(--accent3)" id="pose-form-score">--</div>
-          <div style="font-size:10px;color:var(--text2);letter-spacing:2px">FORME %</div>
+          <div style="font-size:26px;font-weight:900;color:var(--accent3)" id="pose-form-score">--</div>
+          <div style="font-size:9px;color:var(--text2);letter-spacing:2px">FORME %</div>
         </div>
         <div style="text-align:center">
-          <div style="font-size:22px" id="pose-phase-icon">⏳</div>
-          <div style="font-size:10px;color:var(--text2);letter-spacing:2px" id="pose-phase-text">PRÊT</div>
+          <div style="font-size:20px" id="pose-phase-icon">⏳</div>
+          <div style="font-size:9px;color:var(--text2);letter-spacing:2px" id="pose-phase-text">PRÊT</div>
         </div>
       </div>
-      <!-- Status bar -->
-      <div style="background:rgba(0,0,0,0.6);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;text-align:center" id="pose-status-msg">
+      <div style="background:rgba(0,0,0,0.7);border-radius:8px;padding:7px 10px;font-size:11px;font-weight:700;text-align:center" id="pose-status-msg">
         📍 Place-toi de côté et commence tes pompes
       </div>
     </div>
 
-    <!-- Feedback form en bas -->
-    <div style="position:absolute;bottom:80px;left:12px;right:12px">
-      <div id="pose-form-feedback" style="display:none;background:rgba(0,0,0,0.7);border-radius:8px;padding:10px">
-        <div id="pose-feedback-items" style="font-size:12px;line-height:2"></div>
+    <!-- Feedback form -->
+    <div style="position:absolute;bottom:8px;left:8px;right:8px">
+      <div id="pose-form-feedback" style="display:none;background:rgba(0,0,0,0.75);border-radius:8px;padding:8px">
+        <div id="pose-feedback-items" style="font-size:11px;line-height:2"></div>
       </div>
     </div>
   </div>
 
-  <!-- BOUTON VALIDER -->
-  <div style="padding:16px;background:rgba(0,0,0,0.8)">
+  <!-- BOUTON VALIDER — toujours visible en bas -->
+  <div style="padding:12px 16px;background:rgba(0,0,0,0.9);flex-shrink:0">
     <button id="pose-validate-btn" onclick="validatePoseSession()" disabled
-      style="width:100%;padding:16px;background:var(--bg3);border:2px solid var(--muted);color:var(--muted);font-weight:900;font-size:15px;letter-spacing:2px;border-radius:var(--radius);cursor:not-allowed">
+      style="width:100%;padding:14px;background:var(--bg3);border:2px solid var(--muted);color:var(--muted);font-weight:900;font-size:14px;letter-spacing:1px;border-radius:var(--radius);cursor:not-allowed">
       ⏳ FAIS AU MOINS 3 POMPES CORRECTES
     </button>
   </div>
@@ -4331,7 +4329,8 @@ async function runPoseLoop() {
 }
 
 function validatePoseSession() {
-  if(poseValidReps < 3) return;
+  const target = poseTargetReps > 0 ? poseTargetReps : 3;
+  if(poseValidReps < target) return;
 
   const avgForm = poseTotalFormScores.length > 0
     ? Math.round(poseTotalFormScores.reduce((a,b) => a+b, 0) / poseTotalFormScores.length)
@@ -4339,28 +4338,34 @@ function validatePoseSession() {
 
   poseSessionValidated = true;
 
-  // Mettre à jour le formulaire
+  // Mettre à jour le formulaire avec les vraies reps comptées
   document.getElementById('lift-reps').value = poseRepCount;
-  document.getElementById('lift-sets').value = document.getElementById('lift-sets').value || 1;
+  if(!document.getElementById('lift-sets').value) {
+    document.getElementById('lift-sets').value = 1;
+  }
 
   // Mettre à jour le status box
   const box = document.getElementById('camera-status-box');
   const text = document.getElementById('camera-status-text');
-  if(box) {
-    box.style.background = 'rgba(57,255,20,0.1)';
-    box.style.borderColor = 'rgba(57,255,20,0.4)';
-  }
-  if(text) {
-    text.style.color = 'var(--accent4)';
-    text.textContent = '✅ Validé : ' + poseRepCount + ' pompes • Forme moyenne : ' + avgForm + '%';
-  }
+  if(box) { box.style.background = 'rgba(57,255,20,0.1)'; box.style.borderColor = 'rgba(57,255,20,0.4)'; }
+  if(text) { text.style.color = 'var(--accent4)'; text.textContent = '✅ Validé : ' + poseRepCount + ' pompes • Forme : ' + avgForm + '%'; }
 
-  closePoseCamera();
-  showToast('success', '💪 ' + poseRepCount + ' pompes validées par IA ! Forme : ' + avgForm + '%');
+  // Fermer la caméra proprement (sans passer par closePoseCamera pour éviter boucle)
+  document.getElementById('pose-modal').style.display = 'none';
+  if(poseAnimFrame) { cancelAnimationFrame(poseAnimFrame); poseAnimFrame = null; }
+  if(poseStream) { poseStream.getTracks().forEach(t => t.stop()); poseStream = null; }
+
+  showToast('success', '💪 ' + poseRepCount + ' pompes validées ! Forme : ' + avgForm + '%');
   haptic('levelup');
 }
 
 function closePoseCamera() {
+  // Auto-valider si l'objectif était atteint
+  const target = poseTargetReps > 0 ? poseTargetReps : 3;
+  if(poseValidReps >= target && !poseSessionValidated) {
+    validatePoseSession();
+    return; // validatePoseSession appellera closePoseCamera à nouveau
+  }
   document.getElementById('pose-modal').style.display = 'none';
   if(poseAnimFrame) { cancelAnimationFrame(poseAnimFrame); poseAnimFrame = null; }
   if(poseStream) { poseStream.getTracks().forEach(t => t.stop()); poseStream = null; }
