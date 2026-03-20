@@ -1747,20 +1747,20 @@ body::after {
       <label class="form-label">EXERCICE</label>
       <select class="form-select form-input" id="lift-exo" onchange="updateExoIllustration()">
         <option>Pompes 📷</option>
-        <option>Développé couché</option>
-        <option>Squat</option>
-        <option>Soulevé de terre</option>
-        <option>Développé militaire</option>
+        <option>Développé couché 📷</option>
+        <option>Squat 📷</option>
+        <option>Soulevé de terre 📷</option>
+        <option>Développé militaire 📷</option>
         <option>Tractions 📷</option>
-        <option>Dips</option>
-        <option>Curl biceps</option>
-        <option>Triceps poulie</option>
-        <option>Leg press</option>
-        <option>Rowing barre</option>
-        <option>Tirage poulie haute</option>
-        <option>Extensions lombaires</option>
-        <option>Crunchs</option>
-        <option>Gainage</option>
+        <option>Dips 📷</option>
+        <option>Curl biceps 📷</option>
+        <option>Triceps poulie 📷</option>
+        <option>Leg press 📷</option>
+        <option>Rowing barre 📷</option>
+        <option>Tirage poulie haute 📷</option>
+        <option>Extensions lombaires 📷</option>
+        <option>Crunchs 📷</option>
+        <option>Gainage 📷</option>
         <option>Autre</option>
       </select>
     </div>
@@ -2766,10 +2766,10 @@ function logLift() {
 
   if(!sets || !reps) { showToast('info', '⚠️ Remplis les séries et répétitions'); return; }
 
-  // VÉRIFICATION CAMÉRA POUR POMPES ET TRACTIONS
-  if((exo === 'Pompes 📷' || exo === 'Tractions 📷') && !poseSessionValidated) {
-    const name = exo === 'Pompes 📷' ? 'pompes' : 'tractions';
-    showToast('info', '📷 Lance l\'analyse IA pour valider tes ' + name + ' !');
+  // VÉRIFICATION CAMÉRA POUR TOUS LES EXOS AVEC 📷
+  if(exo.includes('📷') && !poseSessionValidated) {
+    const name = exo.replace(' 📷', '');
+    showToast('info', '📷 Lance l\'analyse IA pour valider : ' + name + ' !');
     haptic('medium');
     return;
   }
@@ -3550,7 +3550,7 @@ function updateExoIllustration() {
   if(icon) icon.textContent = data.icon;
   if(tips) tips.textContent = data.tips;
 
-  const needsCamera = exo === 'Pompes 📷' || exo === 'Tractions 📷';
+  const needsCamera = exo.includes('📷');
   const cameraSection = document.getElementById('camera-validate-section');
   const desc = document.getElementById('camera-status-desc');
   const statusBox = document.getElementById('camera-status-box');
@@ -3559,15 +3559,11 @@ function updateExoIllustration() {
   if(cameraSection) cameraSection.style.display = needsCamera ? 'block' : 'none';
 
   if(needsCamera) {
-    // Reset visuel du status box à chaque changement d'exo
     if(statusBox) { statusBox.style.background = 'rgba(255,60,172,0.1)'; statusBox.style.borderColor = 'rgba(255,60,172,0.4)'; }
     if(statusText) { statusText.style.color = 'var(--accent2)'; statusText.textContent = 'Validation caméra IA requise'; }
-    if(desc) desc.textContent = exo === 'Tractions 📷'
-      ? 'Les tractions doivent être vérifiées par la caméra pour être validées'
-      : 'Les pompes doivent être vérifiées par la caméra pour être validées';
+    if(desc) desc.textContent = exoKey + ' doit être vérifié par la caméra IA pour être validé';
   }
 
-  // Reset validation à chaque changement d'exo
   poseSessionValidated = false;
   updateCameraTargetLabel();
 }
@@ -4015,8 +4011,325 @@ function checkNightWorkout() {
 }
 
 // ============================================================
-// ANALYSE TRACTIONS
+// MOTEUR D'ANALYSE UNIVERSEL
 // ============================================================
+
+// Config par exercice : joints à mesurer, seuils haut/bas, feedback
+const EXO_POSE_CONFIG = {
+  'Pompes': {
+    getAngleJoints: kp => [
+      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
+      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
+      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
+    ],
+    upAngle: 155, downAngle: 100,
+    upLabel:'HAUT', downLabel:'BAS',
+    tips: 'Dos droit, descends jusqu\'à 90° aux coudes',
+    checkForm: (angle, kp) => {
+      const ls = getKeypointByName(kp,'left_shoulder'), lh = getKeypointByName(kp,'left_hip'), lk = getKeypointByName(kp,'left_knee');
+      let score = 100; const fb = [];
+      if(ls?.score > 0.4 && lh?.score > 0.4 && lk?.score > 0.4) {
+        const bodyAngle = getAngle(ls, lh, lk);
+        if(bodyAngle < 160) { score -= 25; fb.push('❌ Redresse le dos'); } else fb.push('✅ Dos aligné');
+      }
+      if(angle < 90 && angle > 60) fb.push('✅ Bonne profondeur');
+      else if(angle > 115) { score -= 20; fb.push('⚠️ Descends plus bas'); }
+      return {score, fb};
+    }
+  },
+  'Tractions': {
+    getAngleJoints: kp => [
+      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
+      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
+      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
+    ],
+    upAngle: 100, downAngle: 155, // inversé vs pompes
+    upLabel:'HAUT', downLabel:'BAS',
+    tips: 'Omoplates rentrées, monte menton au-dessus de la barre',
+    checkForm: (angle, kp) => {
+      let score = 100; const fb = [];
+      const ls = getKeypointByName(kp,'left_shoulder'), lh = getKeypointByName(kp,'left_hip');
+      if(ls?.score > 0.4 && lh?.score > 0.4) {
+        const lean = Math.abs(ls.x - lh.x);
+        if(lean > 60) { score -= 20; fb.push('⚠️ Corps trop incliné'); } else fb.push('✅ Corps vertical');
+      }
+      if(angle < 90) fb.push('✅ Bonne hauteur');
+      if(angle > 160) fb.push('✅ Extension complète');
+      return {score, fb};
+    }
+  },
+  'Développé couché': {
+    getAngleJoints: kp => [
+      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
+      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
+      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
+    ],
+    upAngle: 155, downAngle: 100,
+    upLabel:'HAUT', downLabel:'BAS',
+    tips: 'Allonge-toi, dos plaqué, barre jusqu\'à la poitrine',
+    checkForm: (angle, kp) => {
+      let score = 100; const fb = [];
+      const ls = getKeypointByName(kp,'left_shoulder'), rs = getKeypointByName(kp,'right_shoulder');
+      if(ls?.score > 0.4 && rs?.score > 0.4) {
+        const diff = Math.abs(ls.y - rs.y);
+        if(diff > 30) { score -= 20; fb.push('⚠️ Épaules pas symétriques'); } else fb.push('✅ Épaules alignées');
+      }
+      if(angle < 95) fb.push('✅ Bonne descente');
+      else if(angle > 120 && angle < 155) { score -= 15; fb.push('⚠️ Descends la barre à la poitrine'); }
+      return {score, fb};
+    }
+  },
+  'Squat': {
+    getAngleJoints: kp => [
+      getKeypointByName(kp,'left_hip')   || getKeypointByName(kp,'right_hip'),
+      getKeypointByName(kp,'left_knee')  || getKeypointByName(kp,'right_knee'),
+      getKeypointByName(kp,'left_ankle') || getKeypointByName(kp,'right_ankle'),
+    ],
+    upAngle: 160, downAngle: 110,
+    upLabel:'DEBOUT', downLabel:'BAS',
+    tips: 'Pieds largeur épaules, descends cuisses parallèles au sol',
+    checkForm: (angle, kp) => {
+      let score = 100; const fb = [];
+      const ls = getKeypointByName(kp,'left_shoulder'), lh = getKeypointByName(kp,'left_hip');
+      if(ls?.score > 0.4 && lh?.score > 0.4) {
+        const torsoAngle = getAngle({x:lh.x,y:lh.y-50}, lh, ls);
+        if(torsoAngle < 70) { score -= 20; fb.push('⚠️ Garde le buste droit'); } else fb.push('✅ Buste droit');
+      }
+      if(angle < 110) fb.push('✅ Bonne profondeur');
+      else if(angle < 140 && angle > 110) { score -= 15; fb.push('⚠️ Descends plus bas (cuisses parallèles)'); }
+      return {score, fb};
+    }
+  },
+  'Curl biceps': {
+    getAngleJoints: kp => [
+      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
+      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
+      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
+    ],
+    upAngle: 60, downAngle: 155,
+    upLabel:'HAUT', downLabel:'BAS',
+    tips: 'Coudes fixes contre le corps, monte jusqu\'en haut',
+    checkForm: (angle, kp) => {
+      let score = 100; const fb = [];
+      const ls = getKeypointByName(kp,'left_shoulder'), le = getKeypointByName(kp,'left_elbow');
+      if(ls?.score > 0.4 && le?.score > 0.4) {
+        const elbowDrift = Math.abs(ls.x - le.x);
+        if(elbowDrift > 40) { score -= 25; fb.push('⚠️ Coudes fixes — ne te balance pas'); } else fb.push('✅ Coudes stables');
+      }
+      if(angle < 65) fb.push('✅ Bonne flexion');
+      if(angle > 150) fb.push('✅ Extension complète');
+      return {score, fb};
+    }
+  },
+  'Développé militaire': {
+    getAngleJoints: kp => [
+      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
+      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
+      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
+    ],
+    upAngle: 155, downAngle: 100,
+    upLabel:'HAUT', downLabel:'BAS',
+    tips: 'Core gainé, pousse la barre verticalement au-dessus de la tête',
+    checkForm: (angle, kp) => {
+      let score = 100; const fb = [];
+      const ls = getKeypointByName(kp,'left_shoulder'), lh = getKeypointByName(kp,'left_hip');
+      if(ls?.score > 0.4 && lh?.score > 0.4) {
+        const lean = ls.x - lh.x;
+        if(Math.abs(lean) > 35) { score -= 20; fb.push('⚠️ Reste droit, ne te cambre pas'); } else fb.push('✅ Corps droit');
+      }
+      if(angle > 155) fb.push('✅ Extension complète');
+      return {score, fb};
+    }
+  },
+  'Dips': {
+    getAngleJoints: kp => [
+      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
+      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
+      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
+    ],
+    upAngle: 155, downAngle: 95,
+    upLabel:'HAUT', downLabel:'BAS',
+    tips: 'Descends jusqu\'à 90°, coudes proches du corps',
+    checkForm: (angle, kp) => {
+      let score = 100; const fb = [];
+      if(angle < 100) fb.push('✅ Bonne profondeur');
+      else if(angle > 120 && angle < 155) { score -= 20; fb.push('⚠️ Descends plus bas (90°)'); }
+      if(angle > 155) fb.push('✅ Extension complète');
+      return {score, fb};
+    }
+  },
+  'Triceps poulie': {
+    getAngleJoints: kp => [
+      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
+      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
+      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
+    ],
+    upAngle: 95, downAngle: 155,
+    upLabel:'HAUT', downLabel:'BAS',
+    tips: 'Coudes collés au corps, extension complète vers le bas',
+    checkForm: (angle, kp) => {
+      let score = 100; const fb = [];
+      if(angle > 155) fb.push('✅ Extension complète');
+      else if(angle < 140) { score -= 20; fb.push('⚠️ Tends mieux les bras'); }
+      return {score, fb};
+    }
+  },
+  'Rowing barre': {
+    getAngleJoints: kp => [
+      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
+      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
+      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
+    ],
+    upAngle: 75, downAngle: 155,
+    upLabel:'TIRÉ', downLabel:'BAS',
+    tips: 'Dos à 45°, tire la barre vers le nombril',
+    checkForm: (angle, kp) => {
+      let score = 100; const fb = [];
+      const ls = getKeypointByName(kp,'left_shoulder'), lh = getKeypointByName(kp,'left_hip');
+      if(ls?.score > 0.4 && lh?.score > 0.4) {
+        const torso = Math.abs(ls.y - lh.y);
+        if(torso < 40) { score -= 20; fb.push('⚠️ Penche-toi à 45°'); } else fb.push('✅ Bonne inclinaison');
+      }
+      if(angle < 80) fb.push('✅ Bonne traction');
+      return {score, fb};
+    }
+  },
+  'Tirage poulie haute': {
+    getAngleJoints: kp => [
+      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
+      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
+      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
+    ],
+    upAngle: 155, downAngle: 80,
+    upLabel:'HAUT', downLabel:'TIRÉ',
+    tips: 'Tire la barre vers le haut de la poitrine, omoplates rentrées',
+    checkForm: (angle, kp) => {
+      let score = 100; const fb = [];
+      if(angle < 85) fb.push('✅ Bonne traction');
+      if(angle > 155) fb.push('✅ Extension complète');
+      return {score, fb};
+    }
+  },
+  'Soulevé de terre': {
+    getAngleJoints: kp => [
+      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
+      getKeypointByName(kp,'left_hip')      || getKeypointByName(kp,'right_hip'),
+      getKeypointByName(kp,'left_knee')     || getKeypointByName(kp,'right_knee'),
+    ],
+    upAngle: 165, downAngle: 100,
+    upLabel:'DEBOUT', downLabel:'BAS',
+    tips: 'Dos droit, barre proche du corps, pousse avec les jambes',
+    checkForm: (angle, kp) => {
+      let score = 100; const fb = [];
+      const ls = getKeypointByName(kp,'left_shoulder'), lh = getKeypointByName(kp,'left_hip');
+      if(ls?.score > 0.4 && lh?.score > 0.4) {
+        const spineAngle = Math.abs(ls.x - lh.x);
+        if(spineAngle > 50) { score -= 30; fb.push('❌ DANGER — Garde le dos droit !'); } else fb.push('✅ Dos droit');
+      }
+      if(angle > 160) fb.push('✅ Extension complète');
+      return {score, fb};
+    }
+  },
+  'Leg press': {
+    getAngleJoints: kp => [
+      getKeypointByName(kp,'left_hip')   || getKeypointByName(kp,'right_hip'),
+      getKeypointByName(kp,'left_knee')  || getKeypointByName(kp,'right_knee'),
+      getKeypointByName(kp,'left_ankle') || getKeypointByName(kp,'right_ankle'),
+    ],
+    upAngle: 155, downAngle: 90,
+    upLabel:'POUSSÉ', downLabel:'FLÉCHI',
+    tips: 'Pieds à largeur épaules, ne verrouille pas les genoux',
+    checkForm: (angle, kp) => {
+      let score = 100; const fb = [];
+      if(angle < 100) fb.push('✅ Bonne flexion');
+      if(angle > 150) fb.push('✅ Bonne extension');
+      return {score, fb};
+    }
+  },
+  'Extensions lombaires': {
+    getAngleJoints: kp => [
+      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
+      getKeypointByName(kp,'left_hip')      || getKeypointByName(kp,'right_hip'),
+      getKeypointByName(kp,'left_knee')     || getKeypointByName(kp,'right_knee'),
+    ],
+    upAngle: 170, downAngle: 110,
+    upLabel:'HAUT', downLabel:'BAS',
+    tips: 'Mouvement lent et contrôlé, ne sur-étends pas le dos',
+    checkForm: (angle, kp) => {
+      let score = 100; const fb = [];
+      if(angle > 165) { score -= 15; fb.push('⚠️ Ne sur-étends pas le dos'); } else if(angle > 145) fb.push('✅ Bonne extension');
+      return {score, fb};
+    }
+  },
+  'Crunchs': {
+    getAngleJoints: kp => [
+      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
+      getKeypointByName(kp,'left_hip')      || getKeypointByName(kp,'right_hip'),
+      getKeypointByName(kp,'left_knee')     || getKeypointByName(kp,'right_knee'),
+    ],
+    upAngle: 120, downAngle: 160,
+    upLabel:'MONTÉ', downLabel:'ALLONGÉ',
+    tips: 'Expire en montant, contracte les abdos, nuque neutre',
+    checkForm: (angle, kp) => {
+      let score = 100; const fb = [];
+      if(angle < 125) fb.push('✅ Bonne flexion abdominale');
+      else if(angle < 145) { score -= 15; fb.push('⚠️ Monte plus les épaules'); }
+      return {score, fb};
+    }
+  },
+  'Gainage': {
+    getAngleJoints: kp => [
+      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
+      getKeypointByName(kp,'left_hip')      || getKeypointByName(kp,'right_hip'),
+      getKeypointByName(kp,'left_knee')     || getKeypointByName(kp,'right_knee'),
+    ],
+    upAngle: 999, downAngle: 999, // Gainage = tenue, pas de reps
+    isHold: true,
+    upLabel:'TENU', downLabel:'TENU',
+    tips: 'Corps droit, respire normalement, tiens la position',
+    checkForm: (angle, kp) => {
+      let score = 100; const fb = [];
+      if(angle > 160 && angle < 190) fb.push('✅ Alignement parfait');
+      else if(angle < 155) { score -= 25; fb.push('⚠️ Hanches trop basses'); }
+      else if(angle > 190) { score -= 25; fb.push('⚠️ Hanches trop hautes'); }
+      return {score, fb};
+    }
+  },
+};
+
+// Fallback générique
+const GENERIC_EXO_CONFIG = {
+  getAngleJoints: kp => [
+    getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
+    getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
+    getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
+  ],
+  upAngle: 155, downAngle: 90,
+  upLabel:'HAUT', downLabel:'BAS',
+  tips: 'Exécute avec contrôle et amplitude complète',
+  checkForm: () => ({score: 80, fb: ['✅ Mouvement détecté']})
+};
+
+function analyzeExercise(exoName, keypoints) {
+  const config = EXO_POSE_CONFIG[exoName] || GENERIC_EXO_CONFIG;
+  const [a, b, c] = config.getAngleJoints(keypoints);
+  if(!a || !b || !c) return null;
+  if(a.score < 0.4 || b.score < 0.4 || c.score < 0.4) return null;
+
+  const angle = getAngle(a, b, c);
+  const {score, fb} = config.checkForm(angle, keypoints);
+
+  // Pour le gainage, pas de reps — on compte le temps
+  if(config.isHold) {
+    return { angle, isUp: true, isDown: false, isHold: true, formScore: score, feedback: fb };
+  }
+
+  const isUp   = angle >= config.upAngle;
+  const isDown = angle <= config.downAngle;
+  return { angle, isUp, isDown, formScore: score, feedback: fb, upLabel: config.upLabel, downLabel: config.downLabel };
+}
+
+
 function analyzePullup(keypoints) {
   const ls = getKeypointByName(keypoints, 'left_shoulder');
   const rs = getKeypointByName(keypoints, 'right_shoulder');
@@ -4236,22 +4549,16 @@ function updateCameraTargetLabel() {
 
 async function openPoseCamera() {
   const exo = document.getElementById('lift-exo').value;
-  const isPullup = exo === 'Tractions 📷';
-  const exoName = isPullup ? 'TRACTIONS' : 'POMPES';
-  const exoNameFr = isPullup ? 'tractions' : 'pompes';
+  const exoKey = exo.replace(' 📷', '');
+  poseCurrentExo = exoKey;
 
   const modal = document.getElementById('pose-modal');
   modal.style.display = 'flex';
   modal.style.flexDirection = 'column';
 
-  // Mettre à jour le titre du modal
   const titleEl = document.getElementById('pose-modal-title');
-  if(titleEl) titleEl.textContent = '📷 ANALYSE IA — ' + exoName;
+  if(titleEl) titleEl.textContent = '📷 ANALYSE IA — ' + exoKey.toUpperCase();
 
-  // Stocker le type d'exercice courant
-  poseCurrentExo = isPullup ? 'pullup' : 'pushup';
-
-  // Lire le nombre de reps cible depuis le formulaire
   const targetInput = parseInt(document.getElementById('lift-reps').value) || 0;
   poseTargetReps = targetInput > 0 ? targetInput : 0;
 
@@ -4295,9 +4602,10 @@ async function openPoseCamera() {
       );
     }
 
+    const cfg = EXO_POSE_CONFIG[poseCurrentExo] || GENERIC_EXO_CONFIG;
     status.textContent = poseTargetReps > 0
-      ? '🎯 Objectif : ' + poseTargetReps + ' pompes. Place-toi de profil, bras tendus. Go !'
-      : '📍 Place-toi de profil, bras tendus. Go !';
+      ? '🎯 Objectif : ' + poseTargetReps + ' reps — ' + cfg.tips
+      : '💡 ' + cfg.tips;
     runPoseLoop();
 
   } catch(err) {
@@ -4355,14 +4663,11 @@ async function runPoseLoop() {
         const keypoints = poses[0].keypoints;
         drawSkeleton(ctx, keypoints, canvas);
 
-        const analysis = poseCurrentExo === 'pullup'
-          ? analyzePullup(keypoints)
-          : analyzePushup(keypoints);
+        const analysis = analyzeExercise(poseCurrentExo, keypoints);
 
         if(analysis) {
           poseFormScore = analysis.formScore;
 
-          // Feedback
           const feedbackEl = document.getElementById('pose-form-feedback');
           const itemsEl = document.getElementById('pose-feedback-items');
           if(feedbackEl && itemsEl && analysis.feedback.length > 0) {
@@ -4370,42 +4675,45 @@ async function runPoseLoop() {
             itemsEl.innerHTML = analysis.feedback.join('<br>');
           }
 
-          // Détection rep selon l'exercice
-          const goingDown = poseCurrentExo === 'pullup' ? analysis.isDown : analysis.isDown;
-          const goingUp   = poseCurrentExo === 'pullup' ? analysis.isUp   : analysis.isUp;
+          // Gainage = mode chrono (pas de reps)
+          if(analysis.isHold) {
+            document.getElementById('pose-phase-icon').textContent = '⏱️';
+            document.getElementById('pose-phase-text').textContent = 'TENU';
+            document.getElementById('pose-status-msg').textContent = '💪 Tiens la position ! Forme : ' + analysis.formScore + '%';
+          } else {
+            // Détection rep : position haute → basse → haute = 1 rep
+            if(analysis.isDown && posePhase === 'up') {
+              posePhase = 'down';
+              document.getElementById('pose-phase-icon').textContent = '⬇️';
+              document.getElementById('pose-phase-text').textContent = analysis.downLabel || 'BAS';
+            } else if(analysis.isUp && posePhase === 'down') {
+              posePhase = 'up';
+              poseRepCount++;
+              poseTotalFormScores.push(analysis.formScore);
 
-          if(goingDown && posePhase === 'up') {
-            posePhase = 'down';
-            document.getElementById('pose-phase-icon').textContent = poseCurrentExo === 'pullup' ? '⬇️' : '⬇️';
-            document.getElementById('pose-phase-text').textContent = 'BAS';
-          } else if(goingUp && posePhase === 'down') {
-            posePhase = 'up';
-            poseRepCount++;
-            poseTotalFormScores.push(analysis.formScore);
+              const target = poseTargetReps > 0 ? poseTargetReps : 3;
 
-            const target = poseTargetReps > 0 ? poseTargetReps : 3;
-            const exoWord = poseCurrentExo === 'pullup' ? 'traction' : 'pompe';
-
-            if(analysis.formScore >= 60) {
-              poseValidReps++;
-              haptic('success');
-              const remaining = target - poseValidReps;
-              if(remaining > 0) {
-                document.getElementById('pose-status-msg').textContent =
-                  '💪 ' + exoWord + ' ' + poseRepCount + ' ✅ — Encore ' + remaining + ' ! (' + poseValidReps + '/' + target + ')';
+              if(analysis.formScore >= 60) {
+                poseValidReps++;
+                haptic('success');
+                const remaining = target - poseValidReps;
+                if(remaining > 0) {
+                  document.getElementById('pose-status-msg').textContent =
+                    '💪 Rep ' + poseRepCount + ' ✅ — Encore ' + remaining + ' ! (' + poseValidReps + '/' + target + ')';
+                } else {
+                  document.getElementById('pose-status-msg').textContent =
+                    '🎉 OBJECTIF ATTEINT ! ' + poseValidReps + ' reps validées !';
+                }
               } else {
+                haptic('light');
                 document.getElementById('pose-status-msg').textContent =
-                  '🎉 OBJECTIF ATTEINT ! ' + poseValidReps + ' ' + exoWord + 's validées. Forme : ' + analysis.formScore + '%';
+                  '⚠️ Rep ' + poseRepCount + ' non comptée — forme (' + analysis.formScore + '%) (' + poseValidReps + '/' + target + ')';
               }
-            } else {
-              haptic('light');
-              document.getElementById('pose-status-msg').textContent =
-                '⚠️ ' + exoWord + ' ' + poseRepCount + ' non comptée — forme (' + analysis.formScore + '%) (' + poseValidReps + '/' + target + ')';
-            }
 
-            document.getElementById('pose-phase-icon').textContent = '⬆️';
-            document.getElementById('pose-phase-text').textContent = 'HAUT';
-            updatePoseHUD();
+              document.getElementById('pose-phase-icon').textContent = '⬆️';
+              document.getElementById('pose-phase-text').textContent = analysis.upLabel || 'HAUT';
+              updatePoseHUD();
+            }
           }
         } else {
           document.getElementById('pose-status-msg').textContent =
