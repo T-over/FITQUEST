@@ -1444,9 +1444,85 @@ body::after {
 .cal-dot { width:4px; height:4px; border-radius:50%; background:currentColor; }
 .cal-detail-item { padding:8px 0; border-bottom:1px solid var(--border); font-size:13px; }
 .cal-detail-item:last-child { border-bottom:none; }
+/* ===== SPLASH SCREEN ===== */
+#splash {
+  position:fixed; inset:0; z-index:9999;
+  background: linear-gradient(135deg, #06060c 0%, #0d0d1a 50%, #06060c 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+#splash.hide { opacity:0; transform:scale(1.05); pointer-events:none; }
+.splash-logo { font-size:80px; animation:splash-pulse 1s infinite alternate; margin-bottom:16px; }
+@keyframes splash-pulse { from{transform:scale(1);filter:drop-shadow(0 0 20px rgba(0,245,255,0.5))} to{transform:scale(1.1);filter:drop-shadow(0 0 40px rgba(0,245,255,0.9))} }
+.splash-title { font-family:'Exo 2',sans-serif; font-weight:900; font-size:32px; letter-spacing:6px; color:var(--accent); margin-bottom:6px; }
+.splash-sub { font-size:12px; color:var(--text2); letter-spacing:3px; margin-bottom:40px; }
+.splash-bar-wrap { width:200px; height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; }
+.splash-bar { height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2)); border-radius:2px; animation:splash-load 1.8s ease forwards; }
+@keyframes splash-load { from{width:0%} to{width:100%} }
+
+/* ===== TRANSITIONS DE PAGE ===== */
+.page { animation:none; }
+.page.page-enter { animation: page-in 0.3s ease forwards; }
+@keyframes page-in { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+/* ===== MÉTÉO EVENT ===== */
+.weather-banner {
+  background:linear-gradient(135deg,rgba(0,245,255,0.1),rgba(168,85,247,0.1));
+  border:1px solid rgba(0,245,255,0.3);
+  border-radius:var(--radius); padding:14px; margin-bottom:14px;
+}
+.weather-icon { font-size:36px; margin-bottom:6px; }
+.weather-event-name { font-family:'Exo 2',sans-serif; font-weight:700; font-size:16px; color:var(--accent); margin-bottom:4px; }
+.weather-bonus { font-size:12px; color:var(--accent3); }
+
+/* ===== CRAFT ===== */
+.craft-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.craft-card { background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:14px; text-align:center; }
+.craft-card.craftable { border-color:var(--accent3); cursor:pointer; }
+.craft-card.craftable:active { transform:scale(0.97); }
+.craft-ingredients { font-size:11px; color:var(--text2); margin:6px 0; line-height:1.8; }
+.craft-result-icon { font-size:36px; margin-bottom:6px; }
+.craft-name { font-size:13px; font-weight:700; margin-bottom:4px; }
+.craft-btn { width:100%; padding:8px; background:linear-gradient(135deg,var(--accent3),#ff8c00); color:#000; border:none; border-radius:var(--radius); font-weight:900; font-size:12px; cursor:pointer; margin-top:8px; }
+.craft-btn:disabled { background:var(--bg2); color:var(--muted); cursor:not-allowed; }
+
+/* ===== SUCCÈS SECRETS ===== */
+.ach-secret { filter:blur(4px) brightness(0.4); }
+.ach-secret.unlocked { filter:none; animation:ach-reveal 0.5s ease; }
+@keyframes ach-reveal { from{filter:blur(4px) brightness(0.4);transform:scale(0.9)} to{filter:none;transform:scale(1)} }
+
+/* ===== COACH IA ===== */
+.coach-bubble {
+  background:linear-gradient(135deg,rgba(168,85,247,0.15),rgba(0,245,255,0.1));
+  border:1px solid rgba(168,85,247,0.4);
+  border-radius:var(--radius); padding:16px; margin-bottom:14px;
+}
+.coach-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.coach-avatar { font-size:32px; animation:coach-bounce 2s infinite alternate; }
+@keyframes coach-bounce { from{transform:translateY(0)} to{transform:translateY(-4px)} }
+.coach-name { font-family:'Exo 2',sans-serif; font-weight:700; font-size:14px; color:var(--xp-color); }
+.coach-msg { font-size:13px; line-height:1.7; color:var(--text); }
+.coach-tip-card { background:var(--bg3); border-radius:6px; padding:10px; margin-top:8px; font-size:12px; color:var(--text2); border-left:3px solid var(--xp-color); }
+
+/* ===== LANDSCAPE ===== */
+@media (orientation: landscape) and (max-height: 500px) {
+  #bottomnav { flex-direction:column; width:60px; height:100vh; position:fixed; left:0; top:0; bottom:auto; border-top:none; border-right:1px solid var(--border); padding:8px 0; }
+  #bottomnav .nav-btn { flex-direction:column; font-size:8px; padding:6px 4px; }
+  #bottomnav .nav-btn .nav-icon { font-size:18px; }
+  main { margin-left:60px; margin-bottom:0; }
+  .hero-level-section { flex-direction:row; gap:16px; }
+}
 </style>
 </head>
 <body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <div class="splash-logo">⚡</div>
+  <div class="splash-title">FITQUEST</div>
+  <div class="splash-sub">FORGE TON DESTIN</div>
+  <div class="splash-bar-wrap"><div class="splash-bar"></div></div>
+</div>
 
 <div id="toast-container"></div>
 
@@ -1525,6 +1601,23 @@ body::after {
         <div class="streak-suffix">JOURS</div>
       </div>
     </div>
+  </div>
+
+  <!-- MÉTÉO EVENT -->
+  <div class="weather-banner" id="weather-banner" style="display:none">
+    <div class="weather-icon" id="weather-icon">🌤️</div>
+    <div class="weather-event-name" id="weather-event-name">Conditions Standard</div>
+    <div class="weather-bonus" id="weather-bonus">Entraîne-toi !</div>
+  </div>
+
+  <!-- COACH IA -->
+  <div class="coach-bubble" id="coach-bubble">
+    <div class="coach-header">
+      <div class="coach-avatar">🤖</div>
+      <div><div class="coach-name">COACH ARIA</div><div style="font-size:10px;color:var(--text2)">Ton coach IA personnel</div></div>
+    </div>
+    <div class="coach-msg" id="coach-msg">Analyse de tes performances en cours...</div>
+    <div class="coach-tip-card" id="coach-tip">💡 Lance une séance pour recevoir mes conseils personnalisés.</div>
   </div>
 
   <!-- BOSS HEBDO -->
@@ -1852,6 +1945,13 @@ body::after {
     </div>
   </div>
 
+  <!-- CRAFT -->
+  <div class="card">
+    <div class="card-title"><span>⚗️</span> ATELIER DE CRAFT</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Combine tes ressources pour créer des objets puissants.</div>
+    <div class="craft-grid" id="craft-grid"></div>
+  </div>
+
   <div class="card">
     <div class="card-title"><span>🏅</span> SUCCÈS DÉBLOQUÉS</div>
     <div class="achievements-grid" id="achievements-grid"></div>
@@ -1960,19 +2060,70 @@ const QUESTS_DATA = [
 ];
 
 const ACHIEVEMENTS = [
-  {id:'first_run', name:'Premier Souffle', desc:'Ta première course', icon:'👟', condition: s => s.totalKm >= 0.1},
-  {id:'first_lift', name:'Premier Acier', desc:'Ta première séance muscu', icon:'🏋️', condition: s => s.liftSessions >= 1},
-  {id:'5km', name:'5K Fighter', desc:'Courir 5 km', icon:'🏃', condition: s => s.totalKm >= 5},
-  {id:'10km', name:'Décathlon', desc:'10 km cumulés', icon:'🗺️', condition: s => s.totalKm >= 10},
-  {id:'50km', name:'Demi-Centurion', desc:'50 km cumulés', icon:'🌍', condition: s => s.totalKm >= 50},
-  {id:'streak3', name:'Série de 3', desc:'3 jours consécutifs', icon:'🔥', condition: s => s.maxStreak >= 3},
-  {id:'streak7', name:'Semaine de fer', desc:'7 jours consécutifs', icon:'💎', condition: s => s.maxStreak >= 7},
-  {id:'level5', name:'Champion', desc:'Atteindre niveau 5', icon:'🏆', condition: s => s.level >= 5},
-  {id:'quest5', name:'Faiseur de quêtes', desc:'5 quêtes terminées', icon:'📜', condition: s => s.questsDone >= 5},
-  {id:'lift10', name:'Forgeron', desc:'10 séances muscu', icon:'⚒️', condition: s => s.liftSessions >= 10},
-  {id:'speedster', name:'Speedster', desc:'10 km en moins de 60 min', icon:'⚡', condition: s => s.fastRun},
-  {id:'hybrid', name:'Hybride', desc:'10km courus + 5 séances muscu', icon:'🌀', condition: s => s.totalKm >= 10 && s.liftSessions >= 5},
+  {id:'first_run',  name:'Premier Souffle',   desc:'Ta première course',           icon:'👟', secret:false, condition: s => s.totalKm >= 0.1},
+  {id:'first_lift', name:'Premier Acier',     desc:'Ta première séance muscu',     icon:'🏋️', secret:false, condition: s => s.liftSessions >= 1},
+  {id:'5km',        name:'5K Fighter',        desc:'Courir 5 km',                  icon:'🏃', secret:false, condition: s => s.totalKm >= 5},
+  {id:'10km',       name:'Décathlon',         desc:'10 km cumulés',                icon:'🗺️', secret:false, condition: s => s.totalKm >= 10},
+  {id:'50km',       name:'Demi-Centurion',    desc:'50 km cumulés',                icon:'🌍', secret:false, condition: s => s.totalKm >= 50},
+  {id:'streak3',    name:'Série de 3',        desc:'3 jours consécutifs',          icon:'🔥', secret:false, condition: s => s.maxStreak >= 3},
+  {id:'streak7',    name:'Semaine de fer',    desc:'7 jours consécutifs',          icon:'💎', secret:false, condition: s => s.maxStreak >= 7},
+  {id:'level5',     name:'Champion',          desc:'Atteindre niveau 5',           icon:'🏆', secret:false, condition: s => s.level >= 5},
+  {id:'quest5',     name:'Faiseur de quêtes', desc:'5 quêtes terminées',           icon:'📜', secret:false, condition: s => s.questsDone >= 5},
+  {id:'lift10',     name:'Forgeron',          desc:'10 séances muscu',             icon:'⚒️', secret:false, condition: s => s.liftSessions >= 10},
+  {id:'speedster',  name:'Speedster',         desc:'10 km en moins de 60 min',     icon:'⚡', secret:false, condition: s => s.fastRun},
+  {id:'hybrid',     name:'Hybride',           desc:'10km courus + 5 séances muscu',icon:'🌀', secret:false, condition: s => s.totalKm >= 10 && s.liftSessions >= 5},
+  // SECRETS
+  {id:'secret_night',  name:'???',  desc:'Succès secret', icon:'🌙', secret:true, revealName:'Guerrier de la Nuit',  revealDesc:'T\'entraîner après 22h',     condition: s => s.nightWorkout},
+  {id:'secret_100',    name:'???',  desc:'Succès secret', icon:'💯', secret:true, revealName:'Centurion XP',         revealDesc:'Dépasser 10 000 XP total',  condition: s => s.totalXP >= 10000},
+  {id:'secret_boss5',  name:'???',  desc:'Succès secret', icon:'💀', secret:true, revealName:'Tueur de Boss',        revealDesc:'Vaincre 5 boss hebdo',      condition: s => (s.totalBossKills||0) >= 5},
+  {id:'secret_craft',  name:'???',  desc:'Succès secret', icon:'⚗️', secret:true, revealName:'Alchimiste',           revealDesc:'Crafter 3 objets',          condition: s => (s.totalCrafts||0) >= 3},
+  {id:'secret_streak30',name:'???', desc:'Succès secret', icon:'🔱', secret:true, revealName:'Inextinguible',        revealDesc:'30 jours de série',         condition: s => s.maxStreak >= 30},
+  {id:'secret_mount',  name:'???',  desc:'Succès secret', icon:'🐲', secret:true, revealName:'Dresseur Légendaire',  revealDesc:'Posséder le Dragon de Feu', condition: s => (s.ownedMounts||[]).includes('mount_dragon')},
 ];
+
+const CRAFT_RECIPES = [
+  {
+    id:'craft_xp_potion', name:'Potion XP', icon:'🧪', result:'xp_boost',
+    desc:'Double les XP de ta prochaine séance',
+    ingredients: [{item:'gold', amount:100}, {item:'streak', amount:3}],
+    effect: () => { state.xpBoost = true; showToast('success','🧪 Potion XP prête ! Prochaine séance x2 XP'); }
+  },
+  {
+    id:'craft_gold_shield', name:'Bouclier d\'Or', icon:'🛡️', result:'gold_shield',
+    desc:'Protège ta série si tu rates un jour',
+    ingredients: [{item:'gold', amount:200}, {item:'quests', amount:3}],
+    effect: () => { state.streakShield = true; showToast('success','🛡️ Série protégée pour 1 jour !'); }
+  },
+  {
+    id:'craft_legendary', name:'Artefact Légendaire', icon:'⚜️', result:'legendary',
+    desc:'Débloque le titre LÉGENDE immédiatement',
+    ingredients: [{item:'gold', amount:500}, {item:'level', amount:8}],
+    effect: () => {
+      if(!state.unlockedTitles.includes('legendaire')) state.unlockedTitles.push('legendaire');
+      state.activeTitle = 'legendaire';
+      showToast('success','⚜️ ARTEFACT LÉGENDAIRE ! Titre débloqué !');
+      renderProfile();
+    }
+  },
+  {
+    id:'craft_mount_upgrade', name:'Armure de Monture', icon:'🏇', result:'mount_armor',
+    desc:'La monture équipée gagne un effet visuel doré',
+    ingredients: [{item:'gold', amount:300}, {item:'mounts', amount:2}],
+    effect: () => { state.mountArmored = true; showToast('success','🏇 Monture blindée !'); renderMounts(); }
+  },
+];
+
+const WEATHER_EVENTS = [
+  {condition:'clear',  name:'Journée Ensoleillée', icon:'☀️', bonus:'XP course +50%',  xpMult:1.5, type:'run'},
+  {condition:'clouds', name:'Ciel Couvert',         icon:'☁️', bonus:'XP muscu +30%',  xpMult:1.3, type:'lift'},
+  {condition:'rain',   name:'Pluie Guerrière',      icon:'🌧️', bonus:'XP x2 (défi pluvieux !)', xpMult:2.0, type:'all'},
+  {condition:'snow',   name:'Blizzard d\'Acier',    icon:'❄️', bonus:'Or +100% cette séance', xpMult:1.0, goldMult:2.0, type:'all'},
+  {condition:'thunder',name:'Tempête de Foudre',    icon:'⛈️', bonus:'XP x3 (courage ultime!)', xpMult:3.0, type:'all'},
+  {condition:'mist',   name:'Brume Mystérieuse',    icon:'🌫️', bonus:'Chance de succès secret', xpMult:1.2, type:'all'},
+  {condition:'default',name:'Conditions Standard',  icon:'🌤️', bonus:'Entraîne-toi !',  xpMult:1.0, type:'all'},
+];
+
+
 
 const TITLES = [
   {id:'novice', name:'Novice', unlocked: true},
@@ -2134,6 +2285,15 @@ function loadState() {
     ownedMounts: [],
     activeMount: null,
     goals: [],
+    xpBoost: false,
+    streakShield: false,
+    mountArmored: false,
+    totalCrafts: 0,
+    totalBossKills: 0,
+    nightWorkout: false,
+    weatherCache: null,
+    weatherCacheTime: 0,
+    legendaire: false,
   };
   try {
     const saved = localStorage.getItem('fq_state');
@@ -3506,7 +3666,251 @@ function registerServiceWorker() {
   }
 }
 
+// ============================================================
+// SPLASH SCREEN
+// ============================================================
+function hideSplash() {
+  const splash = document.getElementById('splash');
+  if(splash) {
+    setTimeout(() => {
+      splash.classList.add('hide');
+      setTimeout(() => splash.remove(), 700);
+    }, 1800);
+  }
+}
+
+// ============================================================
+// TRANSITIONS DE PAGE
+// ============================================================
+const _origNavigate = navigate;
+function navigate(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active','page-enter'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const pageEl = document.getElementById('page-'+page);
+  if(pageEl) {
+    pageEl.classList.add('active','page-enter');
+    setTimeout(() => pageEl.classList.remove('page-enter'), 350);
+  }
+  if(btn) btn.classList.add('active');
+  if(page === 'home') renderDashboard();
+  if(page === 'quests') renderQuests('active');
+  if(page === 'stats') renderStats();
+  if(page === 'profile') renderProfile();
+  if(page === 'calendar') renderCalendar();
+  window.scrollTo(0,0);
+}
+
+// ============================================================
+// VIBRATION HAPTIQUE
+// ============================================================
+function haptic(type) {
+  if(!navigator.vibrate) return;
+  if(type === 'light') navigator.vibrate(10);
+  else if(type === 'medium') navigator.vibrate(30);
+  else if(type === 'success') navigator.vibrate([20,50,20]);
+  else if(type === 'levelup') navigator.vibrate([50,100,50,100,100]);
+}
+
+// ============================================================
+// MÉTÉO & ÉVÉNEMENTS
+// ============================================================
+async function fetchWeather() {
+  const now = Date.now();
+  if(state.weatherCache && (now - state.weatherCacheTime) < 3600000) {
+    applyWeatherEvent(state.weatherCache);
+    return;
+  }
+  try {
+    const pos = await new Promise((res, rej) =>
+      navigator.geolocation.getCurrentPosition(res, rej, {timeout:5000})
+    );
+    const {latitude, longitude} = pos.coords;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`;
+    const r = await fetch(url);
+    const data = await r.json();
+    const code = data.current_weather?.weathercode;
+    let condition = 'default';
+    if(code === 0 || code === 1) condition = 'clear';
+    else if(code >= 2 && code <= 3) condition = 'clouds';
+    else if(code >= 51 && code <= 67) condition = 'rain';
+    else if(code >= 71 && code <= 77) condition = 'snow';
+    else if(code >= 80 && code <= 82) condition = 'rain';
+    else if(code >= 95) condition = 'thunder';
+    else if(code >= 45 && code <= 48) condition = 'mist';
+    state.weatherCache = condition;
+    state.weatherCacheTime = now;
+    saveState();
+    applyWeatherEvent(condition);
+  } catch(e) {
+    applyWeatherEvent('default');
+  }
+}
+
+function applyWeatherEvent(condition) {
+  const event = WEATHER_EVENTS.find(w => w.condition === condition) || WEATHER_EVENTS.find(w => w.condition === 'default');
+  state.currentWeatherEvent = event;
+  const banner = document.getElementById('weather-banner');
+  const icon = document.getElementById('weather-icon');
+  const name = document.getElementById('weather-event-name');
+  const bonus = document.getElementById('weather-bonus');
+  if(banner) banner.style.display = 'block';
+  if(icon) icon.textContent = event.icon;
+  if(name) name.textContent = event.name;
+  if(bonus) bonus.textContent = '🎯 ' + event.bonus;
+}
+
+// ============================================================
+// COACH IA
+// ============================================================
+function updateCoach() {
+  const msg = document.getElementById('coach-msg');
+  const tip = document.getElementById('coach-tip');
+  if(!msg || !tip) return;
+
+  const totalSessions = state.totalSessions || 0;
+  const totalKm = state.totalKm || 0;
+  const streak = state.streak || 0;
+  const level = state.level || 0;
+  const liftSessions = state.liftSessions || 0;
+  const runSessions = state.runSessions || 0;
+
+  let message = '';
+  let advice = '';
+
+  if(totalSessions === 0) {
+    message = 'Bienvenue, guerrier ! Je suis ARIA, ton coach IA. Commence par une première séance pour que je puisse analyser ton profil.';
+    advice = '💡 Conseil : commence par une course légère ou une séance muscu pour t\'échauffer.';
+  } else if(streak === 0) {
+    message = 'Tu n\'as pas encore de série active. Reviens régulièrement — la constance est la clé du progrès !';
+    advice = '💡 Une séance courte vaut mieux que pas de séance. Même 20 minutes comptent !';
+  } else if(runSessions > liftSessions * 2) {
+    message = `Tu cours beaucoup (${totalKm.toFixed(1)} km) mais ton ratio muscu est faible. Ajoute du renforcement pour équilibrer.`;
+    advice = '💡 La muscu améliore tes performances en course. Essaie 1 séance muscu pour 2 courses.';
+  } else if(liftSessions > runSessions * 3) {
+    message = `Excellente progression en muscu ! Mais ton cardio est en retrait. ${liftSessions} séances muscu, ${runSessions} courses.`;
+    advice = '💡 30 min de cardio par semaine améliore ta récupération et ton endurance générale.';
+  } else if(streak >= 7) {
+    message = `🔥 INCROYABLE ! ${streak} jours de série. Tu es une machine. Attention à la récupération.`;
+    advice = '💡 Après 7 jours consécutifs, offre-toi 1 jour de récup active (marche, stretching).';
+  } else if(level >= 10) {
+    message = `Niveau ${level+1} — tu es dans l\'élite. Tes stats parlent d\'elles-mêmes : ${totalKm.toFixed(0)} km, ${liftSessions} séances muscu.`;
+    advice = '💡 À ce niveau, travaille la qualité plutôt que la quantité. Augmente les charges progressivement.';
+  } else {
+    message = `Bonne progression, ${state.name} ! ${totalSessions} séances au total, série actuelle : ${streak} jours.`;
+    advice = '💡 Objectif semaine : ' + (runSessions < liftSessions ? 'ajoute une course pour équilibrer.' : 'maintiens ta régularité !');
+  }
+
+  msg.textContent = message;
+  tip.textContent = advice;
+}
+
+// ============================================================
+// CRAFT
+// ============================================================
+function canCraft(recipe) {
+  return recipe.ingredients.every(ing => {
+    if(ing.item === 'gold') return (state.gold || 0) >= ing.amount;
+    if(ing.item === 'streak') return state.streak >= ing.amount;
+    if(ing.item === 'quests') return state.questsDone >= ing.amount;
+    if(ing.item === 'level') return (state.level || 0) >= ing.amount;
+    if(ing.item === 'mounts') return (state.ownedMounts || []).length >= ing.amount;
+    return false;
+  });
+}
+
+function getIngLabel(ing) {
+  if(ing.item === 'gold') return '💰 ' + ing.amount + ' or';
+  if(ing.item === 'streak') return '🔥 Série ≥ ' + ing.amount + ' jours';
+  if(ing.item === 'quests') return '📜 ' + ing.amount + ' quêtes faites';
+  if(ing.item === 'level') return '⭐ Niveau ≥ ' + (ing.amount + 1);
+  if(ing.item === 'mounts') return '🐾 ' + ing.amount + ' montures possédées';
+  return '';
+}
+
+function renderCraft() {
+  const grid = document.getElementById('craft-grid');
+  if(!grid) return;
+  if(!state.crafted) state.crafted = [];
+  grid.innerHTML = CRAFT_RECIPES.map(r => {
+    const craftable = canCraft(r);
+    const done = state.crafted.includes(r.id);
+    return `<div class="craft-card ${craftable && !done ? 'craftable' : ''}">
+      <div class="craft-result-icon">${r.icon}</div>
+      <div class="craft-name">${r.name}</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:4px">${r.desc}</div>
+      <div class="craft-ingredients">${r.ingredients.map(i => getIngLabel(i)).join('<br>')}</div>
+      <button class="craft-btn" ${(!craftable || done) ? 'disabled' : ''} onclick="doCraft('${r.id}')">
+        ${done ? '✅ DÉJÀ CRAFTÉ' : craftable ? '⚗️ CRAFTER' : '🔒 INSUFFISANT'}
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function doCraft(id) {
+  const recipe = CRAFT_RECIPES.find(r => r.id === id);
+  if(!recipe || !canCraft(recipe)) return;
+  if(!state.crafted) state.crafted = [];
+  if(state.crafted.includes(id)) return;
+  // Consume ingredients
+  recipe.ingredients.forEach(ing => {
+    if(ing.item === 'gold') state.gold -= ing.amount;
+  });
+  state.crafted.push(id);
+  state.totalCrafts = (state.totalCrafts || 0) + 1;
+  saveState();
+  recipe.effect();
+  haptic('success');
+  renderCraft();
+  checkAchievements();
+}
+
+// ============================================================
+// SUCCÈS SECRETS (override renderAchievements)
+// ============================================================
+function renderAchievements() {
+  const grid = document.getElementById('achievements-grid');
+  if(!grid) return;
+  grid.innerHTML = ACHIEVEMENTS.map(a => {
+    const unlocked = a.condition(state);
+    if(unlocked && !state.unlockedAchievements.includes(a.id)) {
+      state.unlockedAchievements.push(a.id);
+      saveState();
+    }
+    const isSecret = a.secret && !unlocked;
+    return `<div class="achievement ${unlocked ? 'unlocked' : 'locked'} ${isSecret ? 'ach-secret' : ''}">
+      ${unlocked ? '<div class="ach-badge">✓</div>' : ''}
+      <span class="ach-icon">${unlocked && a.revealName ? a.icon : (isSecret ? '❓' : a.icon)}</span>
+      <div class="ach-name">${unlocked && a.revealName ? a.revealName : (isSecret ? '???' : a.name)}</div>
+      <div class="ach-desc">${unlocked && a.revealDesc ? a.revealDesc : (isSecret ? 'Succès secret' : a.desc)}</div>
+    </div>`;
+  }).join('');
+}
+
+function checkAchievements() {
+  const prev = [...state.unlockedAchievements];
+  ACHIEVEMENTS.forEach(a => {
+    if(!prev.includes(a.id) && a.condition(state)) {
+      state.unlockedAchievements.push(a.id);
+      saveState();
+      const displayName = a.revealName || a.name;
+      if(a.secret) {
+        haptic('levelup');
+        setTimeout(() => showToast('success', '🔓 SUCCÈS SECRET débloqué : ' + displayName + ' !'), 1500);
+      } else {
+        setTimeout(() => showToast('success', '🏅 Succès débloqué : ' + displayName), 1500);
+      }
+    }
+  });
+}
+
+// Track night workout
+function checkNightWorkout() {
+  const h = new Date().getHours();
+  if(h >= 22 || h < 3) { state.nightWorkout = true; saveState(); }
+}
+
 function init() {
+  hideSplash();
   checkWeeklyReset();
   updateHeader();
   renderDashboard();
@@ -3521,28 +3925,37 @@ function init() {
   renderPrograms();
   renderGoals();
   renderCalendar();
+  renderCraft();
   updateExoIllustration();
-
-  // Service worker hors-ligne
+  updateCoach();
   registerServiceWorker();
 
-  // Auto-schedule reminder
+  // Météo
+  try { fetchWeather(); } catch(e) {}
+
+  // Haptique sur boutons
+  document.querySelectorAll('.submit-btn, .nav-btn, .quest-card, .craft-btn').forEach(el => {
+    el.addEventListener('click', () => haptic('light'));
+  });
+
   if(localStorage.getItem('fq_notif') === 'true' && Notification.permission === 'granted') {
     scheduleReminderNotification();
   }
 
-  // Nav refresh callbacks
   document.querySelectorAll('.nav-btn').forEach((btn, i) => {
     btn.addEventListener('click', () => {
       const pages = ['home','quests','workout','calendar','stats','profile'];
       const page = pages[i];
+      haptic('light');
       if(page === 'stats') setTimeout(() => { renderWeightLog(); renderExoHistory(); renderGoals(); }, 50);
-      if(page === 'profile') setTimeout(() => { renderShop(); renderMounts(); renderPrograms(); }, 50);
+      if(page === 'profile') setTimeout(() => { renderShop(); renderMounts(); renderPrograms(); renderCraft(); }, 50);
       if(page === 'workout') setTimeout(renderWorkoutHistory, 50);
       if(page === 'calendar') setTimeout(renderCalendar, 50);
+      if(page === 'home') setTimeout(updateCoach, 100);
     });
   });
 }
+
 
 
 init();
