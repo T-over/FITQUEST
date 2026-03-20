@@ -1815,6 +1815,12 @@ body::after {
     <div class="card-title"><span>📊</span> JOURNAL D'ENTRAÎNEMENT</div>
     <div id="workout-history-list"><div class="empty-state"><span class="empty-icon">📓</span><div class="empty-text">Ton journal est vide.<br>Commence à t'entraîner !</div></div></div>
   </div>
+
+  <!-- DURÉE DES SÉANCES -->
+  <div class="card">
+    <div class="card-title"><span>⏱️</span> DURÉE DE MES SÉANCES</div>
+    <div id="session-history-list"><div style="color:var(--text2);font-size:12px;text-align:center;padding:12px">Lance une session pour voir ta durée ici.</div></div>
+  </div>
 </section>
 
 <!-- ======== STATS ======== -->
@@ -2035,7 +2041,7 @@ body::after {
   <div style="padding:12px 16px;background:rgba(0,0,0,0.9);flex-shrink:0">
     <button id="pose-validate-btn" onclick="validatePoseSession()" disabled
       style="width:100%;padding:14px;background:var(--bg3);border:2px solid var(--muted);color:var(--muted);font-weight:900;font-size:14px;letter-spacing:1px;border-radius:var(--radius);cursor:not-allowed">
-      ⏳ FAIS AU MOINS 3 POMPES CORRECTES
+      ⏳ VALIDATION EN COURS (0/3)
     </button>
   </div>
 </div>
@@ -2349,6 +2355,8 @@ function loadState() {
     weeklyDaysThisWeek: 0,
     weeklySquatsThisWeek: 0,
     lastWeekReset: null,
+    weeklyDaysLog: [], // dates des jours d'entraînement cette semaine
+    sessionLog: [],    // [{date, duration, startTime}] historique des séances
     activeProgram: null,
     programDay: 0,
     ownedMounts: [],
@@ -2729,8 +2737,8 @@ function logRun() {
 
   // weekly tracking
   checkWeeklyReset();
-  state.weeklyKmThisWeek = (state.weeklyKmThisWeek || 0) + dist;
-  state.weeklyDaysThisWeek = (state.weeklyDaysThisWeek || 0) + 1;
+  // jour compté via startSession()
+  trackWeeklyDay();
   // or gagné après logRun → appelé après addXP
 
   const details = dist+'km' + (time ? ' · '+time+'min' : '') + ' · '+type;
@@ -2800,7 +2808,7 @@ function logLift() {
   // weekly tracking
   checkWeeklyReset();
   state.weeklyLiftsThisWeek = (state.weeklyLiftsThisWeek || 0) + 1;
-  state.weeklyDaysThisWeek = (state.weeklyDaysThisWeek || 0) + 1;
+  // jour compté via startSession()
   if(exoLow.includes('squat')) state.weeklySquatsThisWeek = (state.weeklySquatsThisWeek || 0) + sets;
   // or gagné après logLift → appelé après addXP
 
@@ -3099,6 +3107,14 @@ function startSession() {
     showToast('info', '⏱️ Une session est déjà en cours !');
     return;
   }
+
+  // Vérifier si une séance a déjà été comptée aujourd'hui
+  const today = new Date().toDateString();
+  const alreadyToday = (state.weeklyDaysLog || []).includes(today);
+  if(alreadyToday) {
+    showToast('info', '⏱️ Tu as déjà compté une séance aujourd\'hui. La session démarre mais ne compte pas de jour supplémentaire.');
+  }
+
   sessionStart = Date.now();
   document.getElementById('active-session-banner').style.display = 'flex';
   document.getElementById('session-timer').textContent = '00:00';
@@ -3108,18 +3124,49 @@ function startSession() {
     const s = String(elapsed % 60).padStart(2, '0');
     document.getElementById('session-timer').textContent = m + ':' + s;
   }, 1000);
-  showToast('success', '⏱️ Session démarrée !');
+
+  // Compter le jour (une seule fois par jour)
+  if(!alreadyToday) {
+    trackWeeklyDay();
+    try { updateBossProgress(state.weeklyDaysThisWeek, state.weeklyKmThisWeek || 0, state.weeklyLiftsThisWeek || 0); } catch(e) {}
+    try { updateWeeklyChallenge(); } catch(e) {}
+  }
+
+  haptic('success');
+  showToast('success', '⏱️ Session démarrée ! C\'est parti 💪');
 }
 
 function stopSession() {
   if(!sessionTimer) return;
   const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
-  const m = Math.floor(elapsed / 60);
+  const minutes = Math.floor(elapsed / 60);
+  const seconds = elapsed % 60;
+
   clearInterval(sessionTimer);
   sessionTimer = null;
-  sessionStart = null;
   document.getElementById('active-session-banner').style.display = 'none';
-  showToast('success', '✅ Session terminée ! Durée : ' + m + ' min');
+
+  // Sauvegarder la durée dans l'historique
+  if(elapsed > 30) { // au moins 30 secondes pour compter
+    if(!state.sessionLog) state.sessionLog = [];
+    const now = new Date();
+    state.sessionLog.push({
+      date: now.toLocaleDateString('fr-FR'),
+      dateKey: now.toDateString(),
+      duration: elapsed,
+      durationMin: minutes,
+      startTime: new Date(sessionStart).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})
+    });
+    // Garder seulement les 30 dernières séances
+    if(state.sessionLog.length > 30) state.sessionLog = state.sessionLog.slice(-30);
+    saveState();
+    renderSessionHistory();
+  }
+
+  haptic('success');
+  sessionStart = null;
+  const durationStr = minutes > 0 ? minutes + ' min ' + seconds + ' sec' : seconds + ' sec';
+  showToast('success', '✅ Session terminée ! Durée : ' + durationStr);
 }
 
 // ============================================================
@@ -3216,12 +3263,23 @@ function getWeekNumber() {
   return Math.ceil(((d - onejan) / 86400000 + onejan.getDay() + 1) / 7);
 }
 
+// Compte un jour d'entraînement seulement une fois par jour
+function trackWeeklyDay() {
+  const today = new Date().toDateString();
+  if(!state.weeklyDaysLog) state.weeklyDaysLog = [];
+  if(!state.weeklyDaysLog.includes(today)) {
+    state.weeklyDaysLog.push(today);
+    state.weeklyDaysThisWeek = state.weeklyDaysLog.length;
+  }
+}
+
 function checkWeeklyReset() {
   const currentWeek = getWeekNumber();
   if(state.lastWeekReset !== currentWeek) {
     state.weeklyKmThisWeek = 0;
     state.weeklyLiftsThisWeek = 0;
     state.weeklyDaysThisWeek = 0;
+    state.weeklyDaysLog = [];
     state.weeklySquatsThisWeek = 0;
     state.weeklyBossDefeated = false;
     state.weeklyBossProgress = 0;
@@ -3734,15 +3792,44 @@ function calShowDay(dateStr) {
   const workouts = (state.workouts||[]).filter(w => w.date === dateStr);
   const el = document.getElementById('cal-day-detail');
   if(!el) return;
+
   if(workouts.length === 0) {
     el.innerHTML = `<div style="color:var(--text2);font-size:13px">Aucune séance le ${dateStr}.</div>`;
     return;
   }
-  el.innerHTML = workouts.map(w => `
+
+  // Cherche les sessions de ce jour
+  const sessions = (state.sessionLog||[]).filter(s => s.date === dateStr);
+  let sessionBanner = '';
+  if(sessions.length > 0) {
+    const totalSec = sessions.reduce((sum, s) => sum + (s.duration || 0), 0);
+    const totalMin = Math.floor(totalSec / 60);
+    const totalSec2 = totalSec % 60;
+    const timeStr = totalMin > 0
+      ? totalMin + ' min' + (totalSec2 > 0 ? ' ' + totalSec2 + 's' : '')
+      : totalSec + ' sec';
+    const sessionList = sessions.map(s =>
+      `<span style="font-size:11px;color:var(--text2)">⏱️ Démarrée à ${s.startTime} — ${s.durationMin} min</span>`
+    ).join('<br>');
+    sessionBanner = `
+      <div style="background:linear-gradient(135deg,rgba(0,245,255,0.1),rgba(168,85,247,0.1));border:1px solid rgba(0,245,255,0.3);border-radius:var(--radius);padding:12px;margin-bottom:10px">
+        <div style="font-size:22px;font-weight:900;font-family:'Exo 2',sans-serif;color:var(--accent)">⏱️ ${timeStr} de sport</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px">${sessions.length} session${sessions.length > 1 ? 's' : ''} ce jour</div>
+        <div style="margin-top:6px">${sessionList}</div>
+      </div>`;
+  }
+
+  // Total XP du jour
+  const totalXP = workouts.reduce((sum, w) => sum + (w.xp || 0), 0);
+
+  el.innerHTML = sessionBanner + workouts.map(w => `
     <div class="cal-detail-item">
       <span style="margin-right:8px">${w.type==='run'?'🏃':'🏋️'}</span>
       <strong>${w.name}</strong> — ${w.details} <span style="color:var(--xp-color)">+${w.xp} XP</span>
-    </div>`).join('');
+    </div>`).join('') +
+    `<div style="text-align:right;margin-top:8px;font-size:12px;color:var(--accent3);font-family:'Share Tech Mono',monospace">
+      Total : +${totalXP} XP • ${workouts.length} exercice${workouts.length > 1 ? 's' : ''}
+    </div>`;
 }
 
 function calPrev() {
@@ -4645,7 +4732,7 @@ function updatePoseHUD() {
     if(poseTargetReps > 0) {
       btn.textContent = '⏳ ' + poseValidReps + ' / ' + poseTargetReps + ' POMPES VALIDÉES';
     } else {
-      btn.textContent = '⏳ FAIS AU MOINS 3 POMPES CORRECTES (' + poseValidReps + '/3)';
+      btn.textContent = '⏳ FAIS AU MOINS 3 ' + (poseCurrentExo || 'POMPES').toUpperCase() + ' CORRECTES (' + poseValidReps + '/3)';
     }
   }
 }
@@ -4779,6 +4866,55 @@ function closePoseCamera() {
   if(poseStream) { poseStream.getTracks().forEach(t => t.stop()); poseStream = null; }
 }
 
+function renderSessionHistory() {
+  const el = document.getElementById('session-history-list');
+  if(!el) return;
+  if(!state.sessionLog || state.sessionLog.length === 0) {
+    el.innerHTML = '<div style="color:var(--text2);font-size:12px;text-align:center;padding:12px">Lance une session pour voir ta durée ici.</div>';
+    return;
+  }
+
+  // Grouper par date
+  const byDate = {};
+  state.sessionLog.forEach(s => {
+    if(!byDate[s.dateKey]) byDate[s.dateKey] = [];
+    byDate[s.dateKey].push(s);
+  });
+
+  const html = Object.entries(byDate).reverse().slice(0, 10).map(([dateKey, sessions]) => {
+    const totalSec = sessions.reduce((acc, s) => acc + s.duration, 0);
+    const totalMin = Math.floor(totalSec / 60);
+    const date = sessions[0].date;
+
+    const sessionsHtml = sessions.map(s => {
+      const m = Math.floor(s.duration / 60);
+      const sec = s.duration % 60;
+      const dur = m > 0 ? m + 'min ' + sec + 's' : sec + 's';
+      return `<div style="font-size:11px;color:var(--text2);padding:3px 0 3px 12px;border-left:2px solid var(--border)">
+        🕐 ${s.startTime} — <span style="color:var(--accent)">${dur}</span>
+      </div>`;
+    }).join('');
+
+    // Barre de durée (max 90min)
+    const pct = Math.min(100, Math.round(totalMin / 90 * 100));
+    const barColor = totalMin >= 60 ? 'var(--accent4)' : totalMin >= 30 ? 'var(--accent3)' : 'var(--accent)';
+
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-weight:700;font-size:13px">${date}</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:${barColor}">${totalMin} min</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:4px;height:6px;overflow:hidden;margin-bottom:6px">
+        <div style="height:100%;width:${pct}%;background:${barColor};border-radius:4px;transition:width 0.4s"></div>
+      </div>
+      ${sessions.length > 1 ? '<div style="font-size:10px;color:var(--text2);margin-bottom:4px">' + sessions.length + ' séances</div>' : ''}
+      ${sessionsHtml}
+    </div>`;
+  }).join('');
+
+  el.innerHTML = html || '<div style="color:var(--text2);font-size:12px;text-align:center;padding:12px">Aucune séance enregistrée.</div>';
+}
+
 function init() {
   hideSplash();
   checkWeeklyReset();
@@ -4796,6 +4932,7 @@ function init() {
   renderGoals();
   renderCalendar();
   renderCraft();
+  renderSessionHistory();
   updateExoIllustration();
   updateCoach();
   registerServiceWorker();
@@ -4819,7 +4956,7 @@ function init() {
       haptic('light');
       if(page === 'stats') setTimeout(() => { renderWeightLog(); renderExoHistory(); renderGoals(); }, 50);
       if(page === 'profile') setTimeout(() => { renderShop(); renderMounts(); renderPrograms(); renderCraft(); }, 50);
-      if(page === 'workout') setTimeout(() => { renderWorkoutHistory(); updateExoIllustration(); }, 50);
+      if(page === 'workout') setTimeout(() => { renderWorkoutHistory(); renderSessionHistory(); updateExoIllustration(); }, 50);
       if(page === 'calendar') setTimeout(renderCalendar, 50);
       if(page === 'home') setTimeout(updateCoach, 100);
     });
