@@ -1874,6 +1874,10 @@ const TITLES = [
   {id:'ironman', name:'Iron Man', unlocked: false},
   {id:'bestmode', name:'BESTMODE', unlocked: false},
   {id:'centurion', name:'Centurion', unlocked: false},
+  {id:'title_beast', name:'BEAST', unlocked: false},
+  {id:'title_ghost', name:'Ghost', unlocked: false},
+  {id:'title_elite', name:'ÉLITE', unlocked: false},
+  {id:'title_machine', name:'Machine', unlocked: false},
 ];
 
 const DAILY_QUESTS = [
@@ -2054,7 +2058,7 @@ function addXP(amount, reason) {
   saveState();
   updateHeader();
   showXPFloat('+'+amount+' XP');
-  showToast('xp-toast','⚡ +'+amount+' XP — '+reason);
+  showToast('success', '⚡ +'+amount+' XP — '+reason);
   const newLv = getLevel(state.xp);
   if(newLv > oldLv) {
     setTimeout(() => showLevelUp(newLv), 800);
@@ -3004,14 +3008,31 @@ function buyShopItem(id) {
   if(!state.shopOwned) state.shopOwned = [];
   if(state.shopOwned.includes(id)) {
     // Equip
-    if(item.type === 'avatar') { state.activeAvatar = id; document.getElementById('p-avatar').textContent = item.icon; document.getElementById('h-avatar').textContent = item.icon; }
-    if(item.type === 'title') { state.activeTitle = id; if(!state.unlockedTitles.includes(id)) state.unlockedTitles.push(id); }
-    saveState(); renderShop(); showToast('success', '✅ ' + item.name + ' équipé !');
+    if(item.type === 'avatar') {
+      state.activeAvatar = id;
+      const pAvatar = document.getElementById('p-avatar');
+      const hAvatar = document.getElementById('h-avatar');
+      if(pAvatar) pAvatar.textContent = item.icon;
+      if(hAvatar) hAvatar.textContent = item.icon;
+    }
+    if(item.type === 'title') {
+      state.activeTitle = id;
+      if(!state.unlockedTitles.includes(id)) state.unlockedTitles.push(id);
+      renderProfile();
+    }
+    saveState(); renderShop();
+    showToast('success', '✅ ' + item.name + ' équipé !');
     return;
   }
-  if((state.shopXP || 0) < item.price) { showToast('info', '💰 Pas assez de XP Boutique ! Tu en gagnes en t\'entraînant.'); return; }
+  if((state.shopXP || 0) < item.price) {
+    showToast('info', '💰 Pas assez de XP Boutique ! Tu en gagnes en t\'entraînant.');
+    return;
+  }
   state.shopXP -= item.price;
   state.shopOwned.push(id);
+  if(item.type === 'title' && !state.unlockedTitles.includes(id)) {
+    state.unlockedTitles.push(id);
+  }
   saveState(); renderShop();
   showToast('success', '🎉 ' + item.name + ' débloqué ! Clique à nouveau pour l\'équiper.');
 }
