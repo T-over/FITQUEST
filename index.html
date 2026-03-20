@@ -1773,6 +1773,7 @@ body::after {
       </div>
       <button class="submit-btn" style="background:linear-gradient(135deg,var(--accent2),var(--xp-color));color:#fff;padding:14px" onclick="openPoseCamera()">
         📷 LANCER L'ANALYSE IA
+        <span id="camera-target-label" style="display:block;font-size:11px;opacity:0.8;margin-top:2px">Remplis d'abord le nombre de reps</span>
       </button>
     </div>
     </div>
@@ -1783,7 +1784,7 @@ body::after {
       </div>
       <div class="form-group">
         <label class="form-label">REPS</label>
-        <input class="form-input" type="number" id="lift-reps" placeholder="10" min="1">
+        <input class="form-input" type="number" id="lift-reps" placeholder="10" min="1" oninput="updateCameraTargetLabel()">
       </div>
     </div>
     <div class="form-group">
@@ -4012,6 +4013,7 @@ let poseRepCount = 0;
 let poseFormScore = 0;
 let posePhase = 'up'; // 'up' or 'down'
 let poseValidReps = 0;
+let poseTargetReps = 0;
 let poseSessionValidated = false;
 let poseTotalFormScores = [];
 
@@ -4146,10 +4148,25 @@ function drawSkeleton(ctx, keypoints, canvas) {
   });
 }
 
+function updateCameraTargetLabel() {
+  const reps = parseInt(document.getElementById('lift-reps').value) || 0;
+  const label = document.getElementById('camera-target-label');
+  if(!label) return;
+  if(reps > 0) {
+    label.textContent = '🎯 Objectif : ' + reps + ' pompe' + (reps > 1 ? 's' : '') + ' à valider';
+  } else {
+    label.textContent = 'Remplis d\'abord le nombre de reps';
+  }
+}
+
 async function openPoseCamera() {
   const modal = document.getElementById('pose-modal');
   modal.style.display = 'flex';
   modal.style.flexDirection = 'column';
+
+  // Lire le nombre de reps cible depuis le formulaire
+  const targetInput = parseInt(document.getElementById('lift-reps').value) || 0;
+  poseTargetReps = targetInput > 0 ? targetInput : 0;
 
   // Reset state
   poseRepCount = 0;
@@ -4161,7 +4178,11 @@ async function openPoseCamera() {
   updatePoseHUD();
 
   const status = document.getElementById('pose-status-msg');
-  status.textContent = '⏳ Chargement du modèle IA...';
+  if(poseTargetReps > 0) {
+    status.textContent = '🎯 Objectif : ' + poseTargetReps + ' pompes. Chargement IA...';
+  } else {
+    status.textContent = '⏳ Chargement du modèle IA... (aucune cible définie)';
+  }
 
   try {
     // Caméra
@@ -4187,7 +4208,9 @@ async function openPoseCamera() {
       );
     }
 
-    status.textContent = '📍 Place-toi de profil, bras tendus. Go !';
+    status.textContent = poseTargetReps > 0
+      ? '🎯 Objectif : ' + poseTargetReps + ' pompes. Place-toi de profil, bras tendus. Go !'
+      : '📍 Place-toi de profil, bras tendus. Go !';
     runPoseLoop();
 
   } catch(err) {
@@ -4201,20 +4224,30 @@ function updatePoseHUD() {
   document.getElementById('pose-form-score').textContent = poseFormScore > 0 ? poseFormScore + '%' : '--';
 
   const btn = document.getElementById('pose-validate-btn');
-  if(poseValidReps >= 3) {
+  const target = poseTargetReps > 0 ? poseTargetReps : 3;
+  const needed = Math.max(target, Math.ceil(target * 0.8)); // 80% min si forme imparfaite
+  const isReady = poseTargetReps > 0
+    ? (poseValidReps >= poseTargetReps)           // objectif exact atteint
+    : (poseValidReps >= 3);                        // minimum 3 si pas de cible
+
+  if(isReady) {
     btn.disabled = false;
     btn.style.background = 'linear-gradient(135deg,var(--accent4),#00c800)';
     btn.style.borderColor = 'var(--accent4)';
     btn.style.color = '#000';
     btn.style.cursor = 'pointer';
-    btn.textContent = '✅ VALIDER ' + poseRepCount + ' POMPES — CONTINUER';
+    btn.textContent = '✅ OBJECTIF ATTEINT — ' + poseRepCount + ' POMPES VALIDÉES !';
   } else {
     btn.disabled = true;
     btn.style.background = 'var(--bg3)';
     btn.style.borderColor = 'var(--muted)';
     btn.style.color = 'var(--muted)';
     btn.style.cursor = 'not-allowed';
-    btn.textContent = '⏳ FAIS AU MOINS 3 POMPES CORRECTES (' + poseValidReps + '/3)';
+    if(poseTargetReps > 0) {
+      btn.textContent = '⏳ ' + poseValidReps + ' / ' + poseTargetReps + ' POMPES VALIDÉES';
+    } else {
+      btn.textContent = '⏳ FAIS AU MOINS 3 POMPES CORRECTES (' + poseValidReps + '/3)';
+    }
   }
 }
 
@@ -4261,12 +4294,20 @@ async function runPoseLoop() {
             if(analysis.formScore >= 60) {
               poseValidReps++;
               haptic('success');
-              document.getElementById('pose-status-msg').textContent =
-                '💪 Rep ' + poseRepCount + ' validée ! Forme : ' + analysis.formScore + '%';
+              const target = poseTargetReps > 0 ? poseTargetReps : 3;
+              const remaining = target - poseValidReps;
+              if(remaining > 0) {
+                document.getElementById('pose-status-msg').textContent =
+                  '💪 Rep ' + poseRepCount + ' ✅ — Encore ' + remaining + ' pompe(s) ! (' + poseValidReps + '/' + target + ')';
+              } else {
+                document.getElementById('pose-status-msg').textContent =
+                  '🎉 OBJECTIF ATTEINT ! ' + poseValidReps + ' pompes validées. Forme : ' + analysis.formScore + '%';
+              }
             } else {
               haptic('light');
+              const target = poseTargetReps > 0 ? poseTargetReps : 3;
               document.getElementById('pose-status-msg').textContent =
-                '⚠️ Rep ' + poseRepCount + ' — Améliore ta forme (' + analysis.formScore + '%)';
+                '⚠️ Rep ' + poseRepCount + ' non comptée — forme insuffisante (' + analysis.formScore + '%) (' + poseValidReps + '/' + target + ')';
             }
 
             document.getElementById('pose-phase-icon').textContent = '⬆️';
