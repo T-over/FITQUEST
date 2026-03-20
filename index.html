@@ -2352,6 +2352,7 @@ function loadState() {
     weeklyChallengeWeek: -1,
     weeklyKmThisWeek: 0,
     weeklyLiftsThisWeek: 0,
+    weeklyLiftDaysLog: [], // jours distincts avec séance muscu
     weeklyDaysThisWeek: 0,
     weeklySquatsThisWeek: 0,
     lastWeekReset: null,
@@ -2807,7 +2808,7 @@ function logLift() {
 
   // weekly tracking
   checkWeeklyReset();
-  state.weeklyLiftsThisWeek = (state.weeklyLiftsThisWeek || 0) + 1;
+  trackWeeklyLiftDay();
   // jour compté via startSession()
   if(exoLow.includes('squat')) state.weeklySquatsThisWeek = (state.weeklySquatsThisWeek || 0) + sets;
   // or gagné après logLift → appelé après addXP
@@ -3263,6 +3264,16 @@ function getWeekNumber() {
   return Math.ceil(((d - onejan) / 86400000 + onejan.getDay() + 1) / 7);
 }
 
+// Compte un jour de muscu seulement une fois par jour
+function trackWeeklyLiftDay() {
+  const today = new Date().toDateString();
+  if(!state.weeklyLiftDaysLog) state.weeklyLiftDaysLog = [];
+  if(!state.weeklyLiftDaysLog.includes(today)) {
+    state.weeklyLiftDaysLog.push(today);
+    state.weeklyLiftsThisWeek = state.weeklyLiftDaysLog.length;
+  }
+}
+
 // Compte un jour d'entraînement seulement une fois par jour
 function trackWeeklyDay() {
   const today = new Date().toDateString();
@@ -3278,6 +3289,7 @@ function checkWeeklyReset() {
   if(state.lastWeekReset !== currentWeek) {
     state.weeklyKmThisWeek = 0;
     state.weeklyLiftsThisWeek = 0;
+    state.weeklyLiftDaysLog = [];
     state.weeklyDaysThisWeek = 0;
     state.weeklyDaysLog = [];
     state.weeklySquatsThisWeek = 0;
@@ -3798,28 +3810,35 @@ function calShowDay(dateStr) {
     return;
   }
 
-  // Cherche les sessions de ce jour
+  // Cherche les sessions timer de ce jour (même format de date)
   const sessions = (state.sessionLog||[]).filter(s => s.date === dateStr);
   let sessionBanner = '';
+
   if(sessions.length > 0) {
     const totalSec = sessions.reduce((sum, s) => sum + (s.duration || 0), 0);
     const totalMin = Math.floor(totalSec / 60);
-    const totalSec2 = totalSec % 60;
+    const remSec = totalSec % 60;
     const timeStr = totalMin > 0
-      ? totalMin + ' min' + (totalSec2 > 0 ? ' ' + totalSec2 + 's' : '')
+      ? totalMin + ' min' + (remSec > 0 ? ' ' + remSec + 's' : '')
       : totalSec + ' sec';
     const sessionList = sessions.map(s =>
-      `<span style="font-size:11px;color:var(--text2)">⏱️ Démarrée à ${s.startTime} — ${s.durationMin} min</span>`
-    ).join('<br>');
+      `<div style="font-size:11px;color:var(--text2);margin-top:3px">⏱️ Démarrée à ${s.startTime} — ${s.durationMin} min</div>`
+    ).join('');
     sessionBanner = `
-      <div style="background:linear-gradient(135deg,rgba(0,245,255,0.1),rgba(168,85,247,0.1));border:1px solid rgba(0,245,255,0.3);border-radius:var(--radius);padding:12px;margin-bottom:10px">
-        <div style="font-size:22px;font-weight:900;font-family:'Exo 2',sans-serif;color:var(--accent)">⏱️ ${timeStr} de sport</div>
+      <div style="background:linear-gradient(135deg,rgba(0,245,255,0.1),rgba(168,85,247,0.1));border:1px solid rgba(0,245,255,0.35);border-radius:var(--radius);padding:12px;margin-bottom:10px">
+        <div style="font-size:24px;font-weight:900;font-family:'Exo 2',sans-serif;color:var(--accent)">⏱️ ${timeStr} de sport</div>
         <div style="font-size:11px;color:var(--text2);margin-top:2px">${sessions.length} session${sessions.length > 1 ? 's' : ''} ce jour</div>
-        <div style="margin-top:6px">${sessionList}</div>
+        ${sessionList}
+      </div>`;
+  } else {
+    // Pas de timer utilisé ce jour — on estime la durée par le nombre d'exos
+    const est = workouts.length * 5;
+    sessionBanner = `
+      <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:var(--radius);padding:10px;margin-bottom:10px">
+        <div style="font-size:13px;color:var(--text2)">⏱️ Durée estimée : ~${est} min <span style="font-size:10px">(lance le timer pour mesurer précisément)</span></div>
       </div>`;
   }
 
-  // Total XP du jour
   const totalXP = workouts.reduce((sum, w) => sum + (w.xp || 0), 0);
 
   el.innerHTML = sessionBanner + workouts.map(w => `
@@ -4722,7 +4741,7 @@ function updatePoseHUD() {
     btn.style.borderColor = 'var(--accent4)';
     btn.style.color = '#000';
     btn.style.cursor = 'pointer';
-    btn.textContent = '✅ OBJECTIF ATTEINT — ' + poseRepCount + ' POMPES VALIDÉES !';
+    btn.textContent = '✅ OBJECTIF ATTEINT — ' + poseRepCount + ' ' + (poseCurrentExo||'REPS').toUpperCase() + ' VALIDÉES !';
   } else {
     btn.disabled = true;
     btn.style.background = 'var(--bg3)';
@@ -4730,7 +4749,7 @@ function updatePoseHUD() {
     btn.style.color = 'var(--muted)';
     btn.style.cursor = 'not-allowed';
     if(poseTargetReps > 0) {
-      btn.textContent = '⏳ ' + poseValidReps + ' / ' + poseTargetReps + ' POMPES VALIDÉES';
+      btn.textContent = '⏳ ' + poseValidReps + ' / ' + poseTargetReps + ' ' + (poseCurrentExo||'REPS').toUpperCase() + ' VALIDÉES';
     } else {
       btn.textContent = '⏳ FAIS AU MOINS 3 ' + (poseCurrentExo || 'POMPES').toUpperCase() + ' CORRECTES (' + poseValidReps + '/3)';
     }
