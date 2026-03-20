@@ -3500,23 +3500,9 @@ function calNext() {
 // ============================================================
 function registerServiceWorker() {
   if('serviceWorker' in navigator) {
-    const swCode = `
-const CACHE = 'fitquest-v1';
-const ASSETS = ['/FITQUEST/', '/FITQUEST/index.html', '/FITQUEST/manifest.json', '/FITQUEST/icon-192.png', '/FITQUEST/icon-512.png'];
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
-});
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))));
-});
-self.addEventListener('fetch', e => {
-  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('/FITQUEST/'))));
-});`;
-    const blob = new Blob([swCode], {type:'application/javascript'});
-    const url = URL.createObjectURL(blob);
-    navigator.serviceWorker.register(url).then(() => {
-      console.log('SW enregistré — mode hors-ligne actif');
-    }).catch(e => console.log('SW non supporté:', e));
+    navigator.serviceWorker.register('/FITQUEST/sw.js')
+      .then(() => console.log('SW actif — hors-ligne OK'))
+      .catch(e => console.log('SW erreur:', e));
   }
 }
 
