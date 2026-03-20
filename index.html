@@ -3021,20 +3021,22 @@ function renderShop() {
     const owned = state.shopOwned && state.shopOwned.includes(item.id);
     const isActive = (item.type === 'avatar' && state.activeAvatar === item.id) ||
                      (item.type === 'title' && state.activeTitle === item.id);
-    return `<div class="shop-item ${owned?'owned':''} ${isActive?'active-item':''}" onclick="buyShopItem('${item.id}')">
+    const priceLabel = owned ? (isActive ? '✅ ACTIF' : '✓ ÉQUIPER') : '💰 ' + item.price + ' or';
+    return `<div class="shop-item ${owned?'owned':''} ${isActive?'active-item':''}" onclick="buyShopItem(this)" data-id="${item.id}">
       <div class="shop-item-icon">${item.icon}</div>
       <div class="shop-item-name">${item.name}</div>
-      <div class="shop-item-price">${owned ? (isActive ? '✅ ACTIF' : '✓ ÉQUIPER') : '💰 ' + item.price + ' XP'}</div>
+      <div class="shop-item-price">${priceLabel}</div>
     </div>`;
   }).join('');
 }
 
-function buyShopItem(id) {
+function buyShopItem(el) {
+  const id = el.dataset.id;
   const item = SHOP_ITEMS.find(i => i.id === id);
   if(!item) return;
   if(!state.shopOwned) state.shopOwned = [];
   if(state.shopOwned.includes(id)) {
-    // Equip
+    // Équiper
     if(item.type === 'avatar') {
       state.activeAvatar = id;
       const pAvatar = document.getElementById('p-avatar');
@@ -3047,12 +3049,14 @@ function buyShopItem(id) {
       if(!state.unlockedTitles.includes(id)) state.unlockedTitles.push(id);
       renderProfile();
     }
-    saveState(); renderShop();
+    saveState();
+    renderShop();
     showToast('success', '✅ ' + item.name + ' équipé !');
     return;
   }
+  // Acheter
   if((state.gold || 0) < item.price) {
-    showToast('info', '💰 Pas assez de Or ! Tu en gagnes en t\'entraînant.');
+    showToast('info', '💰 Pas assez d\'or ! (' + (state.gold||0) + '/' + item.price + ')');
     return;
   }
   state.gold -= item.price;
@@ -3060,7 +3064,8 @@ function buyShopItem(id) {
   if(item.type === 'title' && !state.unlockedTitles.includes(id)) {
     state.unlockedTitles.push(id);
   }
-  saveState(); renderShop();
+  saveState();
+  renderShop();
   showToast('success', '🎉 ' + item.name + ' débloqué ! Clique à nouveau pour l\'équiper.');
 }
 
