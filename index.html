@@ -1396,6 +1396,54 @@ body::after {
 .exo-history-filter { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
 .exo-filter-btn { padding:6px 12px; border:1px solid var(--border); background:var(--bg3); color:var(--text2); border-radius:20px; cursor:pointer; font-size:11px; }
 .exo-filter-btn.active { border-color:var(--accent2); color:var(--accent2); }
+/* ===== ILLUSTRATIONS EXERCICES ===== */
+.exo-illustration { text-align:center; padding:12px 0 4px; }
+.exo-anim { font-size:64px; display:inline-block; animation:exo-bounce 0.6s infinite alternate; }
+@keyframes exo-bounce { from{transform:translateY(0) scale(1)} to{transform:translateY(-10px) scale(1.1)} }
+.exo-anim.run-anim { animation:exo-run 0.5s infinite alternate; }
+@keyframes exo-run { from{transform:translateX(-6px) rotate(-5deg)} to{transform:translateX(6px) rotate(5deg)} }
+.exo-tips { font-size:11px; color:var(--text2); text-align:center; padding:4px 12px 8px; line-height:1.6; }
+
+/* ===== OBJECTIFS ===== */
+.goal-card { background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:14px; margin-bottom:10px; position:relative; }
+.goal-card.done { border-color:var(--accent4); }
+.goal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.goal-name { font-weight:700; font-size:14px; }
+.goal-pct { font-size:12px; color:var(--accent3); font-family:'Share Tech Mono',monospace; }
+.goal-bar { background:var(--bg2); border-radius:4px; height:8px; overflow:hidden; }
+.goal-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width 0.4s; }
+.goal-card.done .goal-fill { background:var(--accent4); }
+.goal-detail { font-size:11px; color:var(--text2); margin-top:5px; }
+.goal-delete { position:absolute; top:10px; right:10px; background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; }
+
+/* ===== MONTURES ===== */
+.mount-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.mount-card { background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:14px; text-align:center; cursor:pointer; transition:border-color 0.2s; }
+.mount-card.owned { border-color:var(--accent); }
+.mount-card.active-mount { border-color:var(--accent3); background:rgba(255,215,0,0.06); }
+.mount-icon { font-size:36px; margin-bottom:6px; }
+.mount-name { font-size:12px; font-weight:700; margin-bottom:3px; }
+.mount-price { font-size:11px; color:var(--accent3); font-family:'Share Tech Mono',monospace; }
+.active-mount-display { text-align:center; padding:14px; background:rgba(255,215,0,0.07); border:1px solid rgba(255,215,0,0.25); border-radius:var(--radius); margin-bottom:14px; }
+.active-mount-icon { font-size:52px; display:inline-block; animation:mount-float 2s infinite alternate ease-in-out; }
+@keyframes mount-float { from{transform:translateY(0)} to{transform:translateY(-10px)} }
+
+/* ===== CALENDRIER ===== */
+.cal-month-nav { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.cal-nav-btn { background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:6px 14px; border-radius:var(--radius); cursor:pointer; font-size:18px; }
+.cal-month-title { font-family:'Exo 2',sans-serif; font-weight:700; font-size:16px; }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+.cal-head { text-align:center; font-size:10px; color:var(--text2); font-weight:700; padding:6px 0; }
+.cal-day { aspect-ratio:1; border-radius:6px; background:var(--bg3); border:1px solid transparent; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:11px; cursor:pointer; gap:2px; }
+.cal-day.other-month { opacity:0.25; }
+.cal-day.today { border-color:var(--xp-color); }
+.cal-day.run-day { background:rgba(0,245,255,0.15); color:var(--accent); }
+.cal-day.lift-day { background:rgba(255,60,172,0.15); color:var(--accent2); }
+.cal-day.both-day { background:rgba(255,215,0,0.15); color:var(--accent3); }
+.cal-day-num { font-weight:700; font-size:11px; }
+.cal-dot { width:4px; height:4px; border-radius:50%; background:currentColor; }
+.cal-detail-item { padding:8px 0; border-bottom:1px solid var(--border); font-size:13px; }
+.cal-detail-item:last-child { border-bottom:none; }
 </style>
 </head>
 <body>
@@ -1557,6 +1605,10 @@ body::after {
   <!-- RUN FORM -->
   <div id="run-form" class="card">
     <div class="card-title"><span>🏃</span> SÉANCE DE COURSE</div>
+    <div class="exo-illustration">
+      <div class="exo-anim run-anim">🏃</div>
+      <div class="exo-tips">Respire par le nez, atterris sur le milieu du pied. Hydrate-toi avant et après !</div>
+    </div>
     <div class="form-group">
       <label class="form-label">DISTANCE (KM)</label>
       <input class="form-input" type="number" id="run-dist" placeholder="5.0" step="0.1" min="0.1">
@@ -1591,9 +1643,13 @@ body::after {
   <!-- LIFT FORM -->
   <div id="lift-form" class="card" style="display:none">
     <div class="card-title"><span>🏋️</span> SÉANCE MUSCU</div>
+    <div class="exo-illustration">
+      <div class="exo-anim" id="exo-anim-icon">🏋️</div>
+      <div class="exo-tips" id="exo-anim-tips">Garde le dos droit, descends lentement.</div>
+    </div>
     <div class="form-group">
       <label class="form-label">EXERCICE</label>
-      <select class="form-select form-input" id="lift-exo">
+      <select class="form-select form-input" id="lift-exo" onchange="updateExoIllustration()">
         <option>Développé couché</option>
         <option>Squat</option>
         <option>Soulevé de terre</option>
@@ -1694,6 +1750,48 @@ body::after {
     <div class="exo-history-filter" id="exo-filter-row"></div>
     <div id="exo-history-list"><div style="color:var(--text2);font-size:12px;text-align:center;padding:12px">Commence à t'entraîner pour voir ta progression.</div></div>
   </div>
+
+  <!-- OBJECTIFS PERSONNALISÉS -->
+  <div class="card">
+    <div class="card-title"><span>🎯</span> MES OBJECTIFS</div>
+    <div id="goals-list"></div>
+    <div style="margin-top:12px">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">TYPE</label>
+          <select class="form-select form-input" id="goal-type">
+            <option value="km">Courir X km ce mois</option>
+            <option value="sessions">X séances ce mois</option>
+            <option value="xp">Gagner X XP ce mois</option>
+            <option value="streak">Série de X jours</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">CIBLE</label>
+          <input class="form-input" type="number" id="goal-target" placeholder="100" min="1">
+        </div>
+      </div>
+      <button class="submit-btn run-color" style="padding:10px" onclick="addGoal()">+ AJOUTER UN OBJECTIF</button>
+    </div>
+  </div>
+</section>
+
+<!-- ======== CALENDRIER ======== -->
+<section class="page" id="page-calendar">
+  <div class="section-title">📅 Calendrier</div>
+  <div class="card">
+    <div class="cal-month-nav">
+      <button class="cal-nav-btn" onclick="calPrev()">‹</button>
+      <div class="cal-month-title" id="cal-title">-</div>
+      <button class="cal-nav-btn" onclick="calNext()">›</button>
+    </div>
+    <div class="cal-grid" id="cal-headers"></div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span>📋</span> SÉANCES DU JOUR</div>
+    <div id="cal-day-detail" style="color:var(--text2);font-size:13px;padding:6px 0">Clique sur un jour pour voir tes séances.</div>
+  </div>
 </section>
 
 <!-- ======== PROFIL ======== -->
@@ -1719,6 +1817,16 @@ body::after {
     <div class="card-title"><span>🛒</span> BOUTIQUE COSMÉTIQUE</div>
     <div class="gold-display">💰 Or : <span id="gold-display">0</span></div>
     <div class="shop-grid" id="shop-grid"></div>
+  </div>
+
+  <!-- MONTURES -->
+  <div class="card">
+    <div class="card-title"><span>🐾</span> MONTURES & FAMILIERS</div>
+    <div class="active-mount-display">
+      <div class="active-mount-icon" id="active-mount-icon">🐾</div>
+      <div style="font-size:12px;color:var(--text2);margin-top:4px" id="active-mount-name">Aucune monture équipée</div>
+    </div>
+    <div class="mount-grid" id="mount-grid"></div>
   </div>
 
   <!-- PROGRAMMES -->
@@ -1768,6 +1876,7 @@ body::after {
   <button class="nav-btn active" onclick="navigate('home',this)"><span class="nav-icon">⚡</span>Accueil</button>
   <button class="nav-btn" onclick="navigate('quests',this)"><span class="nav-icon">⚔️</span>Quêtes<span class="nav-badge" id="quest-badge" style="display:none">!</span></button>
   <button class="nav-btn" onclick="navigate('workout',this)"><span class="nav-icon">🏋️</span>Workout</button>
+  <button class="nav-btn" onclick="navigate('calendar',this)"><span class="nav-icon">📅</span>Agenda</button>
   <button class="nav-btn" onclick="navigate('stats',this)"><span class="nav-icon">📊</span>Stats</button>
   <button class="nav-btn" onclick="navigate('profile',this)"><span class="nav-icon">👤</span>Profil</button>
 </nav>
@@ -1944,6 +2053,35 @@ const PROGRAMS = [
 ];
 
 
+const MOUNTS = [
+  {id:'mount_cat',    name:'Chat Ninja',     icon:'🐱', price:200,  desc:'Discret, efficace'},
+  {id:'mount_dog',    name:'Chien Fidèle',   icon:'🐕', price:300,  desc:'Toujours là pour toi'},
+  {id:'mount_wolf',   name:'Loup Arctique',  icon:'🐺', price:500,  desc:'Féroce et rapide'},
+  {id:'mount_horse',  name:'Cheval Guerre',  icon:'🐴', price:600,  desc:'Puissance et endurance'},
+  {id:'mount_eagle',  name:'Aigle Royal',    icon:'🦅', price:700,  desc:'Vue perçante, vol libre'},
+  {id:'mount_bear',   name:'Ours Grizzly',   icon:'🐻', price:800,  desc:'Force brute'},
+  {id:'mount_unicorn',name:'Licorne Néon',   icon:'🦄', price:1000, desc:'Rare et mystérieuse'},
+  {id:'mount_dragon', name:'Dragon de Feu',  icon:'🐲', price:1500, desc:'Légendaire. Indomptable.'},
+];
+
+const EXO_DATA = {
+  'Développé couché':    {icon:'🏋️', tips:'Dos plaqué, barre à hauteur des yeux. Descends lentement.'},
+  'Squat':               {icon:'🦵', tips:'Genoux dans l\'axe des pieds, descends cuisses parallèles au sol.'},
+  'Soulevé de terre':    {icon:'💪', tips:'Dos droit, barre proche du corps, pousse avec les jambes.'},
+  'Développé militaire': {icon:'🙌', tips:'Core gainé, pousse vertical au-dessus de la tête.'},
+  'Tractions':           {icon:'🤸', tips:'Omoplates rentrées, monte jusqu\'au menton au-dessus de la barre.'},
+  'Dips':                {icon:'💪', tips:'Descends à 90°, coudes proches du corps.'},
+  'Curl biceps':         {icon:'💪', tips:'Coudes fixes, ne balance pas le buste.'},
+  'Triceps poulie':      {icon:'💪', tips:'Coudes collés, extension complète vers le bas.'},
+  'Leg press':           {icon:'🦵', tips:'Pieds à largeur d\'épaules, ne verrouille pas les genoux.'},
+  'Rowing barre':        {icon:'🔙', tips:'Dos à 45°, tire la barre vers le nombril.'},
+  'Tirage poulie haute': {icon:'🔙', tips:'Penche légèrement, barre vers le haut de la poitrine.'},
+  'Extensions lombaires':{icon:'🔙', tips:'Mouvement lent et contrôlé, ne sur-étends pas.'},
+  'Crunchs':             {icon:'⚡', tips:'Expire en montant, contracte les abdos pleinement.'},
+  'Gainage':             {icon:'⚡', tips:'Corps droit, respire normalement, ne retiens pas ta respiration.'},
+  'Autre':               {icon:'🏋️', tips:'Exécute le mouvement avec contrôle. Qualité > quantité.'},
+};
+
 function loadState() {
   const defaults = {
     name: 'Guerrier',
@@ -1993,6 +2131,9 @@ function loadState() {
     lastWeekReset: null,
     activeProgram: null,
     programDay: 0,
+    ownedMounts: [],
+    activeMount: null,
+    goals: [],
   };
   try {
     const saved = localStorage.getItem('fq_state');
@@ -2018,6 +2159,7 @@ function navigate(page, btn) {
   if(page === 'quests') renderQuests('active');
   if(page === 'stats') renderStats();
   if(page === 'profile') renderProfile();
+  if(page === 'calendar') renderCalendar();
   window.scrollTo(0,0);
 }
 function goQuests() {
@@ -3153,6 +3295,231 @@ function resetRestTimer() {
 }
 
 
+// ============================================================
+// ILLUSTRATIONS EXERCICES
+// ============================================================
+function updateExoIllustration() {
+  const exo = document.getElementById('lift-exo').value;
+  const data = EXO_DATA[exo] || {icon:'🏋️', tips:'Exécute avec contrôle. Qualité > quantité.'};
+  const icon = document.getElementById('exo-anim-icon');
+  const tips = document.getElementById('exo-anim-tips');
+  if(icon) icon.textContent = data.icon;
+  if(tips) tips.textContent = data.tips;
+}
+
+// ============================================================
+// MONTURES
+// ============================================================
+function renderMounts() {
+  const grid = document.getElementById('mount-grid');
+  if(!grid) return;
+  if(!state.ownedMounts) state.ownedMounts = [];
+
+  const dispIcon = document.getElementById('active-mount-icon');
+  const dispName = document.getElementById('active-mount-name');
+  if(state.activeMount) {
+    const m = MOUNTS.find(x => x.id === state.activeMount);
+    if(m) {
+      if(dispIcon) dispIcon.textContent = m.icon;
+      if(dispName) dispName.textContent = m.name + ' — ' + m.desc;
+    }
+  } else {
+    if(dispIcon) dispIcon.textContent = '🐾';
+    if(dispName) dispName.textContent = 'Aucune monture équipée';
+  }
+
+  grid.innerHTML = MOUNTS.map(m => {
+    const owned = state.ownedMounts.includes(m.id);
+    const active = state.activeMount === m.id;
+    const label = owned ? (active ? '✅ ÉQUIPÉE' : '✓ ÉQUIPER') : '💰 ' + m.price + ' or';
+    return `<div class="mount-card ${owned?'owned':''} ${active?'active-mount':''}" onclick="buyMount(this)" data-id="${m.id}">
+      <div class="mount-icon">${m.icon}</div>
+      <div class="mount-name">${m.name}</div>
+      <div style="font-size:10px;color:var(--text2);margin-bottom:4px">${m.desc}</div>
+      <div class="mount-price">${label}</div>
+    </div>`;
+  }).join('');
+}
+
+function buyMount(el) {
+  const id = el.dataset.id;
+  const m = MOUNTS.find(x => x.id === id);
+  if(!m) return;
+  if(!state.ownedMounts) state.ownedMounts = [];
+  if(state.ownedMounts.includes(id)) {
+    state.activeMount = state.activeMount === id ? null : id;
+    saveState(); renderMounts();
+    showToast('success', state.activeMount === id ? '🐾 ' + m.name + ' équipée !' : '🐾 Monture retirée');
+    return;
+  }
+  if((state.gold || 0) < m.price) {
+    showToast('info', '💰 Pas assez d\'or ! (' + (state.gold||0) + '/' + m.price + ')');
+    return;
+  }
+  state.gold -= m.price;
+  state.ownedMounts.push(id);
+  saveState(); renderMounts();
+  const el2 = document.getElementById('gold-display');
+  if(el2) el2.textContent = state.gold;
+  showToast('success', '🎉 ' + m.name + ' débloquée ! Clique à nouveau pour l\'équiper.');
+}
+
+// ============================================================
+// OBJECTIFS PERSONNALISÉS
+// ============================================================
+function addGoal() {
+  const type = document.getElementById('goal-type').value;
+  const target = parseInt(document.getElementById('goal-target').value);
+  if(!target || target <= 0) { showToast('info', '⚠️ Saisis une cible valide'); return; }
+  if(!state.goals) state.goals = [];
+  const labels = {km:'Courir', sessions:'Séances', xp:'Gagner XP', streak:'Série'};
+  const units  = {km:'km', sessions:'séances', xp:'XP', streak:'jours'};
+  const monthStart = new Date(); monthStart.setDate(1);
+  state.goals.push({
+    id: Date.now(),
+    type, target,
+    label: labels[type],
+    unit: units[type],
+    createdAt: new Date().toLocaleDateString('fr-FR'),
+  });
+  document.getElementById('goal-target').value = '';
+  saveState();
+  renderGoals();
+  showToast('success', '🎯 Objectif ajouté !');
+}
+
+function deleteGoal(id) {
+  state.goals = (state.goals||[]).filter(g => g.id !== id);
+  saveState(); renderGoals();
+}
+
+function getGoalProgress(g) {
+  if(g.type === 'km') return state.totalKm;
+  if(g.type === 'sessions') return state.totalSessions;
+  if(g.type === 'xp') return state.totalXP;
+  if(g.type === 'streak') return state.streak;
+  return 0;
+}
+
+function renderGoals() {
+  const el = document.getElementById('goals-list');
+  if(!el) return;
+  if(!state.goals || state.goals.length === 0) {
+    el.innerHTML = '<div style="color:var(--text2);font-size:12px;text-align:center;padding:12px">Aucun objectif défini.</div>';
+    return;
+  }
+  el.innerHTML = state.goals.map(g => {
+    const prog = getGoalProgress(g);
+    const pct = Math.min(100, Math.round(prog / g.target * 100));
+    const done = pct >= 100;
+    return `<div class="goal-card ${done?'done':''}">
+      <button class="goal-delete" onclick="deleteGoal(${g.id})">✕</button>
+      <div class="goal-header">
+        <div class="goal-name">${done?'✅ ':''} ${g.label} ${g.target} ${g.unit}</div>
+        <div class="goal-pct">${pct}%</div>
+      </div>
+      <div class="goal-bar"><div class="goal-fill" style="width:${pct}%"></div></div>
+      <div class="goal-detail">${prog.toFixed ? prog.toFixed(1) : prog} / ${g.target} ${g.unit}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// CALENDRIER
+// ============================================================
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+
+function renderCalendar() {
+  const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  document.getElementById('cal-title').textContent = months[calMonth] + ' ' + calYear;
+
+  const headersEl = document.getElementById('cal-headers');
+  const gridEl = document.getElementById('cal-grid');
+  const days = ['L','M','M','J','V','S','D'];
+  headersEl.innerHTML = days.map(d => `<div class="cal-head">${d}</div>`).join('');
+
+  const firstDay = new Date(calYear, calMonth, 1);
+  const lastDay = new Date(calYear, calMonth + 1, 0);
+  const startDow = (firstDay.getDay() + 6) % 7; // Monday = 0
+  const today = new Date();
+
+  let cells = '';
+  // Prev month filler
+  for(let i = 0; i < startDow; i++) {
+    const d = new Date(calYear, calMonth, -startDow + i + 1);
+    cells += `<div class="cal-day other-month"><div class="cal-day-num">${d.getDate()}</div></div>`;
+  }
+  // Current month
+  for(let d = 1; d <= lastDay.getDate(); d++) {
+    const dateStr = new Date(calYear, calMonth, d).toLocaleDateString('fr-FR');
+    const isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
+    const workouts = (state.workouts||[]).filter(w => w.date === dateStr);
+    const hasRun = workouts.some(w => w.type === 'run');
+    const hasLift = workouts.some(w => w.type === 'lift');
+    let cls = '';
+    if(hasRun && hasLift) cls = 'both-day';
+    else if(hasRun) cls = 'run-day';
+    else if(hasLift) cls = 'lift-day';
+    const dot = workouts.length > 0 ? '<div class="cal-dot"></div>' : '';
+    cells += `<div class="cal-day ${cls} ${isToday?'today':''}" onclick="calShowDay('${dateStr}')">
+      <div class="cal-day-num">${d}</div>${dot}
+    </div>`;
+  }
+  gridEl.innerHTML = cells;
+}
+
+function calShowDay(dateStr) {
+  const workouts = (state.workouts||[]).filter(w => w.date === dateStr);
+  const el = document.getElementById('cal-day-detail');
+  if(!el) return;
+  if(workouts.length === 0) {
+    el.innerHTML = `<div style="color:var(--text2);font-size:13px">Aucune séance le ${dateStr}.</div>`;
+    return;
+  }
+  el.innerHTML = workouts.map(w => `
+    <div class="cal-detail-item">
+      <span style="margin-right:8px">${w.type==='run'?'🏃':'🏋️'}</span>
+      <strong>${w.name}</strong> — ${w.details} <span style="color:var(--xp-color)">+${w.xp} XP</span>
+    </div>`).join('');
+}
+
+function calPrev() {
+  calMonth--;
+  if(calMonth < 0) { calMonth = 11; calYear--; }
+  renderCalendar();
+}
+function calNext() {
+  calMonth++;
+  if(calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+// ============================================================
+// SERVICE WORKER (MODE HORS-LIGNE)
+// ============================================================
+function registerServiceWorker() {
+  if('serviceWorker' in navigator) {
+    const swCode = `
+const CACHE = 'fitquest-v1';
+const ASSETS = ['/FITQUEST/', '/FITQUEST/index.html', '/FITQUEST/manifest.json', '/FITQUEST/icon-192.png', '/FITQUEST/icon-512.png'];
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))));
+});
+self.addEventListener('fetch', e => {
+  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('/FITQUEST/'))));
+});`;
+    const blob = new Blob([swCode], {type:'application/javascript'});
+    const url = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(url).then(() => {
+      console.log('SW enregistré — mode hors-ligne actif');
+    }).catch(e => console.log('SW non supporté:', e));
+  }
+}
+
 function init() {
   checkWeeklyReset();
   updateHeader();
@@ -3164,28 +3531,33 @@ function init() {
   renderWeightLog();
   renderExoHistory();
   renderShop();
+  renderMounts();
   renderPrograms();
+  renderGoals();
+  renderCalendar();
+  updateExoIllustration();
 
-  // Auto-schedule reminder if already granted
+  // Service worker hors-ligne
+  registerServiceWorker();
+
+  // Auto-schedule reminder
   if(localStorage.getItem('fq_notif') === 'true' && Notification.permission === 'granted') {
     scheduleReminderNotification();
   }
 
-  // On stats page focus, refresh
-  document.querySelectorAll('.nav-btn')[3].addEventListener('click', () => {
-    setTimeout(() => { renderWeightLog(); renderExoHistory(); }, 50);
-  });
-
-  // On profile page focus, refresh shop & programs
-  document.querySelectorAll('.nav-btn')[4].addEventListener('click', () => {
-    setTimeout(() => { renderShop(); renderPrograms(); }, 50);
-  });
-
-  // On workout page focus, refresh history
-  document.querySelectorAll('.nav-btn')[2].addEventListener('click', () => {
-    setTimeout(renderWorkoutHistory, 50);
+  // Nav refresh callbacks
+  document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      const pages = ['home','quests','workout','calendar','stats','profile'];
+      const page = pages[i];
+      if(page === 'stats') setTimeout(() => { renderWeightLog(); renderExoHistory(); renderGoals(); }, 50);
+      if(page === 'profile') setTimeout(() => { renderShop(); renderMounts(); renderPrograms(); }, 50);
+      if(page === 'workout') setTimeout(renderWorkoutHistory, 50);
+      if(page === 'calendar') setTimeout(renderCalendar, 50);
+    });
   });
 }
+
 
 init();
 </script>
