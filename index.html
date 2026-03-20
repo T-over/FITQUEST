@@ -1751,7 +1751,7 @@ body::after {
         <option>Squat</option>
         <option>Soulevé de terre</option>
         <option>Développé militaire</option>
-        <option>Tractions</option>
+        <option>Tractions 📷</option>
         <option>Dips</option>
         <option>Curl biceps</option>
         <option>Triceps poulie</option>
@@ -1764,12 +1764,12 @@ body::after {
         <option>Autre</option>
       </select>
     </div>
-    <!-- BOUTON CAMERA IA (visible seulement pour les pompes) -->
+    <!-- BOUTON CAMERA IA (visible seulement pour les exos caméra) -->
     <div id="camera-validate-section" style="display:none;margin-bottom:12px">
       <div id="camera-status-box" style="background:rgba(255,60,172,0.1);border:1px solid rgba(255,60,172,0.4);border-radius:var(--radius);padding:12px;text-align:center;margin-bottom:10px">
         <div style="font-size:28px;margin-bottom:4px">📷</div>
         <div style="font-size:13px;font-weight:700;color:var(--accent2)" id="camera-status-text">Validation caméra IA requise</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:4px">Les pompes doivent être vérifiées par la caméra pour être validées</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px" id="camera-status-desc">Cet exercice doit être vérifié par la caméra pour être validé</div>
       </div>
       <button class="submit-btn" style="background:linear-gradient(135deg,var(--accent2),var(--xp-color));color:#fff;padding:14px" onclick="openPoseCamera()">
         📷 LANCER L'ANALYSE IA
@@ -1991,7 +1991,7 @@ body::after {
 <div id="pose-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:#000;flex-direction:column;overflow:hidden">
   <div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.9);flex-shrink:0">
     <div>
-      <div style="font-family:'Exo 2',sans-serif;font-weight:900;font-size:15px;color:var(--accent)">📷 ANALYSE IA — POMPES</div>
+      <div style="font-family:'Exo 2',sans-serif;font-weight:900;font-size:15px;color:var(--accent)" id="pose-modal-title">📷 ANALYSE IA — POMPES</div>
       <div style="font-size:10px;color:var(--text2)">Positionne-toi de profil face à la caméra</div>
     </div>
     <button onclick="closePoseCamera()" style="background:var(--red);border:none;color:#fff;padding:8px 14px;border-radius:var(--radius);font-weight:700;cursor:pointer">✕ QUITTER</button>
@@ -2766,9 +2766,10 @@ function logLift() {
 
   if(!sets || !reps) { showToast('info', '⚠️ Remplis les séries et répétitions'); return; }
 
-  // VÉRIFICATION CAMÉRA POUR LES POMPES
-  if(exo === 'Pompes 📷' && !poseSessionValidated) {
-    showToast('info', '📷 Lance l\'analyse IA pour valider tes pompes !');
+  // VÉRIFICATION CAMÉRA POUR POMPES ET TRACTIONS
+  if((exo === 'Pompes 📷' || exo === 'Tractions 📷') && !poseSessionValidated) {
+    const name = exo === 'Pompes 📷' ? 'pompes' : 'tractions';
+    showToast('info', '📷 Lance l\'analyse IA pour valider tes ' + name + ' !');
     haptic('medium');
     return;
   }
@@ -3549,13 +3550,26 @@ function updateExoIllustration() {
   if(icon) icon.textContent = data.icon;
   if(tips) tips.textContent = data.tips;
 
-  // Afficher/masquer la section caméra
+  const needsCamera = exo === 'Pompes 📷' || exo === 'Tractions 📷';
   const cameraSection = document.getElementById('camera-validate-section');
-  if(cameraSection) {
-    cameraSection.style.display = exo === 'Pompes 📷' ? 'block' : 'none';
+  const desc = document.getElementById('camera-status-desc');
+  const statusBox = document.getElementById('camera-status-box');
+  const statusText = document.getElementById('camera-status-text');
+
+  if(cameraSection) cameraSection.style.display = needsCamera ? 'block' : 'none';
+
+  if(needsCamera) {
+    // Reset visuel du status box à chaque changement d'exo
+    if(statusBox) { statusBox.style.background = 'rgba(255,60,172,0.1)'; statusBox.style.borderColor = 'rgba(255,60,172,0.4)'; }
+    if(statusText) { statusText.style.color = 'var(--accent2)'; statusText.textContent = 'Validation caméra IA requise'; }
+    if(desc) desc.textContent = exo === 'Tractions 📷'
+      ? 'Les tractions doivent être vérifiées par la caméra pour être validées'
+      : 'Les pompes doivent être vérifiées par la caméra pour être validées';
   }
-  // Reset validation si on change d'exo
-  if(exo !== 'Pompes 📷') poseSessionValidated = false;
+
+  // Reset validation à chaque changement d'exo
+  poseSessionValidated = false;
+  updateCameraTargetLabel();
 }
 
 // ============================================================
@@ -4001,16 +4015,80 @@ function checkNightWorkout() {
 }
 
 // ============================================================
-// SYSTÈME DÉTECTION IA POMPES (MoveNet)
+// ANALYSE TRACTIONS
 // ============================================================
+function analyzePullup(keypoints) {
+  const ls = getKeypointByName(keypoints, 'left_shoulder');
+  const rs = getKeypointByName(keypoints, 'right_shoulder');
+  const le = getKeypointByName(keypoints, 'left_elbow');
+  const re = getKeypointByName(keypoints, 'right_elbow');
+  const lw = getKeypointByName(keypoints, 'left_wrist');
+  const rw = getKeypointByName(keypoints, 'right_wrist');
+  const lh = getKeypointByName(keypoints, 'left_hip');
+  const rh = getKeypointByName(keypoints, 'right_hip');
+
+  const minConf = 0.4;
+  const hasLeft  = ls?.score > minConf && le?.score > minConf && lw?.score > minConf;
+  const hasRight = rs?.score > minConf && re?.score > minConf && rw?.score > minConf;
+  if(!hasLeft && !hasRight) return null;
+
+  const shoulder = hasLeft ? ls : rs;
+  const elbow    = hasLeft ? le : re;
+  const wrist    = hasLeft ? lw : rw;
+  const hip      = hasLeft ? lh : rh;
+
+  if(!shoulder || !elbow || !wrist) return null;
+
+  const elbowAngle = getAngle(shoulder, elbow, wrist);
+
+  const feedback = [];
+  let formScore = 100;
+
+  // Pour les tractions : en haut le coude est fléchi (~60-90°), en bas bras tendus (>155°)
+  const isUp   = elbowAngle < 100;   // bras très fléchis = en haut
+  const isDown = elbowAngle > 155;   // bras tendus = en bas (position de départ)
+
+  // Vérifier si les épaules sont au-dessus des poignets (bonne mécanique)
+  if(shoulder.y > wrist.y + 20 && isUp) {
+    feedback.push('✅ Bonne hauteur');
+  } else if(isUp && shoulder.y <= wrist.y + 20) {
+    formScore -= 20;
+    feedback.push('⚠️ Monte plus haut — menton au-dessus de la barre');
+  }
+
+  // Vérifier corps droit (pas trop de balancement)
+  if(hip?.score > minConf) {
+    const bodyLean = Math.abs(shoulder.x - hip.x);
+    if(bodyLean > 60) {
+      formScore -= 20;
+      feedback.push('⚠️ Corps trop incliné — reste vertical');
+    } else {
+      feedback.push('✅ Corps bien vertical');
+    }
+  }
+
+  // Extension complète en bas
+  if(isDown && elbowAngle < 160) {
+    formScore -= 15;
+    feedback.push('⚠️ Tends mieux les bras en bas');
+  } else if(isDown) {
+    feedback.push('✅ Bonne extension en bas');
+  }
+
+  formScore = Math.max(0, formScore);
+  return { elbowAngle, isUp, isDown, formScore, feedback };
+}
+
+
 let poseDetector = null;
 let poseStream = null;
 let poseAnimFrame = null;
 let poseRepCount = 0;
 let poseFormScore = 0;
-let posePhase = 'up'; // 'up' or 'down'
+let posePhase = 'up';
 let poseValidReps = 0;
 let poseTargetReps = 0;
+let poseCurrentExo = 'pushup';
 let poseSessionValidated = false;
 let poseTotalFormScores = [];
 
@@ -4157,9 +4235,21 @@ function updateCameraTargetLabel() {
 }
 
 async function openPoseCamera() {
+  const exo = document.getElementById('lift-exo').value;
+  const isPullup = exo === 'Tractions 📷';
+  const exoName = isPullup ? 'TRACTIONS' : 'POMPES';
+  const exoNameFr = isPullup ? 'tractions' : 'pompes';
+
   const modal = document.getElementById('pose-modal');
   modal.style.display = 'flex';
   modal.style.flexDirection = 'column';
+
+  // Mettre à jour le titre du modal
+  const titleEl = document.getElementById('pose-modal-title');
+  if(titleEl) titleEl.textContent = '📷 ANALYSE IA — ' + exoName;
+
+  // Stocker le type d'exercice courant
+  poseCurrentExo = isPullup ? 'pullup' : 'pushup';
 
   // Lire le nombre de reps cible depuis le formulaire
   const targetInput = parseInt(document.getElementById('lift-reps').value) || 0;
@@ -4265,7 +4355,10 @@ async function runPoseLoop() {
         const keypoints = poses[0].keypoints;
         drawSkeleton(ctx, keypoints, canvas);
 
-        const analysis = analyzePushup(keypoints);
+        const analysis = poseCurrentExo === 'pullup'
+          ? analyzePullup(keypoints)
+          : analyzePushup(keypoints);
+
         if(analysis) {
           poseFormScore = analysis.formScore;
 
@@ -4277,34 +4370,37 @@ async function runPoseLoop() {
             itemsEl.innerHTML = analysis.feedback.join('<br>');
           }
 
-          // Détection rep : down → up = 1 rep
-          if(analysis.isDown && posePhase === 'up') {
+          // Détection rep selon l'exercice
+          const goingDown = poseCurrentExo === 'pullup' ? analysis.isDown : analysis.isDown;
+          const goingUp   = poseCurrentExo === 'pullup' ? analysis.isUp   : analysis.isUp;
+
+          if(goingDown && posePhase === 'up') {
             posePhase = 'down';
-            document.getElementById('pose-phase-icon').textContent = '⬇️';
+            document.getElementById('pose-phase-icon').textContent = poseCurrentExo === 'pullup' ? '⬇️' : '⬇️';
             document.getElementById('pose-phase-text').textContent = 'BAS';
-          } else if(analysis.isUp && posePhase === 'down') {
+          } else if(goingUp && posePhase === 'down') {
             posePhase = 'up';
             poseRepCount++;
             poseTotalFormScores.push(analysis.formScore);
 
-            // Rep valide si forme > 60%
+            const target = poseTargetReps > 0 ? poseTargetReps : 3;
+            const exoWord = poseCurrentExo === 'pullup' ? 'traction' : 'pompe';
+
             if(analysis.formScore >= 60) {
               poseValidReps++;
               haptic('success');
-              const target = poseTargetReps > 0 ? poseTargetReps : 3;
               const remaining = target - poseValidReps;
               if(remaining > 0) {
                 document.getElementById('pose-status-msg').textContent =
-                  '💪 Rep ' + poseRepCount + ' ✅ — Encore ' + remaining + ' pompe(s) ! (' + poseValidReps + '/' + target + ')';
+                  '💪 ' + exoWord + ' ' + poseRepCount + ' ✅ — Encore ' + remaining + ' ! (' + poseValidReps + '/' + target + ')';
               } else {
                 document.getElementById('pose-status-msg').textContent =
-                  '🎉 OBJECTIF ATTEINT ! ' + poseValidReps + ' pompes validées. Forme : ' + analysis.formScore + '%';
+                  '🎉 OBJECTIF ATTEINT ! ' + poseValidReps + ' ' + exoWord + 's validées. Forme : ' + analysis.formScore + '%';
               }
             } else {
               haptic('light');
-              const target = poseTargetReps > 0 ? poseTargetReps : 3;
               document.getElementById('pose-status-msg').textContent =
-                '⚠️ Rep ' + poseRepCount + ' non comptée — forme insuffisante (' + analysis.formScore + '%) (' + poseValidReps + '/' + target + ')';
+                '⚠️ ' + exoWord + ' ' + poseRepCount + ' non comptée — forme (' + analysis.formScore + '%) (' + poseValidReps + '/' + target + ')';
             }
 
             document.getElementById('pose-phase-icon').textContent = '⬆️';
@@ -4411,7 +4507,7 @@ function init() {
       haptic('light');
       if(page === 'stats') setTimeout(() => { renderWeightLog(); renderExoHistory(); renderGoals(); }, 50);
       if(page === 'profile') setTimeout(() => { renderShop(); renderMounts(); renderPrograms(); renderCraft(); }, 50);
-      if(page === 'workout') setTimeout(renderWorkoutHistory, 50);
+      if(page === 'workout') setTimeout(() => { renderWorkoutHistory(); updateExoIllustration(); }, 50);
       if(page === 'calendar') setTimeout(renderCalendar, 50);
       if(page === 'home') setTimeout(updateCoach, 100);
     });
