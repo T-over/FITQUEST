@@ -1365,7 +1365,7 @@ body::after {
 .shop-item-icon { font-size:32px; margin-bottom:6px; }
 .shop-item-name { font-size:12px; font-weight:700; margin-bottom:4px; }
 .shop-item-price { font-size:11px; color:var(--accent3); font-family:'Share Tech Mono',monospace; }
-.shop-xp-display { text-align:center; padding:10px; background:rgba(255,215,0,0.1); border:1px solid rgba(255,215,0,0.3); border-radius:var(--radius); margin-bottom:14px; font-family:'Share Tech Mono',monospace; color:var(--accent3); font-size:14px; }
+.gold-display { text-align:center; padding:10px; background:rgba(255,215,0,0.1); border:1px solid rgba(255,215,0,0.3); border-radius:var(--radius); margin-bottom:14px; font-family:'Share Tech Mono',monospace; color:var(--accent3); font-size:14px; }
 /* WEIGHT */
 .weight-log-item { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border); }
 .weight-log-item:last-child { border-bottom:none; }
@@ -1717,7 +1717,7 @@ body::after {
   <!-- SHOP -->
   <div class="card">
     <div class="card-title"><span>🛒</span> BOUTIQUE COSMÉTIQUE</div>
-    <div class="shop-xp-display">💰 XP Boutique : <span id="shop-xp-display">0</span></div>
+    <div class="gold-display">💰 Or : <span id="gold-display">0</span></div>
     <div class="shop-grid" id="shop-grid"></div>
   </div>
 
@@ -1984,7 +1984,7 @@ function loadState() {
     weightLog: [],
     shopOwned: [],
     activeAvatar: null,
-    shopXP: 0,
+    gold: 0,
     weeklyBossWeek: -1,
     weeklyBossDefeated: false,
     weeklyBossProgress: 0,
@@ -2064,6 +2064,15 @@ function addXP(amount, reason) {
     setTimeout(() => showLevelUp(newLv), 800);
   }
   checkAchievements();
+}
+
+function addGold(amount, reason) {
+  state.gold = (state.gold || 0) + amount;
+  saveState();
+  // Refresh gold display if visible
+  const el = document.getElementById('gold-display');
+  if(el) el.textContent = state.gold;
+  showToast('success', '💰 +'+amount+' Or — '+reason);
 }
 
 function showLevelUp(lv) {
@@ -2259,6 +2268,7 @@ function claimQuest(e, qid) {
   saveState();
   showReward(q.icon, 'Quête accomplie !', q.xp, q.reward);
   addXP(q.xp, 'Quête: '+q.name);
+  setTimeout(() => addGold(Math.round(q.xp * 0.5), 'Quête: '+q.name), 400);
   setTimeout(() => renderQuests(currentQTab), 100);
 }
 
@@ -2354,7 +2364,7 @@ function logRun() {
   checkWeeklyReset();
   state.weeklyKmThisWeek = (state.weeklyKmThisWeek || 0) + dist;
   state.weeklyDaysThisWeek = (state.weeklyDaysThisWeek || 0) + 1;
-  state.shopXP = (state.shopXP || 0) + Math.round(xp * 0.5);
+  // or gagné après logRun → appelé après addXP
 
   const details = dist+'km' + (time ? ' · '+time+'min' : '') + ' · '+type;
   state.workouts.push({
@@ -2369,9 +2379,10 @@ function logRun() {
   document.getElementById('run-dist').value = '';
   document.getElementById('run-time').value = '';
   addXP(xp, 'Course '+dist+'km');
+  const goldEarned = Math.max(5, Math.round(dist * 10));
+  setTimeout(() => addGold(goldEarned, 'Course '+dist+'km'), 400);
   renderDashboard();
   checkQuestProgress();
-  showToast('success', '🏃 Course enregistrée ! '+dist+' km');
 
   try { updateBossProgress(state.weeklyDaysThisWeek, state.weeklyKmThisWeek, state.weeklyLiftsThisWeek || 0); } catch(e) {}
   try { updateWeeklyChallenge(); } catch(e) {}
@@ -2416,7 +2427,7 @@ function logLift() {
   state.weeklyLiftsThisWeek = (state.weeklyLiftsThisWeek || 0) + 1;
   state.weeklyDaysThisWeek = (state.weeklyDaysThisWeek || 0) + 1;
   if(exoLow.includes('squat')) state.weeklySquatsThisWeek = (state.weeklySquatsThisWeek || 0) + sets;
-  state.shopXP = (state.shopXP || 0) + Math.round(xp * 0.5);
+  // or gagné après logLift → appelé après addXP
 
   const details = sets+'×'+reps+(weight?' · '+weight+'kg':'');
   state.workouts.push({
@@ -2432,6 +2443,8 @@ function logLift() {
   document.getElementById('lift-reps').value = '';
   document.getElementById('lift-weight').value = '';
   addXP(xp, exo);
+  const goldEarned = Math.max(5, Math.round(xp * 0.3));
+  setTimeout(() => addGold(goldEarned, exo), 400);
   renderDashboard();
   checkQuestProgress();
   showToast('success', '🏋️ '+exo+' enregistré !');
@@ -2877,7 +2890,8 @@ function updateBossProgress(sessions, kmRun, lifts) {
   if(prog >= boss.target && !state.weeklyBossDefeated) {
     state.weeklyBossDefeated = true;
     addXP(boss.xpReward, '👹 Boss vaincu !');
-    saveState();
+    addXP(boss.xpReward, '👹 Boss vaincu !');
+    setTimeout(() => addGold(Math.round(boss.xpReward * 0.4), 'Boss vaincu'), 400);
     setTimeout(() => showToast('success', '👹 BOSS VAINCU ! +'+ boss.xpReward +' XP !'), 800);
   }
   saveState();
@@ -2927,7 +2941,8 @@ function updateWeeklyChallenge() {
   if(prog >= wc.target && !state.weeklyChallengeDone) {
     state.weeklyChallengeDone = true;
     addXP(wc.xp, '⚡ Défi hebdo accompli !');
-    saveState();
+    addXP(wc.xp, '⚡ Défi hebdo !');
+    setTimeout(() => addGold(Math.round(wc.xp * 0.4), 'Défi hebdo'), 400);
     setTimeout(() => showToast('success', '⚡ DÉFI HEBDO ACCOMPLI ! +' + wc.xp + ' XP !'), 1000);
   }
   renderWeeklyChallenge();
@@ -2999,9 +3014,9 @@ function renderExoHistory(filter) {
 // ============================================================
 function renderShop() {
   const el = document.getElementById('shop-grid');
-  const xpEl = document.getElementById('shop-xp-display');
+  const xpEl = document.getElementById('gold-display');
   if(!el) return;
-  if(xpEl) xpEl.textContent = state.shopXP || 0;
+  if(xpEl) xpEl.textContent = state.gold || 0;
   el.innerHTML = SHOP_ITEMS.map(item => {
     const owned = state.shopOwned && state.shopOwned.includes(item.id);
     const isActive = (item.type === 'avatar' && state.activeAvatar === item.id) ||
@@ -3036,11 +3051,11 @@ function buyShopItem(id) {
     showToast('success', '✅ ' + item.name + ' équipé !');
     return;
   }
-  if((state.shopXP || 0) < item.price) {
-    showToast('info', '💰 Pas assez de XP Boutique ! Tu en gagnes en t\'entraînant.');
+  if((state.gold || 0) < item.price) {
+    showToast('info', '💰 Pas assez de Or ! Tu en gagnes en t\'entraînant.');
     return;
   }
-  state.shopXP -= item.price;
+  state.gold -= item.price;
   state.shopOwned.push(id);
   if(item.type === 'title' && !state.unlockedTitles.includes(id)) {
     state.unlockedTitles.push(id);
