@@ -1793,6 +1793,23 @@ body::after {
     <button class="submit-btn lift-color" onclick="logLift()">⚡ VALIDER L'EXERCICE</button>
   </div>
 
+  <!-- MINUTEUR DE REPOS -->
+  <div class="card">
+    <div class="card-title"><span>⏸️</span> MINUTEUR DE REPOS</div>
+    <div class="rest-timer-display" id="rest-timer-display">1:30</div>
+    <div class="rest-btn-row" style="margin-bottom:12px">
+      <button class="rest-preset-btn" onclick="setRestTimer(30)">30s</button>
+      <button class="rest-preset-btn" onclick="setRestTimer(60)">1min</button>
+      <button class="rest-preset-btn" onclick="setRestTimer(90)">1:30</button>
+      <button class="rest-preset-btn" onclick="setRestTimer(120)">2min</button>
+      <button class="rest-preset-btn" onclick="setRestTimer(180)">3min</button>
+    </div>
+    <div class="rest-btn-row">
+      <button class="submit-btn run-color" style="flex:1;margin:0" onclick="startRestTimer()">▶ DÉMARRER</button>
+      <button class="submit-btn" style="flex:1;margin:0;background:var(--bg3);color:var(--text)" onclick="resetRestTimer()">■ RESET</button>
+    </div>
+  </div>
+
   <!-- WORKOUT HISTORY -->
   <div class="card">
     <div class="card-title"><span>📊</span> JOURNAL D'ENTRAÎNEMENT</div>
@@ -1942,23 +1959,6 @@ body::after {
   <div class="card">
     <div class="card-title"><span>📋</span> PROGRAMMES D'ENTRAÎNEMENT</div>
     <div id="programs-list"></div>
-  </div>
-
-  <!-- MINUTEUR REPOS -->
-  <div class="card">
-    <div class="card-title"><span>⏸️</span> MINUTEUR DE REPOS</div>
-    <div class="rest-timer-display" id="rest-timer-display">1:30</div>
-    <div class="rest-btn-row" style="margin-bottom:12px">
-      <button class="rest-preset-btn" onclick="setRestTimer(30)">30s</button>
-      <button class="rest-preset-btn" onclick="setRestTimer(60)">1min</button>
-      <button class="rest-preset-btn" onclick="setRestTimer(90)">1:30</button>
-      <button class="rest-preset-btn" onclick="setRestTimer(120)">2min</button>
-      <button class="rest-preset-btn" onclick="setRestTimer(180)">3min</button>
-    </div>
-    <div class="rest-btn-row">
-      <button class="submit-btn run-color" style="flex:1;margin:0" onclick="startRestTimer()">▶ DÉMARRER</button>
-      <button class="submit-btn" style="flex:1;margin:0;background:var(--bg3);color:var(--text)" onclick="resetRestTimer()">■ RESET</button>
-    </div>
   </div>
 
   <!-- CRAFT -->
@@ -4558,6 +4558,10 @@ async function openPoseCamera() {
 
   const titleEl = document.getElementById('pose-modal-title');
   if(titleEl) titleEl.textContent = '📷 ANALYSE IA — ' + exoKey.toUpperCase();
+
+  // Mettre à jour aussi le sous-titre
+  const subtitleEl = document.querySelector('#pose-modal [style*="font-size:10px"]');
+  if(subtitleEl) subtitleEl.textContent = 'Positionne-toi face à la caméra pour : ' + exoKey;
 
   const targetInput = parseInt(document.getElementById('lift-reps').value) || 0;
   poseTargetReps = targetInput > 0 ? targetInput : 0;
