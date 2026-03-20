@@ -2356,7 +2356,9 @@ function logRun() {
   state.weeklyDaysThisWeek = (state.weeklyDaysThisWeek || 0) + 1;
   state.shopXP = (state.shopXP || 0) + Math.round(xp * 0.5);
   updateBossProgress(state.weeklyDaysThisWeek, state.weeklyKmThisWeek, state.weeklyLiftsThisWeek || 0);
-  updateWeeklyChallenge(); + (time ? ' · '+time+'min' : '') + ' · '+type;
+  updateWeeklyChallenge();
+
+  const details = dist+'km' + (time ? ' · '+time+'min' : '') + ' · '+type;
   state.workouts.push({
     type: 'run',
     name: 'Course ' + type,
@@ -2417,10 +2419,9 @@ function logLift() {
   state.shopXP = (state.shopXP || 0) + Math.round(xp * 0.5);
   updateBossProgress(state.weeklyDaysThisWeek, state.weeklyKmThisWeek || 0, state.weeklyLiftsThisWeek);
   updateWeeklyChallenge();
+
+  const details = sets+'×'+reps+(weight?' · '+weight+'kg':'');
   state.workouts.push({
-    type: 'lift',
-    name: exo,
-    details,
     xp,
     date: new Date().toLocaleDateString('fr-FR')
   });
@@ -2545,7 +2546,14 @@ function renderStats() {
 function renderProfile() {
   const lv = getLevel(state.xp);
   const lvData = LEVELS[lv];
-  document.getElementById('p-avatar').textContent = lvData.emoji;
+  // Respect custom avatar from shop
+  const avatarEl = document.getElementById('p-avatar');
+  if(state.activeAvatar) {
+    const shopItem = SHOP_ITEMS.find(i => i.id === state.activeAvatar);
+    if(shopItem) avatarEl.textContent = shopItem.icon;
+  } else {
+    avatarEl.textContent = lvData.emoji;
+  }
   document.getElementById('p-name').textContent = state.name;
   document.getElementById('p-class-badge').textContent = lvData.name.toUpperCase();
   document.getElementById('prof-name').value = state.name;
