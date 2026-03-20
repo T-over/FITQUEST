@@ -2355,8 +2355,6 @@ function logRun() {
   state.weeklyKmThisWeek = (state.weeklyKmThisWeek || 0) + dist;
   state.weeklyDaysThisWeek = (state.weeklyDaysThisWeek || 0) + 1;
   state.shopXP = (state.shopXP || 0) + Math.round(xp * 0.5);
-  updateBossProgress(state.weeklyDaysThisWeek, state.weeklyKmThisWeek, state.weeklyLiftsThisWeek || 0);
-  updateWeeklyChallenge();
 
   const details = dist+'km' + (time ? ' · '+time+'min' : '') + ' · '+type;
   state.workouts.push({
@@ -2368,13 +2366,15 @@ function logRun() {
   });
 
   saveState();
-
   document.getElementById('run-dist').value = '';
   document.getElementById('run-time').value = '';
   addXP(xp, 'Course '+dist+'km');
   renderDashboard();
   checkQuestProgress();
   showToast('success', '🏃 Course enregistrée ! '+dist+' km');
+
+  try { updateBossProgress(state.weeklyDaysThisWeek, state.weeklyKmThisWeek, state.weeklyLiftsThisWeek || 0); } catch(e) {}
+  try { updateWeeklyChallenge(); } catch(e) {}
 }
 
 // ============================================================
@@ -2417,17 +2417,17 @@ function logLift() {
   state.weeklyDaysThisWeek = (state.weeklyDaysThisWeek || 0) + 1;
   if(exoLow.includes('squat')) state.weeklySquatsThisWeek = (state.weeklySquatsThisWeek || 0) + sets;
   state.shopXP = (state.shopXP || 0) + Math.round(xp * 0.5);
-  updateBossProgress(state.weeklyDaysThisWeek, state.weeklyKmThisWeek || 0, state.weeklyLiftsThisWeek);
-  updateWeeklyChallenge();
 
   const details = sets+'×'+reps+(weight?' · '+weight+'kg':'');
   state.workouts.push({
+    type: 'lift',
+    name: exo,
+    details,
     xp,
     date: new Date().toLocaleDateString('fr-FR')
   });
 
   saveState();
-
   document.getElementById('lift-sets').value = '';
   document.getElementById('lift-reps').value = '';
   document.getElementById('lift-weight').value = '';
@@ -2435,6 +2435,9 @@ function logLift() {
   renderDashboard();
   checkQuestProgress();
   showToast('success', '🏋️ '+exo+' enregistré !');
+
+  try { updateBossProgress(state.weeklyDaysThisWeek, state.weeklyKmThisWeek || 0, state.weeklyLiftsThisWeek); } catch(e) {}
+  try { updateWeeklyChallenge(); } catch(e) {}
 }
 
 function updateStreak() {
@@ -2563,7 +2566,8 @@ function renderProfile() {
   tWrap.innerHTML = TITLES.map(t => {
     const unlocked = state.unlockedTitles.includes(t.id);
     const active = state.activeTitle === t.id;
-    return `<div class="title-chip ${active?'active':''} ${!unlocked?'locked-chip':''}" onclick="${unlocked?`setTitle('${t.id}')`:'showToast(\'info\',\'🔒 Titre verrouillé — complète des quêtes !\')'}">${unlocked?'':'🔒 '}${t.name}</div>`;
+    const clickFn = unlocked ? `setTitle("${t.id}")` : `showToast("info","🔒 Titre verrouillé !")`;
+    return `<div class="title-chip ${active?"active":""} ${!unlocked?"locked-chip":""}" onclick="${clickFn}">${unlocked?"":"🔒 "}${t.name}</div>`;
   }).join('');
 
   // Achievements
