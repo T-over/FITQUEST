@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Exo+2:wght@300;400;700;900&family=Share+Tech+Mono&display=swap">
 <link rel="manifest" href="/FITQUEST/manifest.json">
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@4.10.0/dist/tf-backend-wasm.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.0/dist/pose-detection.min.js"></script>
 <style>
 :root {
@@ -4174,11 +4175,15 @@ async function openPoseCamera() {
 
     status.textContent = '🧠 Initialisation MoveNet...';
 
+    // Initialiser TF avec backend compatible mobile
+    await tf.setBackend('wasm').catch(() => tf.setBackend('cpu'));
+    await tf.ready();
+
     // Charger MoveNet
     if(!poseDetector) {
       poseDetector = await poseDetection.createDetector(
         poseDetection.SupportedModels.MoveNet,
-        { modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER }
+        { modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING }
       );
     }
 
