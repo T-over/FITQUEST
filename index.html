@@ -1625,6 +1625,9 @@ body::after {
 <body>
 
 <!-- SPLASH SCREEN -->
+<!-- ONBOARDING -->
+<div id="onboarding-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.92);align-items:center;justify-content:center;padding:20px"></div>
+
 <div id="splash">
   <div class="splash-logo">⚡</div>
   <div class="splash-title">FITQUEST</div>
@@ -1774,8 +1777,50 @@ body::after {
     <button class="qtab" onclick="switchQTab('course',this)">🏃 Course</button>
     <button class="qtab" onclick="switchQTab('muscu',this)">🏋️ Muscu</button>
     <button class="qtab" onclick="switchQTab('epiques',this)">⚡ Épiques</button>
+    <button class="qtab" onclick="switchQTab('custom',this)">🎯 Mes défis</button>
   </div>
   <div id="quest-list"></div>
+
+  <!-- CRÉATEUR DE DÉFIS PERSONNALISÉS -->
+  <div id="custom-challenge-creator" style="display:none">
+    <div class="card">
+      <div class="card-title"><span>🎯</span> CRÉER UN DÉFI PERSONNEL</div>
+      <div class="form-group">
+        <label class="form-label">NOM DU DÉFI</label>
+        <input class="form-input" type="text" id="cc-name" placeholder="Ex: Courir tous les matins" maxlength="40">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">TYPE</label>
+          <select class="form-select form-input" id="cc-type">
+            <option value="run">🏃 Distance (km)</option>
+            <option value="lift_sessions">🏋️ Séances muscu</option>
+            <option value="total_sessions">💪 Total séances</option>
+            <option value="streak">🔥 Série de jours</option>
+            <option value="xp">⭐ XP à gagner</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">OBJECTIF</label>
+          <input class="form-input" type="number" id="cc-target" placeholder="10" min="1">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">RÉCOMPENSE XP</label>
+          <input class="form-input" type="number" id="cc-xp" placeholder="200" min="50" max="2000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">EMOJI</label>
+          <input class="form-input" type="text" id="cc-icon" placeholder="🎯" maxlength="2">
+        </div>
+      </div>
+      <button class="submit-btn" style="background:linear-gradient(135deg,var(--accent3),#ff8c00);color:#000" onclick="createCustomChallenge()">
+        ✅ CRÉER CE DÉFI
+      </button>
+    </div>
+    <div id="custom-challenge-list"></div>
+  </div>
 </section>
 
 <!-- ======== WORKOUT ======== -->
@@ -2303,26 +2348,56 @@ const LEVELS = [
 ];
 
 const QUESTS_DATA = [
-  // COURSE
-  {id:'run1', cat:'course', name:'Premiers Pas', desc:'Cours 1 km sans t\'arrêter.', icon:'👟', type:'run', target:1, unit:'km', xp:50, diff:'easy', reward:'Titre: Marcheur'},
-  {id:'run2', cat:'course', name:'Le Classique', desc:'Cours 5 km d\'un coup.', icon:'🏃', type:'run', target:5, unit:'km', xp:150, diff:'medium', reward:'Titre: Coureur'},
-  {id:'run3', cat:'course', name:'Semi-Marathon', desc:'Accumule 21 km de course.', icon:'🗺️', type:'run', target:21, unit:'km', xp:400, diff:'hard', reward:'Badge: Semi-marathonien'},
-  {id:'run4', cat:'course', name:'Série de 3', desc:'Cours 3 fois cette semaine.', icon:'🔁', type:'run_sessions', target:3, unit:'séances', xp:200, diff:'medium', reward:'Badge: Régularité'},
-  {id:'run5', cat:'course', name:'Ultra Coureur', desc:'Cours 100 km au total.', icon:'🏔️', type:'run', target:100, unit:'km', xp:1000, diff:'epic', reward:'Titre: Ultra'},
-  {id:'run6', cat:'course', name:'Speed Demon', desc:'Cours en mode intervalles 3 fois.', icon:'⚡', type:'run_interval', target:3, unit:'fois', xp:250, diff:'hard', reward:'Badge: Sprinter'},
-  {id:'run7', cat:'course', name:'Trailblazer', desc:'Fais 2 sorties trail.', icon:'🌲', type:'run_trail', target:2, unit:'trails', xp:300, diff:'hard', reward:'Badge: Traileur'},
-  // MUSCU
-  {id:'lift1', cat:'muscu', name:'Initiation Fer', desc:'Réalise ta première séance de muscu.', icon:'🏋️', type:'lift_sessions', target:1, unit:'séances', xp:60, diff:'easy', reward:'Titre: Forgeron'},
-  {id:'lift2', cat:'muscu', name:'Routine Béton', desc:'Fais 5 séances de muscu.', icon:'💪', type:'lift_sessions', target:5, unit:'séances', xp:200, diff:'medium', reward:'Badge: Habitué'},
-  {id:'lift3', cat:'muscu', name:'Roi du Squat', desc:'Effectue 10 séries de squats.', icon:'🦵', type:'squat_sets', target:10, unit:'séries', xp:180, diff:'medium', reward:'Badge: Squatting'},
-  {id:'lift4', cat:'muscu', name:'King Press', desc:'Bench press 10 fois.', icon:'🤜', type:'bench_sets', target:10, unit:'séries', xp:180, diff:'medium', reward:'Badge: Poitrine'},
-  {id:'lift5', cat:'muscu', name:'Iron Man', desc:'20 séances de muscu totales.', icon:'🔩', type:'lift_sessions', target:20, unit:'séances', xp:500, diff:'epic', reward:'Titre: Iron Man'},
-  {id:'lift6', cat:'muscu', name:'Soulève Tout', desc:'Fais du soulevé de terre 5 fois.', icon:'🏗️', type:'deadlift_sets', target:5, unit:'séries', xp:220, diff:'hard', reward:'Badge: Deadlifter'},
-  // ÉPIQUES
-  {id:'epic1', cat:'epiques', name:'BESTMODE', desc:'30 séances de sport au total (muscu + course).', icon:'👹', type:'total_sessions', target:30, unit:'séances', xp:800, diff:'epic', reward:'Titre: Bestmode'},
-  {id:'epic2', cat:'epiques', name:'Le Grand Mélange', desc:'Cours 10 km ET fais 5 séances muscu.', icon:'🌀', type:'combo', target:1, unit:'combo', xp:600, diff:'epic', reward:'Badge: Hybride'},
-  {id:'epic3', cat:'epiques', name:'50 KM CLUB', desc:'Cours 50 km au total.', icon:'🌍', type:'run', target:50, unit:'km', xp:700, diff:'epic', reward:'Titre: Coureur de fond'},
-  {id:'epic4', cat:'epiques', name:'CENTURION', desc:'Réalise 100 séances au total.', icon:'⚔️', type:'total_sessions', target:100, unit:'séances', xp:2000, diff:'epic', reward:'Titre: Centurion'},
+  // ===== COURSE (15) =====
+  {id:'run1',  cat:'course', name:'Premiers Pas',       desc:'Cours 1 km sans t\'arrêter.',              icon:'👟', type:'run',          target:1,   unit:'km',      xp:50,   diff:'easy',   reward:'50 or'},
+  {id:'run2',  cat:'course', name:'Le Classique',       desc:'Cours 5 km d\'un coup.',                   icon:'🏃', type:'run',          target:5,   unit:'km',      xp:150,  diff:'medium', reward:'Titre: Coureur'},
+  {id:'run3',  cat:'course', name:'Décathlon',          desc:'Accumule 10 km de course.',                icon:'🗺️', type:'run',          target:10,  unit:'km',      xp:200,  diff:'medium', reward:'100 or'},
+  {id:'run4',  cat:'course', name:'Série de 3',         desc:'Cours 3 fois cette semaine.',              icon:'🔁', type:'run_sessions',  target:3,   unit:'séances', xp:200,  diff:'medium', reward:'Badge: Régularité'},
+  {id:'run5',  cat:'course', name:'Semi-Marathon',      desc:'Accumule 21 km de course.',                icon:'🏅', type:'run',          target:21,  unit:'km',      xp:400,  diff:'hard',   reward:'Titre: Semi'},
+  {id:'run6',  cat:'course', name:'Speed Demon',        desc:'Cours en mode intervalles 3 fois.',        icon:'⚡', type:'run_interval',  target:3,   unit:'fois',    xp:250,  diff:'hard',   reward:'Badge: Sprinter'},
+  {id:'run7',  cat:'course', name:'Trailblazer',        desc:'Fais 2 sorties trail.',                    icon:'🌲', type:'run_trail',     target:2,   unit:'trails',  xp:300,  diff:'hard',   reward:'Badge: Traileur'},
+  {id:'run8',  cat:'course', name:'50 KM CLUB',         desc:'Cours 50 km au total.',                    icon:'🌍', type:'run',          target:50,  unit:'km',      xp:700,  diff:'epic',   reward:'Titre: Coureur de fond'},
+  {id:'run9',  cat:'course', name:'Ultra Coureur',      desc:'Cours 100 km au total.',                   icon:'🏔️', type:'run',          target:100, unit:'km',      xp:1000, diff:'epic',   reward:'Titre: Ultra'},
+  {id:'run10', cat:'course', name:'Matin Difficile',    desc:'Fais 5 séances de course.',                icon:'🌅', type:'run_sessions',  target:5,   unit:'séances', xp:150,  diff:'medium', reward:'75 or'},
+  {id:'run11', cat:'course', name:'Explorateur GPS',    desc:'Révèle 50 zones sur la carte.',            icon:'🗺️', type:'map_cells',     target:50,  unit:'zones',   xp:300,  diff:'hard',   reward:'150 or'},
+  {id:'run12', cat:'course', name:'Cartographe',        desc:'Révèle 200 zones sur la carte.',           icon:'🌐', type:'map_cells',     target:200, unit:'zones',   xp:600,  diff:'epic',   reward:'Titre: Cartographe'},
+  {id:'run13', cat:'course', name:'Marathon',           desc:'Cours 42 km au total.',                    icon:'🏆', type:'run',          target:42,  unit:'km',      xp:800,  diff:'epic',   reward:'Titre: Marathonien'},
+  {id:'run14', cat:'course', name:'Régularité de fer',  desc:'Cours 10 fois en tout.',                   icon:'🔩', type:'run_sessions',  target:10,  unit:'séances', xp:350,  diff:'hard',   reward:'200 or'},
+  {id:'run15', cat:'course', name:'Longue Sortie',      desc:'Cours 10 km en une seule séance.',         icon:'🦅', type:'single_run',    target:10,  unit:'km',      xp:400,  diff:'hard',   reward:'Titre: Endurant'},
+
+  // ===== MUSCU (18) =====
+  {id:'lift1',  cat:'muscu', name:'Initiation Fer',     desc:'Réalise ta première séance de muscu.',     icon:'🏋️', type:'lift_sessions', target:1,  unit:'séances', xp:60,   diff:'easy',   reward:'30 or'},
+  {id:'lift2',  cat:'muscu', name:'Routine Béton',      desc:'Fais 5 séances de muscu.',                 icon:'💪', type:'lift_sessions', target:5,  unit:'séances', xp:200,  diff:'medium', reward:'Badge: Habitué'},
+  {id:'lift3',  cat:'muscu', name:'Roi du Squat',       desc:'Effectue 10 séries de squats.',            icon:'🦵', type:'squat_sets',    target:10, unit:'séries',  xp:180,  diff:'medium', reward:'100 or'},
+  {id:'lift4',  cat:'muscu', name:'King Press',         desc:'Fais du développé couché 10 fois.',        icon:'🤜', type:'bench_sets',    target:10, unit:'séries',  xp:180,  diff:'medium', reward:'Badge: Poitrine'},
+  {id:'lift5',  cat:'muscu', name:'Iron Man',           desc:'20 séances de muscu totales.',             icon:'🔩', type:'lift_sessions', target:20, unit:'séances', xp:500,  diff:'epic',   reward:'Titre: Iron Man'},
+  {id:'lift6',  cat:'muscu', name:'Soulève Tout',       desc:'Fais du soulevé de terre 5 fois.',         icon:'🏗️', type:'deadlift_sets', target:5,  unit:'séries',  xp:220,  diff:'hard',   reward:'Badge: Deadlifter'},
+  {id:'lift7',  cat:'muscu', name:'100 Pompes',         desc:'Réalise 100 pompes au total (cumulé).',    icon:'💪', type:'total_pushups', target:100, unit:'pompes', xp:300,  diff:'hard',   reward:'150 or'},
+  {id:'lift8',  cat:'muscu', name:'Tractions Pro',      desc:'Fais des tractions 5 fois.',               icon:'🤸', type:'pullup_sets',   target:5,  unit:'séries',  xp:250,  diff:'hard',   reward:'Badge: Pull'},
+  {id:'lift9',  cat:'muscu', name:'La Semaine Bras',    desc:'Fais curls + triceps 3 fois.',             icon:'💪', type:'arm_sessions',  target:3,  unit:'fois',    xp:200,  diff:'medium', reward:'100 or'},
+  {id:'lift10', cat:'muscu', name:'Gainage de Fer',     desc:'Fais du gainage 5 fois.',                  icon:'🧱', type:'plank_sets',    target:5,  unit:'fois',    xp:150,  diff:'easy',   reward:'75 or'},
+  {id:'lift11', cat:'muscu', name:'30 Séances',         desc:'30 séances de muscu totales.',             icon:'🔱', type:'lift_sessions', target:30, unit:'séances', xp:700,  diff:'epic',   reward:'Titre: Forgeron'},
+  {id:'lift12', cat:'muscu', name:'Polyvalent',         desc:'Fais 5 exercices différents.',             icon:'🌀', type:'diff_exos',     target:5,  unit:'exos',    xp:200,  diff:'medium', reward:'Badge: Polyvalent'},
+  {id:'lift13', cat:'muscu', name:'200 Pompes',         desc:'Cumule 200 pompes.',                       icon:'🔥', type:'total_pushups', target:200, unit:'pompes', xp:500,  diff:'epic',   reward:'250 or'},
+  {id:'lift14', cat:'muscu', name:'Jambes d\'Acier',    desc:'Fais 10 séries de leg press.',             icon:'🦾', type:'legpress_sets', target:10, unit:'séries',  xp:200,  diff:'medium', reward:'100 or'},
+  {id:'lift15', cat:'muscu', name:'Dos Béton',          desc:'Fais rowing + tirage 5 fois.',             icon:'🔙', type:'back_sessions', target:5,  unit:'fois',    xp:220,  diff:'medium', reward:'Badge: Dos'},
+  {id:'lift16', cat:'muscu', name:'Série Parfaite',     desc:'Valide 3 exos avec l\'IA caméra.',         icon:'📷', type:'ai_validated',  target:3,  unit:'exos',    xp:350,  diff:'hard',   reward:'Titre: Précis'},
+  {id:'lift17', cat:'muscu', name:'50 Séances',         desc:'50 séances de muscu — légende.',           icon:'⚔️', type:'lift_sessions', target:50, unit:'séances', xp:1500, diff:'epic',   reward:'Titre: Titan'},
+  {id:'lift18', cat:'muscu', name:'Full Body Week',     desc:'Cours ET fais muscu la même semaine.',     icon:'🌐', type:'hybrid_week',   target:1,  unit:'semaine', xp:250,  diff:'medium', reward:'Badge: Complet'},
+
+  // ===== ÉPIQUES (12) =====
+  {id:'epic1', cat:'epiques', name:'BESTMODE',          desc:'30 séances de sport au total.',            icon:'👹', type:'total_sessions', target:30,  unit:'séances', xp:800,  diff:'epic', reward:'Titre: Bestmode'},
+  {id:'epic2', cat:'epiques', name:'Le Grand Mélange',  desc:'Cours 10 km ET fais 5 séances muscu.',    icon:'🌀', type:'combo',          target:1,   unit:'combo',   xp:600,  diff:'epic', reward:'Badge: Hybride'},
+  {id:'epic3', cat:'epiques', name:'CENTURION',         desc:'100 séances au total.',                    icon:'⚔️', type:'total_sessions', target:100, unit:'séances', xp:2000, diff:'epic', reward:'Titre: Centurion'},
+  {id:'epic4', cat:'epiques', name:'Série Légendaire',  desc:'Maintiens un streak de 30 jours.',        icon:'🔥', type:'streak',         target:30,  unit:'jours',   xp:1500, diff:'epic', reward:'Titre: Légende'},
+  {id:'epic5', cat:'epiques', name:'10 000 XP',         desc:'Atteins 10 000 XP total.',                 icon:'⭐', type:'total_xp',       target:10000,unit:'XP',     xp:1000, diff:'epic', reward:'Titre: Grand Maître'},
+  {id:'epic6', cat:'epiques', name:'Toutes les Quêtes', desc:'Complète 10 quêtes.',                      icon:'📜', type:'quests_done',    target:10,  unit:'quêtes',  xp:500,  diff:'hard', reward:'Badge: Complétiste'},
+  {id:'epic7', cat:'epiques', name:'Boss Slayer',       desc:'Bats 3 boss de la semaine.',               icon:'💀', type:'boss_kills',     target:3,   unit:'boss',    xp:700,  diff:'epic', reward:'Titre: Boss Slayer'},
+  {id:'epic8', cat:'epiques', name:'200 KM',            desc:'Cours 200 km au total.',                   icon:'🚀', type:'run',            target:200, unit:'km',      xp:2500, diff:'epic', reward:'Titre: Ultramarathonien'},
+  {id:'epic9', cat:'epiques', name:'Collectionneur',    desc:'Possède 10 familiers.',                    icon:'🐾', type:'mounts_owned',   target:10,  unit:'familiers',xp:600, diff:'epic', reward:'250 or'},
+  {id:'epic10',cat:'epiques', name:'Explorateur Total', desc:'Révèle 500 zones sur la carte.',           icon:'🌍', type:'map_cells',      target:500, unit:'zones',   xp:1000, diff:'epic', reward:'Titre: Voyageur'},
+  {id:'epic11',cat:'epiques', name:'Streak de Feu',     desc:'7 jours consécutifs d\'entraînement.',    icon:'💎', type:'streak',         target:7,   unit:'jours',   xp:400,  diff:'hard', reward:'Bouclier de streak'},
+  {id:'epic12',cat:'epiques', name:'ASCENDANCE',        desc:'Atteins le niveau 10.',                    icon:'🌟', type:'level',          target:10,  unit:'niveau',  xp:2000, diff:'epic', reward:'Titre: Transcendé'},
 ];
 
 const ACHIEVEMENTS = [
@@ -2761,9 +2836,11 @@ function addXP(amount, reason) {
   updateHeader();
   showXPFloat('+'+amount+' XP');
   showToast('success', '⚡ +'+amount+' XP — '+reason);
+  playSound('xp');
   const newLv = getLevel(state.xp);
   if(newLv > oldLv) {
     setTimeout(() => showLevelUp(newLv), 800);
+    setTimeout(() => playSound('levelup'), 800);
   }
   checkAchievements();
 }
@@ -2868,7 +2945,16 @@ function switchQTab(tab, btn) {
   currentQTab = tab;
   document.querySelectorAll('.qtab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderQuests(tab);
+  const creator = document.getElementById('custom-challenge-creator');
+  const questList = document.getElementById('quest-list');
+  if(tab === 'custom') {
+    questList.style.display = 'none';
+    if(creator) { creator.style.display = 'block'; renderCustomChallenges(); }
+  } else {
+    questList.style.display = 'block';
+    if(creator) creator.style.display = 'none';
+    renderQuests(tab);
+  }
 }
 
 function renderQuests(tab) {
@@ -2895,16 +2981,40 @@ function renderQuests(tab) {
 
 function getQuestProgress(q) {
   switch(q.type) {
-    case 'run': return state.totalKm;
-    case 'run_sessions': return state.runSessions;
-    case 'run_interval': return state.run_interval;
-    case 'run_trail': return state.run_trail;
-    case 'lift_sessions': return state.liftSessions;
-    case 'squat_sets': return state.squat_sets;
-    case 'bench_sets': return state.bench_sets;
-    case 'deadlift_sets': return state.deadlift_sets;
-    case 'total_sessions': return state.totalSessions;
-    case 'combo': return (state.totalKm >= 10 && state.liftSessions >= 5) ? 1 : 0;
+    case 'run':            return state.totalKm || 0;
+    case 'single_run': {
+      const runs = (state.workouts||[]).filter(w=>w.type==='run');
+      const best = runs.reduce((m,w)=>{ const d=parseFloat(w.details)||0; return d>m?d:m; },0);
+      return best;
+    }
+    case 'run_sessions':   return state.runSessions || 0;
+    case 'run_interval':   return state.run_interval || 0;
+    case 'run_trail':      return state.run_trail || 0;
+    case 'lift_sessions':  return state.liftSessions || 0;
+    case 'squat_sets':     return state.squat_sets || 0;
+    case 'bench_sets':     return state.bench_sets || 0;
+    case 'deadlift_sets':  return state.deadlift_sets || 0;
+    case 'pullup_sets':    return (state.workouts||[]).filter(w=>w.name&&w.name.includes('Traction')).length;
+    case 'plank_sets':     return (state.workouts||[]).filter(w=>w.name&&w.name.includes('Gainage')).length;
+    case 'arm_sessions':   return (state.workouts||[]).filter(w=>w.name&&(w.name.includes('Curl')||w.name.includes('Triceps'))).length;
+    case 'back_sessions':  return (state.workouts||[]).filter(w=>w.name&&(w.name.includes('Rowing')||w.name.includes('Tirage'))).length;
+    case 'legpress_sets':  return (state.workouts||[]).filter(w=>w.name&&w.name.includes('Leg press')).length;
+    case 'ai_validated':   return state.aiValidatedCount || 0;
+    case 'total_pushups':  return state.totalPushups || 0;
+    case 'diff_exos': {
+      const exos = new Set((state.workouts||[]).filter(w=>w.type==='lift').map(w=>w.name));
+      return exos.size;
+    }
+    case 'total_sessions': return state.totalSessions || 0;
+    case 'total_xp':       return state.totalXP || 0;
+    case 'streak':         return state.maxStreak || 0;
+    case 'level':          return (state.level || 0) + 1;
+    case 'quests_done':    return state.questsDone || 0;
+    case 'boss_kills':     return state.totalBossKills || 0;
+    case 'mounts_owned':   return (state.ownedMounts||[]).length;
+    case 'map_cells':      return (state.exploredCells||[]).length;
+    case 'hybrid_week':    return (state.weeklyKmThisWeek>0 && state.weeklyLiftsThisWeek>0) ? 1 : 0;
+    case 'combo':          return (state.totalKm>=10 && state.liftSessions>=5) ? 1 : 0;
     default: return 0;
   }
 }
@@ -2955,11 +3065,18 @@ function claimQuest(e, qid) {
     const titleId = q.reward.split(': ')[1].toLowerCase().replace(' ','-');
     if(!state.unlockedTitles.includes(titleId)) state.unlockedTitles.push(titleId);
   }
+  // unlock gold reward
+  if(q.reward.match(/^\d+ or$/)) {
+    const gold = parseInt(q.reward);
+    setTimeout(() => addGold(gold, 'Quête: '+q.name), 300);
+  }
 
   saveState();
+  playSound('quest');
+  haptic('levelup');
   showReward(q.icon, 'Quête accomplie !', q.xp, q.reward);
   addXP(q.xp, 'Quête: '+q.name);
-  setTimeout(() => addGold(Math.round(q.xp * 0.5), 'Quête: '+q.name), 400);
+  setTimeout(() => addGold(Math.round(q.xp * 0.3), 'Quête: '+q.name), 400);
   setTimeout(() => renderQuests(currentQTab), 100);
 }
 
@@ -5078,7 +5195,7 @@ async function runPoseLoop() {
 
               if(analysis.formScore >= 60) {
                 poseValidReps++;
-                haptic('success');
+                haptic('success'); playSound('rep');
                 const remaining = target - poseValidReps;
                 if(remaining > 0) {
                   document.getElementById('pose-status-msg').textContent =
@@ -5124,6 +5241,12 @@ function validatePoseSession() {
     : 0;
 
   poseSessionValidated = true;
+  state.aiValidatedCount = (state.aiValidatedCount || 0) + 1;
+  // Tracker les pompes pour la quête 100 pompes
+  if(poseCurrentExo === 'Pompes') {
+    state.totalPushups = (state.totalPushups || 0) + poseRepCount;
+  }
+  saveState();
 
   // Mettre à jour le formulaire avec les vraies reps comptées
   document.getElementById('lift-reps').value = poseRepCount;
@@ -5960,7 +6083,311 @@ function initMapPage() {
   }, 150);
 }
 
+// ============================================================
+// SONS (Web Audio API)
+// ============================================================
+let audioCtx = null;
+function getAudioCtx() {
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function playSound(type) {
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    const now = ctx.currentTime;
+    if(type === 'xp') {
+      osc.frequency.setValueAtTime(523, now);
+      osc.frequency.setValueAtTime(659, now+0.1);
+      osc.frequency.setValueAtTime(784, now+0.2);
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now+0.4);
+      osc.start(now); osc.stop(now+0.4);
+    } else if(type === 'levelup') {
+      osc.frequency.setValueAtTime(392, now);
+      osc.frequency.setValueAtTime(523, now+0.15);
+      osc.frequency.setValueAtTime(659, now+0.3);
+      osc.frequency.setValueAtTime(784, now+0.45);
+      gain.gain.setValueAtTime(0.4, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now+0.8);
+      osc.start(now); osc.stop(now+0.8);
+    } else if(type === 'quest') {
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.setValueAtTime(554, now+0.1);
+      osc.frequency.setValueAtTime(659, now+0.2);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now+0.5);
+      osc.start(now); osc.stop(now+0.5);
+    } else if(type === 'error') {
+      osc.frequency.setValueAtTime(200, now);
+      osc.frequency.setValueAtTime(150, now+0.15);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now+0.3);
+      osc.start(now); osc.stop(now+0.3);
+    } else if(type === 'rep') {
+      osc.frequency.setValueAtTime(880, now);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now+0.08);
+      osc.start(now); osc.stop(now+0.08);
+    }
+  } catch(e) {}
+}
+
+// ============================================================
+// NOTIFICATIONS PUSH RÉELLES (via sw.js)
+// ============================================================
+async function setupNotifications() {
+  if(!('Notification' in window)) return;
+  const permission = await Notification.requestPermission();
+  if(permission === 'granted') {
+    localStorage.setItem('fq_notif', 'true');
+    showToast('success', '🔔 Notifications activées !');
+    scheduleReminderNotification();
+  } else {
+    showToast('info', '🔕 Notifications refusées');
+  }
+}
+
+function sendNotification(title, body, icon='⚡') {
+  if(Notification.permission !== 'granted') return;
+  try {
+    if('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.ready.then(reg => {
+        reg.showNotification(title, {
+          body, icon:'/FITQUEST/icon-192.png', badge:'/FITQUEST/icon-192.png',
+          vibrate:[200,100,200], tag:'fitquest', renotify:true
+        });
+      });
+    } else {
+      new Notification(title, {body});
+    }
+  } catch(e) {}
+}
+
+function scheduleReminderNotification() {
+  // Rappel quotidien à 18h
+  const now = new Date();
+  const target = new Date();
+  target.setHours(18, 0, 0, 0);
+  if(target <= now) target.setDate(target.getDate() + 1);
+  const delay = target - now;
+  setTimeout(() => {
+    if(localStorage.getItem('fq_notif') === 'true') {
+      const msgs = [
+        'Tu n\'as pas encore bougé aujourd\'hui 💪',
+        'Le boss de la semaine t\'attend !',
+        'Ta série est en danger — entraîne-toi !',
+        'Un peu de sport ce soir ? 🏃',
+        'Tes familiers s\'ennuient sans toi 🐾',
+      ];
+      const msg = msgs[Math.floor(Math.random() * msgs.length)];
+      sendNotification('⚡ FitQuest', msg);
+      scheduleReminderNotification(); // reprogrammer pour le lendemain
+    }
+  }, delay);
+}
+
+// ============================================================
+// ONBOARDING — TUTORIEL PREMIER LANCEMENT
+// ============================================================
+const ONBOARDING_STEPS = [
+  {
+    icon: '⚡',
+    title: 'Bienvenue dans FitQuest !',
+    desc: 'Transforme ton entraînement en aventure RPG. Gagne des XP, monte de niveau, et deviens une légende.',
+    action: null
+  },
+  {
+    icon: '🏋️',
+    title: 'Enregistre tes séances',
+    desc: 'Va dans Workout pour logger tes courses et séances muscu. Chaque effort rapporte de l\'XP et de l\'or.',
+    action: null
+  },
+  {
+    icon: '📷',
+    title: 'L\'IA vérifie ta forme',
+    desc: 'Pour les pompes, squats et autres exercices, l\'IA caméra compte tes reps et vérifie ta technique automatiquement.',
+    action: null
+  },
+  {
+    icon: '🗺️',
+    title: 'Explore ta ville',
+    desc: 'Ouvre la page Carte et appuie sur "Ma Position" pour révéler les zones autour de toi. Plus tu cours, plus tu découvres !',
+    action: null
+  },
+  {
+    icon: '⚔️',
+    title: 'Complète des quêtes',
+    desc: 'Des dizaines de quêtes t\'attendent. Tu peux même créer tes propres défis personnalisés dans l\'onglet "Mes défis".',
+    action: null
+  },
+  {
+    icon: '🔔',
+    title: 'Active les rappels',
+    desc: 'Reçois des rappels quotidiens pour ne jamais oublier ta séance. Utile pour maintenir ta série !',
+    action: 'notif'
+  },
+];
+
+let onboardingStep = 0;
+
+function showOnboarding() {
+  if(localStorage.getItem('fq_onboarded')) return;
+  const el = document.getElementById('onboarding-overlay');
+  if(el) { el.style.display = 'flex'; renderOnboardingStep(); }
+}
+
+function renderOnboardingStep() {
+  const step = ONBOARDING_STEPS[onboardingStep];
+  const total = ONBOARDING_STEPS.length;
+  const el = document.getElementById('onboarding-overlay');
+  if(!el || !step) return;
+
+  const dots = Array.from({length:total}, (_,i) =>
+    `<div style="width:8px;height:8px;border-radius:50%;background:${i===onboardingStep?'var(--accent)':'rgba(255,255,255,0.2)'};transition:all 0.3s"></div>`
+  ).join('');
+
+  el.innerHTML = `
+    <div style="background:var(--bg2);border-radius:20px;padding:32px 24px;max-width:340px;width:90%;text-align:center;position:relative">
+      <div style="font-size:64px;margin-bottom:16px;animation:lu-emoji-spin 0.5s ease">${step.icon}</div>
+      <div style="font-family:'Exo 2',sans-serif;font-weight:900;font-size:20px;margin-bottom:10px;color:var(--accent)">${step.title}</div>
+      <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:24px">${step.desc}</div>
+      <div style="display:flex;justify-content:center;gap:6px;margin-bottom:24px">${dots}</div>
+      ${step.action === 'notif' ? `<button onclick="setupNotifications()" style="width:100%;padding:12px;background:rgba(0,245,255,0.1);border:1px solid var(--accent);color:var(--accent);border-radius:var(--radius);font-weight:700;cursor:pointer;margin-bottom:10px">🔔 ACTIVER LES NOTIFICATIONS</button>` : ''}
+      <button onclick="nextOnboardingStep()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;font-weight:900;font-size:15px;border:none;border-radius:var(--radius);cursor:pointer">
+        ${onboardingStep < total-1 ? 'SUIVANT →' : '🚀 C\'EST PARTI !'}
+      </button>
+      ${onboardingStep > 0 ? `<button onclick="prevOnboardingStep()" style="margin-top:8px;background:none;border:none;color:var(--text2);cursor:pointer;font-size:13px">← Retour</button>` : ''}
+      <button onclick="skipOnboarding()" style="position:absolute;top:12px;right:12px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px">Passer</button>
+    </div>`;
+}
+
+function nextOnboardingStep() {
+  if(onboardingStep < ONBOARDING_STEPS.length - 1) {
+    onboardingStep++;
+    haptic('light');
+    renderOnboardingStep();
+  } else {
+    skipOnboarding();
+  }
+}
+function prevOnboardingStep() {
+  if(onboardingStep > 0) { onboardingStep--; renderOnboardingStep(); }
+}
+function skipOnboarding() {
+  localStorage.setItem('fq_onboarded', '1');
+  const el = document.getElementById('onboarding-overlay');
+  if(el) { el.style.opacity='0'; el.style.transition='opacity 0.4s'; setTimeout(()=>el.style.display='none',400); }
+  haptic('success');
+  playSound('xp');
+}
+
+// ============================================================
+// DÉFIS PERSONNALISÉS
+// ============================================================
+function createCustomChallenge() {
+  const name   = document.getElementById('cc-name')?.value?.trim();
+  const type   = document.getElementById('cc-type')?.value;
+  const target = parseInt(document.getElementById('cc-target')?.value);
+  const xp     = parseInt(document.getElementById('cc-xp')?.value) || 200;
+  const icon   = document.getElementById('cc-icon')?.value?.trim() || '🎯';
+
+  if(!name) { showToast('info', '⚠️ Donne un nom à ton défi'); playSound('error'); return; }
+  if(!target || target <= 0) { showToast('info', '⚠️ Saisis un objectif valide'); playSound('error'); return; }
+
+  if(!state.customChallenges) state.customChallenges = [];
+  const units = {run:'km', lift_sessions:'séances', total_sessions:'séances', streak:'jours', xp:'XP'};
+  state.customChallenges.push({
+    id: 'cc_' + Date.now(),
+    name, type, target, xp: Math.min(2000, Math.max(50, xp)),
+    icon, unit: units[type] || 'fois',
+    createdAt: new Date().toLocaleDateString('fr-FR'),
+    completed: false,
+  });
+  saveState();
+  // Reset form
+  ['cc-name','cc-target','cc-xp','cc-icon'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  renderCustomChallenges();
+  showToast('success', '🎯 Défi créé !');
+  playSound('quest');
+  haptic('success');
+}
+
+function claimCustomChallenge(id) {
+  if(!state.customChallenges) return;
+  const ch = state.customChallenges.find(c => c.id === id);
+  if(!ch || ch.completed) return;
+  ch.completed = true;
+  addXP(ch.xp, '🎯 Défi : ' + ch.name);
+  saveState();
+  renderCustomChallenges();
+  showToast('success', '🏆 Défi accompli ! +' + ch.xp + ' XP');
+  playSound('quest');
+  haptic('levelup');
+}
+
+function deleteCustomChallenge(id) {
+  if(!state.customChallenges) return;
+  state.customChallenges = state.customChallenges.filter(c => c.id !== id);
+  saveState();
+  renderCustomChallenges();
+}
+
+function getCustomProgress(ch) {
+  // Réutiliser getQuestProgress avec un objet compatible
+  return getQuestProgress({type: ch.type});
+}
+
+function renderCustomChallenges() {
+  const el = document.getElementById('custom-challenge-list');
+  if(!el) return;
+  const challenges = state.customChallenges || [];
+  if(!challenges.length) {
+    el.innerHTML = `<div class="empty-state"><span class="empty-icon">🎯</span><div class="empty-text">Pas encore de défi perso.<br>Crée-en un au-dessus !</div></div>`;
+    return;
+  }
+  el.innerHTML = challenges.map(ch => {
+    const prog = getCustomProgress(ch);
+    const pct = Math.min(100, (prog / ch.target) * 100);
+    const claimable = prog >= ch.target && !ch.completed;
+    return `<div class="quest-card ${ch.completed?'completed':claimable?'active-quest':''}">
+      ${ch.completed ? '<div class="quest-complete-badge">✓ FAIT</div>' : ''}
+      <div class="quest-card-header">
+        <div class="quest-icon-wrap challenge" style="font-size:24px">${ch.icon}</div>
+        <div class="quest-meta">
+          <div class="quest-name">${ch.name}</div>
+          <div class="quest-desc">Objectif : ${ch.target} ${ch.unit} · Créé le ${ch.createdAt}</div>
+          <div class="quest-tags">
+            <span class="quest-tag xp">+${ch.xp} XP</span>
+            <span class="quest-tag diff-medium">PERSO</span>
+          </div>
+        </div>
+      </div>
+      <div style="margin:10px 0 4px;display:flex;justify-content:space-between;font-size:12px;color:var(--text2)">
+        <span>Progression</span><span>${Math.round(prog)} / ${ch.target} ${ch.unit}</span>
+      </div>
+      <div style="background:var(--bg3);border-radius:4px;height:6px;overflow:hidden;margin-bottom:12px">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent3),#ff8c00);border-radius:4px;transition:width 0.5s"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        ${claimable ? `<button class="quest-btn active" onclick="claimCustomChallenge('${ch.id}')" style="flex:1">🏆 RÉCLAMER</button>` : ''}
+        ${ch.completed ? `<button class="quest-btn done" style="flex:1" disabled>✅ Accompli</button>` : ''}
+        <button onclick="deleteCustomChallenge('${ch.id}')" style="padding:8px 12px;background:rgba(255,60,60,0.15);border:1px solid rgba(255,60,60,0.3);color:#ff4444;border-radius:var(--radius);cursor:pointer;font-size:12px">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function init() {
+  // Init customChallenges in state if missing
+  if(!state.customChallenges) { state.customChallenges = []; saveState(); }
+  if(!state.aiValidatedCount) state.aiValidatedCount = 0;
+  if(!state.totalPushups) state.totalPushups = 0;
+  if(!state.totalBossKills) state.totalBossKills = 0;
+
   hideSplash();
   checkWeeklyReset();
   updateHeader();
@@ -5984,11 +6411,10 @@ function init() {
   registerServiceWorker();
   checkSundayRecap();
 
-  try { fetchWeather(); } catch(e) {}
+  // Onboarding premier lancement (après le splash)
+  setTimeout(showOnboarding, 2200);
 
-  document.querySelectorAll('.submit-btn, .nav-btn, .quest-card, .craft-btn').forEach(el => {
-    el.addEventListener('click', () => haptic('light'));
-  });
+  try { fetchWeather(); } catch(e) {}
 
   if(localStorage.getItem('fq_notif') === 'true' && Notification.permission === 'granted') {
     scheduleReminderNotification();
