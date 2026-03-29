@@ -1515,6 +1515,90 @@ body::after {
   main { margin-left:60px; margin-bottom:0; }
   .hero-level-section { flex-direction:row; gap:16px; }
 }
+/* ===== GRAPHIQUE PROGRESSION ===== */
+.prog-chart-wrap { position:relative; width:100%; height:160px; margin-top:12px; }
+.prog-chart-canvas { width:100%; height:100%; }
+.prog-chart-label { display:flex; justify-content:space-between; font-size:10px; color:var(--text2); margin-top:4px; font-family:'Share Tech Mono',monospace; }
+.prog-chart-filters { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+.prog-chart-filter { padding:5px 12px; border:1px solid var(--border); background:var(--bg3); color:var(--text2); border-radius:20px; cursor:pointer; font-size:11px; }
+.prog-chart-filter.active { border-color:var(--accent2); color:var(--accent2); background:rgba(255,60,172,0.1); }
+.chart-stat-row { display:flex; gap:10px; margin-top:10px; }
+.chart-stat { flex:1; text-align:center; background:var(--bg3); border-radius:var(--radius); padding:8px; }
+.chart-stat-val { font-size:18px; font-weight:900; color:var(--accent); font-family:'Exo 2',sans-serif; }
+.chart-stat-lbl { font-size:10px; color:var(--text2); margin-top:2px; }
+
+/* ===== CARTE DU MONDE ===== */
+.world-map-wrap { position:relative; width:100%; padding-top:50%; overflow:hidden; border-radius:var(--radius); background:var(--bg2); margin-bottom:12px; }
+.world-map-inner { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+.world-map-svg { width:100%; height:100%; }
+.world-region { transition:fill 0.5s, opacity 0.5s; cursor:pointer; }
+.world-region.locked { fill:#1a1a2e; opacity:0.4; }
+.world-region.unlocked { opacity:1; }
+.world-region.active-region { filter:drop-shadow(0 0 8px currentColor); }
+.world-progress-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.world-milestone { display:flex; align-items:center; gap:8px; padding:8px; border-radius:var(--radius); margin-bottom:6px; }
+.world-milestone.done { background:rgba(57,255,20,0.1); border:1px solid rgba(57,255,20,0.3); }
+.world-milestone.next { background:rgba(0,245,255,0.08); border:1px solid rgba(0,245,255,0.2); }
+.world-milestone.locked { background:var(--bg3); border:1px solid var(--border); opacity:0.5; }
+
+/* ===== LEVEL UP SPECTACULAIRE ===== */
+#levelup-fullscreen {
+  display:none; position:fixed; inset:0; z-index:9998;
+  background:radial-gradient(circle at 50% 50%, #0a0a1a 0%, #000 100%);
+  flex-direction:column; align-items:center; justify-content:center;
+  text-align:center;
+}
+#levelup-fullscreen.show { display:flex; }
+.lu-ring {
+  width:180px; height:180px; border-radius:50%;
+  border:4px solid transparent;
+  background:linear-gradient(var(--bg), var(--bg)) padding-box,
+             linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3)) border-box;
+  display:flex; align-items:center; justify-content:center;
+  animation:lu-ring-pulse 1s infinite alternate;
+  margin-bottom:24px; position:relative;
+}
+@keyframes lu-ring-pulse {
+  from { box-shadow:0 0 30px rgba(0,245,255,0.4), 0 0 60px rgba(255,60,172,0.2); transform:scale(1); }
+  to   { box-shadow:0 0 60px rgba(0,245,255,0.8), 0 0 100px rgba(255,60,172,0.5); transform:scale(1.05); }
+}
+.lu-emoji-big { font-size:72px; animation:lu-emoji-spin 0.6s ease; }
+@keyframes lu-emoji-spin { from{transform:scale(0) rotate(-180deg)} to{transform:scale(1) rotate(0deg)} }
+.lu-level-num { font-family:'Exo 2',sans-serif; font-weight:900; font-size:80px; line-height:1;
+  background:linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  animation:lu-num-pop 0.5s ease 0.3s both; }
+@keyframes lu-num-pop { from{opacity:0;transform:scale(0.5)} to{opacity:1;transform:scale(1)} }
+.lu-title-text { font-family:'Exo 2',sans-serif; font-weight:900; font-size:28px; letter-spacing:4px;
+  color:#fff; margin-bottom:8px; animation:lu-slide-up 0.5s ease 0.5s both; }
+.lu-sub-text { font-size:14px; color:var(--text2); margin-bottom:32px; animation:lu-slide-up 0.5s ease 0.7s both; }
+@keyframes lu-slide-up { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+.lu-stars { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+.lu-star { position:absolute; width:4px; height:4px; border-radius:50%; animation:lu-star-fall linear infinite; }
+@keyframes lu-star-fall { from{transform:translateY(-10px) scale(0);opacity:1} to{transform:translateY(100vh) scale(1);opacity:0} }
+.lu-continue-btn {
+  padding:16px 48px; background:linear-gradient(135deg, var(--accent3), #ff8c00);
+  color:#000; font-weight:900; font-size:16px; letter-spacing:2px; border:none;
+  border-radius:var(--radius); cursor:pointer; animation:lu-slide-up 0.5s ease 0.9s both;
+}
+
+/* ===== RECAP HEBDO ===== */
+.recap-modal { background:var(--bg2); border-radius:16px; padding:20px; max-width:360px; width:90%; max-height:85vh; overflow-y:auto; }
+.recap-stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0; }
+.recap-stat { background:var(--bg3); border-radius:var(--radius); padding:12px; text-align:center; }
+.recap-stat-val { font-size:24px; font-weight:900; font-family:'Exo 2',sans-serif; }
+.recap-stat-lbl { font-size:10px; color:var(--text2); letter-spacing:1px; }
+
+/* ===== PRINT / PDF ===== */
+@media print {
+  #bottomnav, #splash, .nav-btn, button:not(.close-btn), .session-stop,
+  #pose-modal, #levelup-fullscreen, .modal-overlay { display:none !important; }
+  body { background:#fff !important; color:#000 !important; }
+  .page { display:block !important; page-break-after:always; }
+  .card { border:1px solid #ccc !important; background:#f9f9f9 !important; margin-bottom:12px; }
+  .section-title { color:#000 !important; }
+  .big-stat-val { color:#000 !important; }
+}
 </style>
 </head>
 <body>
@@ -1813,6 +1897,14 @@ body::after {
   <!-- WORKOUT HISTORY -->
   <div class="card">
     <div class="card-title"><span>📊</span> JOURNAL D'ENTRAÎNEMENT</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <input class="form-input" type="text" id="history-search" placeholder="🔍 Rechercher..." oninput="renderWorkoutHistory()" style="flex:1;padding:8px 12px;font-size:13px">
+      <select class="form-select form-input" id="history-filter" onchange="renderWorkoutHistory()" style="width:auto;padding:8px 10px;font-size:12px">
+        <option value="all">Tout</option>
+        <option value="run">Course</option>
+        <option value="lift">Muscu</option>
+      </select>
+    </div>
     <div id="workout-history-list"><div class="empty-state"><span class="empty-icon">📓</span><div class="empty-text">Ton journal est vide.<br>Commence à t'entraîner !</div></div></div>
   </div>
 
@@ -1876,11 +1968,38 @@ body::after {
     <div id="weight-log-list"><div style="color:var(--text2);font-size:12px;text-align:center;padding:12px">Aucune mesure encore.</div></div>
   </div>
 
+  <!-- GRAPHIQUE PROGRESSION PAR EXERCICE -->
+  <div class="card">
+    <div class="card-title"><span>📈</span> PROGRESSION DES CHARGES</div>
+    <div class="prog-chart-filters" id="prog-chart-filter-row"></div>
+    <div class="prog-chart-wrap">
+      <canvas id="prog-chart-canvas" class="prog-chart-canvas"></canvas>
+    </div>
+    <div class="chart-stat-row" id="chart-stat-row"></div>
+  </div>
+
   <!-- HISTORIQUE PAR EXERCICE -->
   <div class="card">
-    <div class="card-title"><span>📈</span> HISTORIQUE PAR EXERCICE</div>
+    <div class="card-title"><span>📋</span> HISTORIQUE PAR EXERCICE</div>
     <div class="exo-history-filter" id="exo-filter-row"></div>
     <div id="exo-history-list"><div style="color:var(--text2);font-size:12px;text-align:center;padding:12px">Commence à t'entraîner pour voir ta progression.</div></div>
+  </div>
+
+  <!-- CARTE DU MONDE -->
+  <div class="card">
+    <div class="card-title"><span>🌍</span> CARTE DU MONDE — EXPLORER</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Débloque des régions en courant des kilomètres !</div>
+    <div class="world-map-wrap">
+      <div class="world-map-inner" id="world-map-svg-wrap"></div>
+    </div>
+    <div id="world-milestones"></div>
+  </div>
+
+  <!-- EXPORT PDF -->
+  <div class="card">
+    <div class="card-title"><span>📄</span> EXPORT & PARTAGE</div>
+    <button class="submit-btn" style="background:var(--accent3);color:#000;margin-bottom:8px" onclick="exportStatsPDF()">📄 EXPORTER MES STATS (PDF)</button>
+    <button class="submit-btn" style="background:var(--bg3);color:var(--text)" onclick="showWeeklyRecap()">📊 VOIR MON RECAP HEBDO</button>
   </div>
 
   <!-- OBJECTIFS PERSONNALISÉS -->
@@ -2069,7 +2188,7 @@ body::after {
   </div>
 </div>
 
-<div class="modal-overlay" id="levelup-modal">
+<div class="modal-overlay" id="levelup-modal" style="display:none">
   <div class="modal" style="text-align:center">
     <div class="reward-particles" id="levelup-particles"></div>
     <div class="modal-handle"></div>
@@ -2078,6 +2197,33 @@ body::after {
     <div class="modal-title" style="margin-top:8px" id="lu-classname">Apprenti</div>
     <div class="modal-subtitle" id="lu-desc">Tu passes à un nouveau rang !</div>
     <button class="close-btn" onclick="closeModal('levelup-modal')" style="background:linear-gradient(135deg,var(--accent3),#ff8c00)">🏆 CONTINUER</button>
+  </div>
+</div>
+
+<!-- LEVEL UP FULLSCREEN SPECTACULAIRE -->
+<div id="levelup-fullscreen">
+  <div class="lu-stars" id="lu-stars"></div>
+  <div class="lu-ring">
+    <div class="lu-emoji-big" id="lu-fs-emoji">⚡</div>
+  </div>
+  <div style="margin-bottom:8px;font-size:12px;letter-spacing:4px;color:var(--accent3);font-family:'Share Tech Mono',monospace">NIVEAU</div>
+  <div class="lu-level-num" id="lu-fs-num">2</div>
+  <div class="lu-title-text" id="lu-fs-name">APPRENTI</div>
+  <div class="lu-sub-text" id="lu-fs-desc">Tu passes à un nouveau rang !</div>
+  <button class="lu-continue-btn" onclick="closeLevelUpFullscreen()">🏆 CONTINUER</button>
+</div>
+
+<!-- RECAP HEBDO MODAL -->
+<div class="modal-overlay" id="recap-modal">
+  <div class="recap-modal">
+    <div style="font-size:12px;letter-spacing:3px;color:var(--accent);font-family:'Share Tech Mono',monospace;margin-bottom:6px">📊 RECAP DE LA SEMAINE</div>
+    <div style="font-family:'Exo 2',sans-serif;font-weight:900;font-size:20px;margin-bottom:4px" id="recap-title">Semaine du 20 Mars</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:14px" id="recap-subtitle">Voici ton bilan !</div>
+    <div class="recap-stat-grid" id="recap-stats"></div>
+    <div id="recap-boss-result" style="margin-bottom:12px"></div>
+    <div id="recap-achievements" style="margin-bottom:14px"></div>
+    <div id="recap-message" style="font-size:13px;line-height:1.7;color:var(--text);background:var(--bg3);border-radius:var(--radius);padding:12px;margin-bottom:14px;border-left:3px solid var(--accent)"></div>
+    <button class="close-btn" onclick="closeModal('recap-modal')" style="width:100%">✅ SUPER, MERCI !</button>
   </div>
 </div>
 
@@ -2240,16 +2386,38 @@ const BOSS_DATA = [
 ];
 
 const SHOP_ITEMS = [
-  {id:'avatar_fire', name:'Avatar Flamme', icon:'🔥', price:200, type:'avatar', desc:'Avatar enflammé'},
-  {id:'avatar_ice', name:'Avatar Glace', icon:'❄️', price:200, type:'avatar', desc:'Avatar glacial'},
-  {id:'avatar_thunder', name:'Avatar Foudre', icon:'⚡', price:300, type:'avatar', desc:'Avatar électrique'},
-  {id:'avatar_dragon', name:'Avatar Dragon', icon:'🐉', price:500, type:'avatar', desc:'Avatar légendaire'},
-  {id:'avatar_robot', name:'Avatar Robot', icon:'🤖', price:400, type:'avatar', desc:'Avatar futuriste'},
-  {id:'avatar_ninja', name:'Avatar Ninja', icon:'🥷', price:350, type:'avatar', desc:'Avatar furtif'},
-  {id:'avatar_beast', name:'Avatar BEAST', icon:'👹', price:300, type:'avatar', desc:'Pour les vrais'},
-  {id:'avatar_ghost', name:'Avatar Ghost', icon:'👻', price:250, type:'avatar', desc:'Invisible mais présent'},
-  {id:'avatar_elite', name:'Avatar ÉLITE', icon:'💎', price:500, type:'avatar', desc:'Le sommet'},
-  {id:'avatar_machine', name:'Avatar Machine', icon:'⚙️', price:400, type:'avatar', desc:'Implacable'},
+  // AVATARS
+  {id:'avatar_fire',    name:'Flamme',      icon:'🔥', price:200,  type:'avatar', cat:'avatar', desc:'Avatar enflammé'},
+  {id:'avatar_ice',     name:'Glace',       icon:'❄️', price:200,  type:'avatar', cat:'avatar', desc:'Avatar glacial'},
+  {id:'avatar_thunder', name:'Foudre',      icon:'⚡', price:300,  type:'avatar', cat:'avatar', desc:'Avatar électrique'},
+  {id:'avatar_dragon',  name:'Dragon',      icon:'🐉', price:500,  type:'avatar', cat:'avatar', desc:'Avatar légendaire'},
+  {id:'avatar_robot',   name:'Robot',       icon:'🤖', price:400,  type:'avatar', cat:'avatar', desc:'Avatar futuriste'},
+  {id:'avatar_ninja',   name:'Ninja',       icon:'🥷', price:350,  type:'avatar', cat:'avatar', desc:'Avatar furtif'},
+  {id:'avatar_beast',   name:'BEAST',       icon:'👹', price:300,  type:'avatar', cat:'avatar', desc:'Pour les vrais'},
+  {id:'avatar_ghost',   name:'Ghost',       icon:'👻', price:250,  type:'avatar', cat:'avatar', desc:'Invisible mais présent'},
+  {id:'avatar_elite',   name:'ÉLITE',       icon:'💎', price:500,  type:'avatar', cat:'avatar', desc:'Le sommet'},
+  {id:'avatar_machine', name:'Machine',     icon:'⚙️', price:400,  type:'avatar', cat:'avatar', desc:'Implacable'},
+  {id:'avatar_alien',   name:'Alien',       icon:'👽', price:450,  type:'avatar', cat:'avatar', desc:'Venu d\'ailleurs'},
+  {id:'avatar_skull',   name:'Skull',       icon:'💀', price:350,  type:'avatar', cat:'avatar', desc:'Hardcore'},
+  {id:'avatar_crown',   name:'Couronne',    icon:'👑', price:600,  type:'avatar', cat:'avatar', desc:'Royauté'},
+  {id:'avatar_wolf2',   name:'Loup',        icon:'🐺', price:300,  type:'avatar', cat:'avatar', desc:'Féroce'},
+  {id:'avatar_lion',    name:'Lion',        icon:'🦁', price:400,  type:'avatar', cat:'avatar', desc:'Roi des rois'},
+  {id:'avatar_shark',   name:'Requin',      icon:'🦈', price:350,  type:'avatar', cat:'avatar', desc:'Sans pitié'},
+  // TITRES
+  {id:'title_beast2',   name:'BEAST MODE',  icon:'🔥', price:300,  type:'title',  cat:'title',  desc:'Mode bestial activé'},
+  {id:'title_ghost2',   name:'GHOST',       icon:'👻', price:250,  type:'title',  cat:'title',  desc:'Invisible'},
+  {id:'title_elite2',   name:'ÉLITE',       icon:'💎', price:500,  type:'title',  cat:'title',  desc:'Au sommet'},
+  {id:'title_machine2', name:'MACHINE',     icon:'⚙️', price:400,  type:'title',  cat:'title',  desc:'Implacable'},
+  {id:'title_legend',   name:'LÉGENDE',     icon:'⭐', price:700,  type:'title',  cat:'title',  desc:'Statut légendaire'},
+  {id:'title_god',      name:'DEMI-DIEU',   icon:'🌟', price:1000, type:'title',  cat:'title',  desc:'Au-delà du mortel'},
+  {id:'title_ninja2',   name:'SHADOW',      icon:'🥷', price:350,  type:'title',  cat:'title',  desc:'Discret mais redoutable'},
+  {id:'title_warrior',  name:'GUERRIER',    icon:'⚔️', price:200,  type:'title',  cat:'title',  desc:'Combattant né'},
+  {id:'title_titan2',   name:'TITAN',       icon:'💪', price:450,  type:'title',  cat:'title',  desc:'Force brute'},
+  // BONUS (effets temporaires décoratifs)
+  {id:'bonus_xp2',      name:'XP x2',       icon:'⚡', price:150,  type:'bonus',  cat:'bonus',  desc:'Rappel quotidien XP'},
+  {id:'bonus_streak',   name:'Streak Shield',icon:'🛡️',price:200,  type:'bonus',  cat:'bonus',  desc:'Protège ta série 1 jour'},
+  {id:'bonus_gold',     name:'Or x2',       icon:'💰', price:180,  type:'bonus',  cat:'bonus',  desc:'Double l\'or pendant 24h'},
+  {id:'bonus_lucky',    name:'Chance+',     icon:'🍀', price:250,  type:'bonus',  cat:'bonus',  desc:'Bonus mystère à la prochaine séance'},
 ];
 
 const PROGRAMS = [
@@ -2869,12 +3037,34 @@ function updateStreak() {
 // ============================================================
 function renderWorkoutHistory() {
   const el = document.getElementById('workout-history-list');
-  if(!state.workouts.length) {
-    el.innerHTML = '<div class="empty-state"><span class="empty-icon">📓</span><div class="empty-text">Ton journal est vide.</div></div>';
+  if(!el) return;
+
+  const searchEl = document.getElementById('history-search');
+  const filterEl = document.getElementById('history-filter');
+  const query = (searchEl?.value || '').toLowerCase().trim();
+  const typeFilter = filterEl?.value || 'all';
+
+  let list = [...(state.workouts || [])].reverse();
+
+  // Filtre type
+  if(typeFilter !== 'all') list = list.filter(w => w.type === typeFilter);
+
+  // Recherche texte
+  if(query) list = list.filter(w =>
+    w.name.toLowerCase().includes(query) ||
+    w.details.toLowerCase().includes(query) ||
+    w.date.includes(query)
+  );
+
+  if(!list.length) {
+    el.innerHTML = query
+      ? `<div style="color:var(--text2);font-size:13px;text-align:center;padding:16px">Aucun résultat pour "${query}"</div>`
+      : '<div class="empty-state"><span class="empty-icon">📓</span><div class="empty-text">Ton journal est vide.</div></div>';
     return;
   }
-  const list = state.workouts.slice(-20).reverse();
-  el.innerHTML = list.map(w => `
+
+  // Afficher max 30
+  el.innerHTML = list.slice(0,30).map(w => `
     <div class="history-item">
       <div class="history-icon ${w.type === 'run' ? 'run-h' : 'lift-h'}">${w.type === 'run' ? '🏃' : '🏋️'}</div>
       <div class="history-info">
@@ -2883,7 +3073,7 @@ function renderWorkoutHistory() {
       </div>
       <div class="history-xp">+${w.xp} XP</div>
     </div>
-  `).join('');
+  `).join('') + (list.length > 30 ? `<div style="text-align:center;color:var(--text2);font-size:12px;padding:8px">+${list.length-30} autres séances</div>` : '');
 }
 
 // ============================================================
@@ -3463,22 +3653,39 @@ function renderExoHistory(filter) {
 // ============================================================
 // SHOP
 // ============================================================
-function renderShop() {
+let shopActiveCat = 'avatar';
+
+function renderShop(cat) {
+  if(cat) shopActiveCat = cat;
   const el = document.getElementById('shop-grid');
   const xpEl = document.getElementById('gold-display');
   if(!el) return;
   if(xpEl) xpEl.textContent = state.gold || 0;
-  el.innerHTML = SHOP_ITEMS.map(item => {
+
+  // Category tabs
+  const cats = [{id:'avatar',label:'🧑 Avatars'},{id:'title',label:'📛 Titres'},{id:'bonus',label:'⚡ Bonus'}];
+  const tabsHtml = `<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+    ${cats.map(c => `<button onclick="renderShop('${c.id}')"
+      style="padding:6px 14px;border-radius:20px;border:1px solid ${shopActiveCat===c.id?'var(--accent)':'var(--border)'};
+             background:${shopActiveCat===c.id?'rgba(0,245,255,0.1)':'var(--bg3)'};
+             color:${shopActiveCat===c.id?'var(--accent)':'var(--text2)'};cursor:pointer;font-size:12px;font-weight:${shopActiveCat===c.id?'700':'400'}">
+      ${c.label}</button>`).join('')}
+  </div>`;
+
+  const filtered = SHOP_ITEMS.filter(i => i.cat === shopActiveCat);
+  el.innerHTML = tabsHtml + `<div class="shop-grid">${filtered.map(item => {
     const owned = state.shopOwned && state.shopOwned.includes(item.id);
     const isActive = (item.type === 'avatar' && state.activeAvatar === item.id) ||
                      (item.type === 'title' && state.activeTitle === item.id);
-    const priceLabel = owned ? (isActive ? '✅ ACTIF' : '✓ ÉQUIPER') : '💰 ' + item.price + ' or';
-    return `<div class="shop-item ${owned?'owned':''} ${isActive?'active-item':''}" onclick="buyShopItem(this)" data-id="${item.id}">
+    const isBonus = item.type === 'bonus';
+    const priceLabel = isBonus ? '💰 ' + item.price + ' or' : (owned ? (isActive ? '✅ ACTIF' : '✓ ÉQUIPER') : '💰 ' + item.price + ' or');
+    return `<div class="shop-item ${owned&&!isBonus?'owned':''} ${isActive?'active-item':''}" onclick="buyShopItem(this)" data-id="${item.id}">
       <div class="shop-item-icon">${item.icon}</div>
       <div class="shop-item-name">${item.name}</div>
+      <div style="font-size:10px;color:var(--text2);margin-bottom:4px">${item.desc}</div>
       <div class="shop-item-price">${priceLabel}</div>
     </div>`;
-  }).join('');
+  }).join('')}</div>`;
 }
 
 function buyShopItem(el) {
@@ -3511,6 +3718,16 @@ function buyShopItem(el) {
     return;
   }
   state.gold -= item.price;
+
+  // Bonus — consommable, pas stocké comme owned
+  if(item.type === 'bonus') {
+    if(id === 'bonus_xp2') { state.xpBoost = true; showToast('success', '⚡ XP x2 activé pour la prochaine séance !'); }
+    else if(id === 'bonus_streak') { state.streakShield = true; showToast('success', '🛡️ Série protégée pour 1 jour !'); }
+    else if(id === 'bonus_gold') { state.goldBoost = true; showToast('success', '💰 Or x2 pendant 24h !'); state.goldBoostTime = Date.now(); }
+    else if(id === 'bonus_lucky') { const bonusXP = Math.round(Math.random()*200+50); addXP(bonusXP, '🍀 Chance bonus !'); showToast('success', '🍀 Bonus mystère : +' + bonusXP + ' XP !'); }
+    saveState(); renderShop(); return;
+  }
+
   state.shopOwned.push(id);
   if(item.type === 'title' && !state.unlockedTitles.includes(id)) {
     state.unlockedTitles.push(id);
@@ -4934,7 +5151,425 @@ function renderSessionHistory() {
   el.innerHTML = html || '<div style="color:var(--text2);font-size:12px;text-align:center;padding:12px">Aucune séance enregistrée.</div>';
 }
 
+// ============================================================
+// LEVEL UP SPECTACULAIRE
+// ============================================================
+function showLevelUp(lv) {
+  const lvData = LEVELS[lv];
+  state.level = lv;
+  saveState();
+
+  // Fullscreen spectaculaire
+  const fs = document.getElementById('levelup-fullscreen');
+  document.getElementById('lu-fs-emoji').textContent = lvData.emoji;
+  document.getElementById('lu-fs-num').textContent = lv + 1;
+  document.getElementById('lu-fs-name').textContent = lvData.name.toUpperCase();
+  document.getElementById('lu-fs-desc').textContent = lvData.desc;
+
+  // Créer les étoiles
+  const stars = document.getElementById('lu-stars');
+  stars.innerHTML = '';
+  for(let i = 0; i < 40; i++) {
+    const s = document.createElement('div');
+    s.className = 'lu-star';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = '0';
+    s.style.background = ['#00f5ff','#ff3cac','#ffd700','#39ff14','#a855f7'][Math.floor(Math.random()*5)];
+    s.style.animationDuration = (1 + Math.random() * 3) + 's';
+    s.style.animationDelay = (Math.random() * 2) + 's';
+    s.style.width = s.style.height = (2 + Math.random() * 6) + 'px';
+    stars.appendChild(s);
+  }
+
+  fs.classList.add('show');
+  haptic('levelup');
+  updateHeader();
+}
+
+function closeLevelUpFullscreen() {
+  document.getElementById('levelup-fullscreen').classList.remove('show');
+}
+
+// ============================================================
+// GRAPHIQUE PROGRESSION DES CHARGES
+// ============================================================
+let progChartExo = null;
+
+function renderProgChart(filter) {
+  const canvas = document.getElementById('prog-chart-canvas');
+  const filterRow = document.getElementById('prog-chart-filter-row');
+  const statRow = document.getElementById('chart-stat-row');
+  if(!canvas) return;
+
+  const lifts = (state.workouts||[]).filter(w => w.type === 'lift');
+  if(lifts.length === 0) {
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.offsetWidth || 300;
+    canvas.height = 160;
+    ctx.fillStyle = 'rgba(255,255,255,0.1)';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = '#888';
+    ctx.font = '13px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Pas encore de données muscu', canvas.width/2, 80);
+    return;
+  }
+
+  const exercises = [...new Set(lifts.map(w => w.name))];
+  const active = filter || progChartExo || exercises[0];
+  progChartExo = active;
+
+  if(filterRow) {
+    filterRow.innerHTML = exercises.slice(0,6).map(e =>
+      `<button class="prog-chart-filter ${e===active?'active':''}" onclick="renderProgChart('${e.replace(/'/g,"\\'")}')">
+        ${e.replace(' 📷','')}
+      </button>`).join('');
+  }
+
+  // Data pour l'exercice sélectionné
+  const data = lifts.filter(w => w.name === active).slice(-15); // 15 dernières
+
+  // Extraire charges
+  const weights = data.map(w => {
+    const m = w.details.match(/·\s*([\d.]+)kg/);
+    return m ? parseFloat(m[1]) : 0;
+  });
+  const reps = data.map(w => {
+    const m = w.details.match(/^(\d+)×(\d+)/);
+    return m ? parseInt(m[2]) : 0;
+  });
+  const dates = data.map(w => w.date ? w.date.split('/').slice(0,2).join('/') : '');
+
+  // Stats
+  const maxW = Math.max(...weights, 1);
+  const minW = Math.min(...weights.filter(x=>x>0), maxW);
+  const avgW = weights.filter(x=>x>0).length ? Math.round(weights.filter(x=>x>0).reduce((a,b)=>a+b,0)/weights.filter(x=>x>0).length) : 0;
+  const totalReps = reps.reduce((a,b)=>a+b,0);
+
+  if(statRow) {
+    statRow.innerHTML = `
+      <div class="chart-stat"><div class="chart-stat-val" style="color:var(--accent2)">${maxW>0?maxW+'kg':'—'}</div><div class="chart-stat-lbl">MAX CHARGE</div></div>
+      <div class="chart-stat"><div class="chart-stat-val" style="color:var(--accent3)">${avgW>0?avgW+'kg':'—'}</div><div class="chart-stat-lbl">MOYENNE</div></div>
+      <div class="chart-stat"><div class="chart-stat-val" style="color:var(--xp-color)">${totalReps}</div><div class="chart-stat-lbl">REPS TOTAL</div></div>
+    `;
+  }
+
+  // Dessiner le graphique
+  canvas.width = canvas.offsetWidth || 340;
+  canvas.height = 160;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const pad = {top:20, right:10, bottom:30, left:35};
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Fond
+  ctx.fillStyle = 'rgba(255,255,255,0.03)';
+  ctx.fillRect(0, 0, W, H);
+
+  if(data.length < 2) {
+    ctx.fillStyle = '#888'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(data.length === 0 ? 'Aucune donnée' : 'Fais au moins 2 séances pour voir la courbe', W/2, H/2);
+    return;
+  }
+
+  const chartW = W - pad.left - pad.right;
+  const chartH = H - pad.top - pad.bottom;
+  const range = maxW - minW || 1;
+  const stepX = chartW / (data.length - 1);
+
+  // Grille
+  ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+  ctx.lineWidth = 1;
+  for(let i = 0; i <= 4; i++) {
+    const y = pad.top + chartH - (i / 4) * chartH;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+    const val = minW + (i / 4) * range;
+    ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.font = '10px monospace'; ctx.textAlign = 'right';
+    ctx.fillText(val.toFixed(0)+'kg', pad.left - 4, y + 4);
+  }
+
+  // Gradient sous la courbe
+  const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + chartH);
+  grad.addColorStop(0, 'rgba(255,60,172,0.4)');
+  grad.addColorStop(1, 'rgba(255,60,172,0)');
+  ctx.beginPath();
+  weights.forEach((w, i) => {
+    const x = pad.left + i * stepX;
+    const y = pad.top + chartH - ((w - minW) / range) * chartH;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.lineTo(pad.left + (weights.length-1) * stepX, pad.top + chartH);
+  ctx.lineTo(pad.left, pad.top + chartH);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Courbe principale
+  ctx.beginPath();
+  ctx.strokeStyle = '#ff3cac';
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  weights.forEach((w, i) => {
+    const x = pad.left + i * stepX;
+    const y = pad.top + chartH - ((w - minW) / range) * chartH;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Points + dates
+  weights.forEach((w, i) => {
+    const x = pad.left + i * stepX;
+    const y = pad.top + chartH - ((w - minW) / range) * chartH;
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, 2*Math.PI);
+    ctx.fillStyle = w === maxW ? '#ffd700' : '#ff3cac';
+    ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+    if(i % Math.ceil(data.length / 5) === 0 || i === data.length-1) {
+      ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '9px monospace'; ctx.textAlign = 'center';
+      ctx.fillText(dates[i], x, H - 4);
+    }
+  });
+}
+
+// ============================================================
+// CARTE DU MONDE
+// ============================================================
+const WORLD_REGIONS = [
+  {id:'fr',    name:'France',         km:10,   color:'#00f5ff', emoji:'🇫🇷', x:48, y:42, w:6, h:6},
+  {id:'eu',    name:'Europe',         km:50,   color:'#3b82f6', emoji:'🌍', x:44, y:36, w:14, h:12},
+  {id:'na',    name:'Amérique du Nord',km:150, color:'#a855f7', emoji:'🌎', x:10, y:28, w:22, h:18},
+  {id:'sa',    name:'Amérique du Sud', km:300, color:'#39ff14', emoji:'🌎', x:18, y:52, w:14, h:20},
+  {id:'af',    name:'Afrique',        km:500,  color:'#ffd700', emoji:'🌍', x:44, y:48, w:14, h:22},
+  {id:'as',    name:'Asie',           km:1000, color:'#ff3cac', emoji:'🌏', x:60, y:32, w:24, h:22},
+  {id:'oc',    name:'Océanie',        km:2000, color:'#ff8c00', emoji:'🌏', x:70, y:58, w:14, h:12},
+  {id:'world', name:'Tour du Monde',  km:5000, color:'#fff',    emoji:'🚀', x:0,  y:0,  w:0,  h:0},
+];
+
+function renderWorldMap() {
+  const wrap = document.getElementById('world-map-svg-wrap');
+  const milestones = document.getElementById('world-milestones');
+  if(!wrap) return;
+
+  const km = state.totalKm || 0;
+
+  // SVG simple avec rectangles pour les continents
+  const svgItems = WORLD_REGIONS.filter(r => r.x > 0).map(r => {
+    const unlocked = km >= r.km;
+    const color = unlocked ? r.color : '#1a1a2e';
+    const opacity = unlocked ? 1 : 0.3;
+    return `<rect x="${r.x}%" y="${r.y}%" width="${r.w}%" height="${r.h}%"
+      rx="4" fill="${color}" opacity="${opacity}"
+      style="cursor:pointer;transition:all 0.5s">
+      <title>${r.name} — ${unlocked ? '✅ Débloqué' : r.km + ' km requis'}</title>
+    </rect>
+    <text x="${r.x + r.w/2}%" y="${r.y + r.h/2 + 1}%" text-anchor="middle" dominant-baseline="middle"
+      font-size="12" style="pointer-events:none;user-select:none">${r.emoji}</text>`;
+  }).join('');
+
+  wrap.innerHTML = `<svg viewBox="0 0 100 80" style="width:100%;height:100%;background:#0a0a1a;border-radius:8px">
+    <!-- Océans -->
+    <rect width="100" height="80" fill="#0d1b2a"/>
+    ${svgItems}
+    <!-- Compteur km -->
+    <text x="50" y="76" text-anchor="middle" font-size="6" fill="rgba(255,255,255,0.5)" font-family="monospace">${km.toFixed(1)} km parcourus</text>
+  </svg>`;
+
+  if(milestones) {
+    milestones.innerHTML = WORLD_REGIONS.map(r => {
+      const unlocked = km >= r.km;
+      const isCurrent = !unlocked && WORLD_REGIONS.find(x => x.km > km && x.km === r.km);
+      const cls = unlocked ? 'done' : (km < r.km && (!WORLD_REGIONS.find(x=>x.km<r.km&&km<x.km)) ? 'next' : 'locked');
+      return `<div class="world-milestone ${cls}">
+        <span style="font-size:24px">${r.emoji}</span>
+        <div>
+          <div style="font-weight:700;font-size:13px">${r.name}</div>
+          <div style="font-size:11px;color:var(--text2)">${unlocked ? '✅ Débloqué !' : r.km + ' km requis — encore ' + Math.max(0, r.km - km).toFixed(1) + ' km'}</div>
+        </div>
+        ${unlocked ? '<span style="margin-left:auto;color:var(--accent4)">✅</span>' : '<span style="margin-left:auto;color:var(--muted)">🔒</span>'}
+      </div>`;
+    }).join('');
+  }
+}
+
+// ============================================================
+// RECAP HEBDOMADAIRE
+// ============================================================
+function showWeeklyRecap() {
+  const now = new Date();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay() + 1);
+  const weekStr = weekStart.toLocaleDateString('fr-FR', {day:'numeric', month:'long'});
+
+  document.getElementById('recap-title').textContent = 'Semaine du ' + weekStr;
+
+  const km = (state.weeklyKmThisWeek || 0).toFixed(1);
+  const lifts = state.weeklyLiftsThisWeek || 0;
+  const days = state.weeklyDaysThisWeek || 0;
+  const xpWeek = (state.workouts||[]).filter(w => {
+    const d = new Date(w.date?.split('/').reverse().join('-'));
+    return d >= weekStart;
+  }).reduce((sum,w) => sum + (w.xp||0), 0);
+
+  document.getElementById('recap-stats').innerHTML = `
+    <div class="recap-stat"><div class="recap-stat-val" style="color:var(--accent)">${km}</div><div class="recap-stat-lbl">KM COURUS</div></div>
+    <div class="recap-stat"><div class="recap-stat-val" style="color:var(--accent2)">${lifts}</div><div class="recap-stat-lbl">JOURS MUSCU</div></div>
+    <div class="recap-stat"><div class="recap-stat-val" style="color:var(--accent3)">${xpWeek}</div><div class="recap-stat-lbl">XP GAGNÉS</div></div>
+    <div class="recap-stat"><div class="recap-stat-val" style="color:var(--accent4)">${days}</div><div class="recap-stat-lbl">JOURS ACTIFS</div></div>
+  `;
+
+  // Boss résultat
+  const boss = getBoss();
+  const bossEl = document.getElementById('recap-boss-result');
+  bossEl.innerHTML = state.weeklyBossDefeated
+    ? `<div style="background:rgba(57,255,20,0.1);border:1px solid rgba(57,255,20,0.3);border-radius:var(--radius);padding:10px;text-align:center">
+        ${boss.icon} <strong>Boss vaincu !</strong> ${boss.name} n'a pas résisté !
+      </div>`
+    : `<div style="background:rgba(255,60,172,0.08);border:1px solid rgba(255,60,172,0.2);border-radius:var(--radius);padding:10px;text-align:center">
+        ${boss.icon} Boss en cours : ${state.weeklyBossProgress||0}/${boss.target} — <strong>continue !</strong>
+      </div>`;
+
+  // Message personnalisé
+  let msg = '';
+  if(days === 0) msg = '😴 Semaine calme... La prochaine sera la bonne ! Ton corps se repose, c\'est aussi important.';
+  else if(days >= 5) msg = '🔥 Semaine EXCEPTIONNELLE ! ' + days + ' jours actifs, tu es une machine. Attention à la récupération ce week-end.';
+  else if(km > 20) msg = '🏃 Excellent cardio cette semaine ! ' + km + ' km au compteur. Pense à ajouter de la muscu pour équilibrer.';
+  else if(lifts >= 3) msg = '💪 Belle semaine de muscu ! ' + lifts + ' jours de résistance. Ajoute une course pour booster ta récupération.';
+  else msg = '✅ Bonne semaine, ' + state.name + ' ! ' + days + ' jour(s) actifs, ' + km + ' km. Continue sur cette lancée !';
+
+  document.getElementById('recap-message').textContent = msg;
+
+  const subtitle = days >= 5 ? '🔥 Semaine légendaire !' : days >= 3 ? '💪 Bonne semaine !' : '👍 Semaine correcte';
+  document.getElementById('recap-subtitle').textContent = subtitle;
+
+  openModal('recap-modal');
+}
+
+function checkSundayRecap() {
+  const now = new Date();
+  const isSunday = now.getDay() === 0;
+  const todayStr = now.toDateString();
+  const lastRecap = localStorage.getItem('fq_last_recap');
+  if(isSunday && lastRecap !== todayStr && (state.weeklyDaysThisWeek || 0) > 0) {
+    localStorage.setItem('fq_last_recap', todayStr);
+    setTimeout(() => showWeeklyRecap(), 2000);
+  }
+}
+
+// ============================================================
+// EXPORT PDF
+// ============================================================
+function exportStatsPDF() {
+  // Créer une page print-friendly dans un nouvel onglet
+  const km = (state.totalKm || 0).toFixed(1);
+  const lvl = (state.level || 0) + 1;
+  const lv = LEVELS[state.level || 0];
+  const streak = state.streak || 0;
+  const totalXP = state.totalXP || 0;
+  const liftS = state.liftSessions || 0;
+  const questsDone = state.questsDone || 0;
+  const date = new Date().toLocaleDateString('fr-FR', {day:'numeric', month:'long', year:'numeric'});
+
+  const recentWorkouts = (state.workouts||[]).slice(-10).reverse().map(w =>
+    `<tr><td>${w.date}</td><td>${w.name}</td><td>${w.details}</td><td style="color:#a855f7">+${w.xp} XP</td></tr>`
+  ).join('');
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>FitQuest — Stats de ${state.name}</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width:700px; margin:0 auto; padding:20px; color:#111; }
+    h1 { color:#7c3aed; border-bottom:3px solid #7c3aed; padding-bottom:8px; }
+    .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:20px 0; }
+    .stat { background:#f3f4f6; border-radius:8px; padding:16px; text-align:center; }
+    .stat-val { font-size:28px; font-weight:900; color:#7c3aed; }
+    .stat-lbl { font-size:11px; color:#666; letter-spacing:1px; margin-top:4px; }
+    table { width:100%; border-collapse:collapse; margin-top:16px; }
+    th { background:#7c3aed; color:#fff; padding:8px 12px; text-align:left; font-size:12px; }
+    td { padding:8px 12px; border-bottom:1px solid #e5e7eb; font-size:13px; }
+    tr:nth-child(even) td { background:#f9fafb; }
+    .header { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
+    .avatar { font-size:48px; }
+    .footer { margin-top:30px; text-align:center; color:#999; font-size:11px; }
+  </style>
+  </head><body>
+  <div class="header">
+    <div class="avatar">${lv.emoji}</div>
+    <div>
+      <h1>FitQuest — ${state.name}</h1>
+      <div style="color:#666">Niveau ${lvl} • ${lv.name} • Exporté le ${date}</div>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="stat"><div class="stat-val">${km}</div><div class="stat-lbl">KM COURUS</div></div>
+    <div class="stat"><div class="stat-val">${liftS}</div><div class="stat-lbl">SÉANCES MUSCU</div></div>
+    <div class="stat"><div class="stat-val">${totalXP}</div><div class="stat-lbl">XP TOTAL</div></div>
+    <div class="stat"><div class="stat-val">${streak}</div><div class="stat-lbl">SÉRIE ACTUELLE</div></div>
+    <div class="stat"><div class="stat-val">${questsDone}</div><div class="stat-lbl">QUÊTES FAITES</div></div>
+    <div class="stat"><div class="stat-val">${(state.unlockedAchievements||[]).length}</div><div class="stat-lbl">SUCCÈS</div></div>
+  </div>
+  <h2>10 dernières séances</h2>
+  <table><thead><tr><th>Date</th><th>Exercice</th><th>Détails</th><th>XP</th></tr></thead>
+  <tbody>${recentWorkouts}</tbody></table>
+  <div class="footer">Généré par FitQuest — Forge ton Destin 💪</div>
+  <script>window.onload=()=>window.print();<\/script>
+  </body></html>`;
+
+  const win = window.open('', '_blank');
+  if(win) { win.document.write(html); win.document.close(); }
+  else showToast('info', '⚠️ Autorise les popups pour exporter le PDF');
+}
+
 function init() {
+  hideSplash();
+  checkWeeklyReset();
+  updateHeader();
+  renderDashboard();
+  renderWorkoutHistory();
+  checkQuestProgress();
+  renderBoss();
+  renderWeeklyChallenge();
+  renderWeightLog();
+  renderExoHistory();
+  renderProgChart();
+  renderWorldMap();
+  renderShop();
+  renderMounts();
+  renderPrograms();
+  renderGoals();
+  renderCalendar();
+  renderCraft();
+  updateExoIllustration();
+  updateCoach();
+  registerServiceWorker();
+  checkSundayRecap();
+
+  try { fetchWeather(); } catch(e) {}
+
+  document.querySelectorAll('.submit-btn, .nav-btn, .quest-card, .craft-btn').forEach(el => {
+    el.addEventListener('click', () => haptic('light'));
+  });
+
+  if(localStorage.getItem('fq_notif') === 'true' && Notification.permission === 'granted') {
+    scheduleReminderNotification();
+  }
+
+  document.querySelectorAll('.nav-btn').forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      const pages = ['home','quests','workout','calendar','stats','profile'];
+      const page = pages[i];
+      haptic('light');
+      if(page === 'stats') setTimeout(() => {
+        renderWeightLog(); renderExoHistory(); renderGoals();
+        renderProgChart(); renderWorldMap();
+      }, 50);
+      if(page === 'profile') setTimeout(() => { renderShop(); renderMounts(); renderPrograms(); renderCraft(); }, 50);
+      if(page === 'workout') setTimeout(() => { renderWorkoutHistory(); renderSessionHistory(); updateExoIllustration(); }, 50);
+      if(page === 'calendar') setTimeout(renderCalendar, 50);
+      if(page === 'home') setTimeout(updateCoach, 100);
+    });
+  });
+}
   hideSplash();
   checkWeeklyReset();
   updateHeader();
