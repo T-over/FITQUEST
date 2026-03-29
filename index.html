@@ -5784,13 +5784,12 @@ function cellKey(lat, lng) {
 function revealAround(lat, lng) {
   if(!state.exploredCells) state.exploredCells = [];
   let newCells = 0;
+  const baseLat = Math.floor(lat / FOG_CELL_SIZE);
+  const baseLng = Math.floor(lng / FOG_CELL_SIZE);
 
   for(let dy = -REVEAL_RADIUS; dy <= REVEAL_RADIUS; dy++) {
     for(let dx = -REVEAL_RADIUS; dx <= REVEAL_RADIUS; dx++) {
-      if(dx*dx + dy*dy > REVEAL_RADIUS*REVEAL_RADIUS) continue;
-      const cellLat = Math.floor(lat/FOG_CELL_SIZE) * FOG_CELL_SIZE + dy * FOG_CELL_SIZE;
-      const cellLng = Math.floor(lng/FOG_CELL_SIZE) * FOG_CELL_SIZE + dx * FOG_CELL_SIZE;
-      const key = cellKey(cellLat, cellLng);
+      const key = (baseLat + dy) + '_' + (baseLng + dx);
       if(!state.exploredCells.includes(key)) {
         state.exploredCells.push(key);
         newCells++;
@@ -5799,7 +5798,7 @@ function revealAround(lat, lng) {
   }
 
   if(newCells > 0) {
-    const distRevealed = newCells * FOG_CELL_SIZE * 111; // km approximatif
+    const distRevealed = newCells * FOG_CELL_SIZE * 111;
     state.exploredKm = (state.exploredKm || 0) + distRevealed;
     state.mapCenter = {lat, lng};
     saveState();
@@ -5826,19 +5825,7 @@ function drawFog() {
     color: 'transparent', fillColor: '#000020', fillOpacity: 0.82, weight: 0, interactive: false
   }).addTo(leafletMap);
 
-  // Dessiner les zones révélées en cyan semi-transparent par-dessus (soustraction visuelle)
-  const revealedLayers = (state.exploredCells || []).map(key => {
-    const [clat, clng] = key.split('_').map(Number);
-    const lat = clat * FOG_CELL_SIZE;
-    const lng = clng * FOG_CELL_SIZE;
-    return L.rectangle(
-      [[lat, lng], [lat + FOG_CELL_SIZE, lng + FOG_CELL_SIZE]],
-      { color: 'transparent', fillColor: '#fff', fillOpacity: 0, weight: 0, interactive: false }
-    ).addTo(leafletMap);
-  });
-
-  // Utiliser un SVG path avec "trous" pour le fog of war
-  // Méthode : dessiner un grand polygone avec des trous pour chaque cellule révélée
+  // Utiliser un polygone avec trous pour le fog of war (evenodd)
   if((state.exploredCells || []).length > 0) {
     leafletMap.removeLayer(bigRect);
     const outerRing = [[-90,-180],[-90,180],[90,180],[90,-180],[-90,-180]];
@@ -5846,7 +5833,13 @@ function drawFog() {
       const [clat, clng] = key.split('_').map(Number);
       const lat = clat * FOG_CELL_SIZE;
       const lng = clng * FOG_CELL_SIZE;
-      return [[lat,lng],[lat+FOG_CELL_SIZE,lng],[lat+FOG_CELL_SIZE,lng+FOG_CELL_SIZE],[lat,lng+FOG_CELL_SIZE]];
+      // Carré parfait autour de la cellule
+      return [
+        [lat, lng],
+        [lat + FOG_CELL_SIZE, lng],
+        [lat + FOG_CELL_SIZE, lng + FOG_CELL_SIZE],
+        [lat, lng + FOG_CELL_SIZE]
+      ];
     });
     fogLayer = L.polygon([outerRing, ...holes], {
       color: 'transparent', fillColor: '#000020', fillOpacity: 0.82, weight: 0,
