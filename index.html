@@ -4947,6 +4947,18 @@ async function openPoseCamera() {
   }
 
   try {
+    // Vérifier/demander la permission caméra explicitement
+    if(navigator.permissions) {
+      try {
+        const perm = await navigator.permissions.query({name:'camera'});
+        if(perm.state === 'denied') {
+          status.textContent = '❌ Caméra bloquée — va dans Paramètres > Applications > Chrome > Autorisations';
+          showToast('info', '📷 Autorise la caméra dans les paramètres Android');
+          return;
+        }
+      } catch(e) {}
+    }
+
     // Caméra
     poseStream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: 'user', width: 640, height: 480 },
@@ -5797,49 +5809,49 @@ function revealAround(lat, lng) {
 
 function drawFog() {
   if(!leafletMap) return;
-  if(fogLayer) leafletMap.removeLayer(fogLayer);
-  if(!showFog) return;
-  if(!state.exploredCells || state.exploredCells.length === 0) {
-    // Couvrir toute la map de brouillard
-    fogLayer = L.rectangle([[-90,-180],[90,180]], {
-      color: 'transparent', fillColor: '#000', fillOpacity: 0.75, weight: 0
-    }).addTo(leafletMap);
-    return;
+
+  // Supprimer l'ancien fog
+  if(fogLayer) {
+    if(Array.isArray(fogLayer)) fogLayer.forEach(l => leafletMap.removeLayer(l));
+    else leafletMap.removeLayer(fogLayer);
+    fogLayer = null;
   }
+  if(!showFog) return;
 
-  // Créer un SVG overlay pour le fog of war
-  // On utilise un canvas overlay Leaflet pour le fog
-  const canvas = document.createElement('canvas');
-  const size = leafletMap.getSize();
-  canvas.width = size.x;
-  canvas.height = size.y;
-  const ctx = canvas.getContext('2d');
+  // Couvrir toute la map d'un rectangle noir
+  const bigRect = L.rectangle([[-90,-180],[90,180]], {
+    color: 'transparent', fillColor: '#000020', fillOpacity: 0.82, weight: 0, interactive: false
+  }).addTo(leafletMap);
 
-  // Fond noir semi-transparent
-  ctx.fillStyle = 'rgba(0,0,0,0.75)';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Effacer les zones explorées
-  ctx.globalCompositeOperation = 'destination-out';
-  state.exploredCells.forEach(key => {
+  // Dessiner les zones révélées en cyan semi-transparent par-dessus (soustraction visuelle)
+  const revealedLayers = (state.exploredCells || []).map(key => {
     const [clat, clng] = key.split('_').map(Number);
     const lat = clat * FOG_CELL_SIZE;
     const lng = clng * FOG_CELL_SIZE;
-    const p1 = leafletMap.latLngToContainerPoint([lat, lng]);
-    const p2 = leafletMap.latLngToContainerPoint([lat + FOG_CELL_SIZE, lng + FOG_CELL_SIZE]);
-    ctx.fillStyle = 'rgba(0,0,0,1)';
-    ctx.fillRect(Math.min(p1.x,p2.x), Math.min(p1.y,p2.y),
-                 Math.abs(p2.x-p1.x)+1, Math.abs(p2.y-p1.y)+1);
+    return L.rectangle(
+      [[lat, lng], [lat + FOG_CELL_SIZE, lng + FOG_CELL_SIZE]],
+      { color: 'transparent', fillColor: '#fff', fillOpacity: 0, weight: 0, interactive: false }
+    ).addTo(leafletMap);
   });
 
-  ctx.globalCompositeOperation = 'source-over';
-
-  // Convertir canvas en image overlay
-  const imgUrl = canvas.toDataURL();
-  const bounds = leafletMap.getBounds();
-  fogLayer = L.imageOverlay(imgUrl, bounds, {opacity:1, zIndex:400}).addTo(leafletMap);
-
-  leafletMap.on('moveend zoomend', () => { if(showFog) drawFog(); });
+  // Utiliser un SVG path avec "trous" pour le fog of war
+  // Méthode : dessiner un grand polygone avec des trous pour chaque cellule révélée
+  if((state.exploredCells || []).length > 0) {
+    leafletMap.removeLayer(bigRect);
+    const outerRing = [[-90,-180],[-90,180],[90,180],[90,-180],[-90,-180]];
+    const holes = (state.exploredCells || []).map(key => {
+      const [clat, clng] = key.split('_').map(Number);
+      const lat = clat * FOG_CELL_SIZE;
+      const lng = clng * FOG_CELL_SIZE;
+      return [[lat,lng],[lat+FOG_CELL_SIZE,lng],[lat+FOG_CELL_SIZE,lng+FOG_CELL_SIZE],[lat,lng+FOG_CELL_SIZE]];
+    });
+    fogLayer = L.polygon([outerRing, ...holes], {
+      color: 'transparent', fillColor: '#000020', fillOpacity: 0.82, weight: 0,
+      interactive: false, fillRule: 'evenodd'
+    }).addTo(leafletMap);
+  } else {
+    fogLayer = bigRect;
+  }
 }
 
 function toggleFog() {
