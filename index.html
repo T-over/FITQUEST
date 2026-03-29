@@ -2774,17 +2774,6 @@ function addGold(amount, reason) {
   showToast('success', '💰 +'+amount+' Or — '+reason);
 }
 
-function showLevelUp(lv) {
-  const lvData = LEVELS[lv];
-  document.getElementById('lu-level').textContent = lv+1;
-  document.getElementById('lu-classname').textContent = lvData.name;
-  document.getElementById('lu-desc').textContent = lvData.desc;
-  state.level = lv;
-  saveState();
-  createParticles('levelup-particles');
-  openModal('levelup-modal');
-  updateHeader();
-}
 
 // ============================================================
 // HEADER UPDATE
@@ -4013,59 +4002,6 @@ function updateExoIllustration() {
 // ============================================================
 // MONTURES
 // ============================================================
-function renderMounts() {
-  const grid = document.getElementById('mount-grid');
-  if(!grid) return;
-  if(!state.ownedMounts) state.ownedMounts = [];
-
-  const dispIcon = document.getElementById('active-mount-icon');
-  const dispName = document.getElementById('active-mount-name');
-  if(state.activeMount) {
-    const m = MOUNTS.find(x => x.id === state.activeMount);
-    if(m) {
-      if(dispIcon) dispIcon.textContent = m.icon;
-      if(dispName) dispName.textContent = m.name + ' — ' + m.desc;
-    }
-  } else {
-    if(dispIcon) dispIcon.textContent = '🐾';
-    if(dispName) dispName.textContent = 'Aucune monture équipée';
-  }
-
-  grid.innerHTML = MOUNTS.map(m => {
-    const owned = state.ownedMounts.includes(m.id);
-    const active = state.activeMount === m.id;
-    const label = owned ? (active ? '✅ ÉQUIPÉE' : '✓ ÉQUIPER') : '💰 ' + m.price + ' or';
-    return `<div class="mount-card ${owned?'owned':''} ${active?'active-mount':''}" onclick="buyMount(this)" data-id="${m.id}">
-      <div class="mount-icon">${m.icon}</div>
-      <div class="mount-name">${m.name}</div>
-      <div style="font-size:10px;color:var(--text2);margin-bottom:4px">${m.desc}</div>
-      <div class="mount-price">${label}</div>
-    </div>`;
-  }).join('');
-}
-
-function buyMount(el) {
-  const id = el.dataset.id;
-  const m = MOUNTS.find(x => x.id === id);
-  if(!m) return;
-  if(!state.ownedMounts) state.ownedMounts = [];
-  if(state.ownedMounts.includes(id)) {
-    state.activeMount = state.activeMount === id ? null : id;
-    saveState(); renderMounts();
-    showToast('success', state.activeMount === id ? '🐾 ' + m.name + ' équipée !' : '🐾 Monture retirée');
-    return;
-  }
-  if((state.gold || 0) < m.price) {
-    showToast('info', '💰 Pas assez d\'or ! (' + (state.gold||0) + '/' + m.price + ')');
-    return;
-  }
-  state.gold -= m.price;
-  state.ownedMounts.push(id);
-  saveState(); renderMounts();
-  const el2 = document.getElementById('gold-display');
-  if(el2) el2.textContent = state.gold;
-  showToast('success', '🎉 ' + m.name + ' débloquée ! Clique à nouveau pour l\'équiper.');
-}
 
 // ============================================================
 // OBJECTIFS PERSONNALISÉS
@@ -4262,22 +4198,6 @@ function hideSplash() {
 // TRANSITIONS DE PAGE
 // ============================================================
 const _origNavigate = navigate;
-function navigate(page, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active','page-enter'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  const pageEl = document.getElementById('page-'+page);
-  if(pageEl) {
-    pageEl.classList.add('active','page-enter');
-    setTimeout(() => pageEl.classList.remove('page-enter'), 350);
-  }
-  if(btn) btn.classList.add('active');
-  if(page === 'home') renderDashboard();
-  if(page === 'quests') renderQuests('active');
-  if(page === 'stats') renderStats();
-  if(page === 'profile') renderProfile();
-  if(page === 'calendar') renderCalendar();
-  window.scrollTo(0,0);
-}
 
 // ============================================================
 // VIBRATION HAPTIQUE
@@ -4446,41 +4366,7 @@ function doCraft(id) {
 // ============================================================
 // SUCCÈS SECRETS (override renderAchievements)
 // ============================================================
-function renderAchievements() {
-  const grid = document.getElementById('achievements-grid');
-  if(!grid) return;
-  grid.innerHTML = ACHIEVEMENTS.map(a => {
-    const unlocked = a.condition(state);
-    if(unlocked && !state.unlockedAchievements.includes(a.id)) {
-      state.unlockedAchievements.push(a.id);
-      saveState();
-    }
-    const isSecret = a.secret && !unlocked;
-    return `<div class="achievement ${unlocked ? 'unlocked' : 'locked'} ${isSecret ? 'ach-secret' : ''}">
-      ${unlocked ? '<div class="ach-badge">✓</div>' : ''}
-      <span class="ach-icon">${unlocked && a.revealName ? a.icon : (isSecret ? '❓' : a.icon)}</span>
-      <div class="ach-name">${unlocked && a.revealName ? a.revealName : (isSecret ? '???' : a.name)}</div>
-      <div class="ach-desc">${unlocked && a.revealDesc ? a.revealDesc : (isSecret ? 'Succès secret' : a.desc)}</div>
-    </div>`;
-  }).join('');
-}
 
-function checkAchievements() {
-  const prev = [...state.unlockedAchievements];
-  ACHIEVEMENTS.forEach(a => {
-    if(!prev.includes(a.id) && a.condition(state)) {
-      state.unlockedAchievements.push(a.id);
-      saveState();
-      const displayName = a.revealName || a.name;
-      if(a.secret) {
-        haptic('levelup');
-        setTimeout(() => showToast('success', '🔓 SUCCÈS SECRET débloqué : ' + displayName + ' !'), 1500);
-      } else {
-        setTimeout(() => showToast('success', '🏅 Succès débloqué : ' + displayName), 1500);
-      }
-    }
-  });
-}
 
 // Track night workout
 function checkNightWorkout() {
@@ -6084,9 +5970,6 @@ function init() {
       haptic('light');
       if(page === 'map') setTimeout(initMapPage, 100);
       if(page === 'stats') setTimeout(() => { renderWeightLog(); renderExoHistory(); renderGoals(); renderProgChart(); renderWorldMap(); }, 50);
-        renderWeightLog(); renderExoHistory(); renderGoals();
-        renderProgChart(); renderWorldMap();
-      }, 50);
       if(page === 'profile') setTimeout(() => { renderShop(); renderMounts(); renderPrograms(); renderCraft(); }, 50);
       if(page === 'workout') setTimeout(() => { renderWorkoutHistory(); renderSessionHistory(); updateExoIllustration(); }, 50);
       if(page === 'calendar') setTimeout(renderCalendar, 50);
