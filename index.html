@@ -2132,7 +2132,7 @@ body::after {
 </section>
 
 <!-- ======== CARTE FOG OF WAR ======== -->
-<section class="page" id="page-map" style="display:none">
+<section class="page" id="page-map">
   <div class="section-title">🗺️ Exploration</div>
   <div class="map-hud">
     <div class="map-hud-stat"><div class="map-hud-val" id="map-cells-count">0</div><div class="map-hud-lbl">ZONES</div></div>
@@ -5920,13 +5920,14 @@ function renderMapMilestones() {
 function initMapPage() {
   updateMapHUD();
   renderMapMilestones();
-  // Si on a une position sauvegardée, init la carte dessus
-  if(state.mapCenter) {
-    setTimeout(() => initLeafletMap(state.mapCenter.lat, state.mapCenter.lng), 100);
-  } else {
-    // Utiliser Saint-Étienne par défaut (ta ville)
-    setTimeout(() => initLeafletMap(45.4397, 4.3872), 100);
-  }
+  const center = state.mapCenter || {lat: 45.4397, lng: 4.3872};
+  setTimeout(() => {
+    if(!leafletMap) {
+      initLeafletMap(center.lat, center.lng);
+    } else {
+      leafletMap.invalidateSize(); // recalcule la taille si la div était cachée
+    }
+  }, 150);
 }
 
 function init() {
