@@ -5814,40 +5814,53 @@ function drawFog() {
 
   // Supprimer l'ancien fog
   if(fogLayer) {
-    if(Array.isArray(fogLayer)) fogLayer.forEach(l => leafletMap.removeLayer(l));
-    else leafletMap.removeLayer(fogLayer);
+    if(Array.isArray(fogLayer)) fogLayer.forEach(l => { try{leafletMap.removeLayer(l)}catch(e){} });
+    else { try{leafletMap.removeLayer(fogLayer)}catch(e){} }
     fogLayer = null;
   }
   if(!showFog) return;
 
-  // Couvrir toute la map d'un rectangle noir
-  const bigRect = L.rectangle([[-90,-180],[90,180]], {
-    color: 'transparent', fillColor: '#000020', fillOpacity: 0.82, weight: 0, interactive: false
+  // Nettoyer les anciennes cellules avec format flottant
+  if(state.exploredCells) {
+    state.exploredCells = state.exploredCells.filter(k => k && !k.includes('.') && k.split('_').length === 2);
+  }
+
+  const cells = state.exploredCells || [];
+
+  if(cells.length === 0) {
+    fogLayer = L.rectangle([[-85,-180],[85,180]], {
+      color:'transparent', fillColor:'#000', fillOpacity:0.78, weight:0, interactive:false
+    }).addTo(leafletMap);
+    return;
+  }
+
+  // Polygone avec trous (evenodd) = fog of war propre
+  const outer = [[-85,-180],[-85,180],[85,180],[85,-180]];
+  const holes = cells.map(key => {
+    const parts = key.split('_');
+    const clat = parseInt(parts[0]);
+    const clng = parseInt(parts[1]);
+    const lat = clat * FOG_CELL_SIZE;
+    const lng = clng * FOG_CELL_SIZE;
+    return [[lat,lng],[lat+FOG_CELL_SIZE,lng],[lat+FOG_CELL_SIZE,lng+FOG_CELL_SIZE],[lat,lng+FOG_CELL_SIZE],[lat,lng]];
+  });
+
+  const fog = L.polygon([outer, ...holes], {
+    color:'transparent', fillColor:'#000010', fillOpacity:0.80,
+    weight:0, interactive:false, fillRule:'evenodd'
   }).addTo(leafletMap);
 
-  // Utiliser un polygone avec trous pour le fog of war (evenodd)
-  if((state.exploredCells || []).length > 0) {
-    leafletMap.removeLayer(bigRect);
-    const outerRing = [[-90,-180],[-90,180],[90,180],[90,-180],[-90,-180]];
-    const holes = (state.exploredCells || []).map(key => {
-      const [clat, clng] = key.split('_').map(Number);
-      const lat = clat * FOG_CELL_SIZE;
-      const lng = clng * FOG_CELL_SIZE;
-      // Carré parfait autour de la cellule
-      return [
-        [lat, lng],
-        [lat + FOG_CELL_SIZE, lng],
-        [lat + FOG_CELL_SIZE, lng + FOG_CELL_SIZE],
-        [lat, lng + FOG_CELL_SIZE]
-      ];
+  // Contour cyan subtil sur les zones révélées
+  const borders = L.layerGroup(cells.map(key => {
+    const parts = key.split('_');
+    const lat = parseInt(parts[0]) * FOG_CELL_SIZE;
+    const lng = parseInt(parts[1]) * FOG_CELL_SIZE;
+    return L.rectangle([[lat,lng],[lat+FOG_CELL_SIZE,lng+FOG_CELL_SIZE]], {
+      color:'rgba(0,245,255,0.15)', weight:0.5, fill:false, interactive:false
     });
-    fogLayer = L.polygon([outerRing, ...holes], {
-      color: 'transparent', fillColor: '#000020', fillOpacity: 0.82, weight: 0,
-      interactive: false, fillRule: 'evenodd'
-    }).addTo(leafletMap);
-  } else {
-    fogLayer = bigRect;
-  }
+  })).addTo(leafletMap);
+
+  fogLayer = [fog, borders];
 }
 
 function toggleFog() {
@@ -5865,6 +5878,15 @@ function updateMapPosition() {
   navigator.geolocation.getCurrentPosition(pos => {
     const lat = pos.coords.latitude;
     const lng = pos.coords.longitude;
+
+    // Nettoyer les anciennes cellules avec format invalide
+    if(state.exploredCells) {
+      const before = state.exploredCells.length;
+      state.exploredCells = state.exploredCells.filter(k =>
+        k && !k.includes('.') && k.split('_').length === 2
+      );
+      if(state.exploredCells.length !== before) saveState();
+    }
 
     if(!leafletMap) {
       initLeafletMap(lat, lng);
