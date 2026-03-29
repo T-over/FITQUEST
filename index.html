@@ -2163,7 +2163,10 @@ body::after {
   <button class="nav-btn" onclick="navigate('calendar',this)"><span class="nav-icon">📅</span>Agenda</button>
   <button class="nav-btn" onclick="navigate('stats',this)"><span class="nav-icon">📊</span>Stats</button>
   <button class="nav-btn" onclick="navigate('profile',this)"><span class="nav-icon">👤</span>Profil</button>
-</nav> style="display:none;position:fixed;inset:0;z-index:9000;background:#000;flex-direction:column;overflow:hidden">
+</nav>
+
+<!-- MODAL CAMÉRA IA -->
+<div id="pose-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:#000;flex-direction:column;overflow:hidden">
   <div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.9);flex-shrink:0">
     <div>
       <div style="font-family:'Exo 2',sans-serif;font-weight:900;font-size:15px;color:var(--accent)" id="pose-modal-title">📷 ANALYSE IA — POMPES</div>
