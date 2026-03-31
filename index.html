@@ -3185,14 +3185,10 @@ function logRun() {
   if(!dist || dist <= 0) { showToast('info', '⚠️ Saisis une distance valide'); return; }
 
   state.totalKm += dist;
-  state.runSessions++;  // compte chaque course (pour les quêtes de distance)
-  // totalSessions = jours distincts
-  const todayStr = new Date().toDateString();
-  if(!state.allSessionDays) state.allSessionDays = [];
-  if(!state.allSessionDays.includes(todayStr)) {
-    state.allSessionDays.push(todayStr);
-    state.totalSessions = state.allSessionDays.length;
-  }
+  state.runSessions++;
+  // types
+  if(type === 'interval') state.run_interval++;
+  if(type === 'trail') state.run_trail++;
 
   // types
   if(type === 'interval') state.run_interval++;
@@ -3273,19 +3269,10 @@ function logLift() {
     return;
   }
 
-  state.liftSessions++;  // compte les exercices (pour les quêtes d'exercices)
-  // totalSessions = jours distincts avec au moins 1 séance muscu
-  const todayStr = new Date().toDateString();
+  state.liftSessions++;
   if(!state.liftDaysLog) state.liftDaysLog = [];
-  if(!state.liftDaysLog.includes(todayStr)) {
-    state.liftDaysLog.push(todayStr);
-  }
-  // totalSessions = jours uniques (course + muscu combinés)
-  if(!state.allSessionDays) state.allSessionDays = [];
-  if(!state.allSessionDays.includes(todayStr)) {
-    state.allSessionDays.push(todayStr);
-    state.totalSessions = state.allSessionDays.length;
-  }
+  const todayLift = new Date().toDateString();
+  if(!state.liftDaysLog.includes(todayLift)) state.liftDaysLog.push(todayLift);
 
   // track specific exercises
   const exoLow = exo.toLowerCase();
@@ -3632,13 +3619,6 @@ function startSession() {
     return;
   }
 
-  // Vérifier si une séance a déjà été comptée aujourd'hui
-  const today = new Date().toDateString();
-  const alreadyToday = (state.weeklyDaysLog || []).includes(today);
-  if(alreadyToday) {
-    showToast('info', '⏱️ Tu as déjà compté une séance aujourd\'hui. La session démarre mais ne compte pas de jour supplémentaire.');
-  }
-
   sessionStart = Date.now();
   document.getElementById('active-session-banner').style.display = 'flex';
   document.getElementById('session-timer').textContent = '00:00';
@@ -3649,14 +3629,21 @@ function startSession() {
     document.getElementById('session-timer').textContent = m + ':' + s;
   }, 1000);
 
-  // Compter le jour (une seule fois par jour)
-  if(!alreadyToday) {
-    trackWeeklyDay();
-    try { updateBossProgress(state.weeklyDaysThisWeek, state.weeklyKmThisWeek || 0, state.weeklyLiftsThisWeek || 0); } catch(e) {}
-    try { updateWeeklyChallenge(); } catch(e) {}
+  // Compter la séance (une seule fois par jour)
+  const today = new Date().toDateString();
+  if(!state.allSessionDays) state.allSessionDays = [];
+  if(!state.allSessionDays.includes(today)) {
+    state.allSessionDays.push(today);
+    state.totalSessions = state.allSessionDays.length;
+    saveState();
   }
 
+  trackWeeklyDay();
+  try { updateBossProgress(state.weeklyDaysThisWeek, state.weeklyKmThisWeek || 0, state.weeklyLiftsThisWeek || 0); } catch(e) {}
+  try { updateWeeklyChallenge(); } catch(e) {}
+
   haptic('success');
+  playSound('xp');
   showToast('success', '⏱️ Session démarrée ! C\'est parti 💪');
 }
 
@@ -6223,26 +6210,47 @@ function sendNotification(title, body, icon='⚡') {
 }
 
 function scheduleReminderNotification() {
-  // Rappel quotidien à 18h
   const now = new Date();
-  const target = new Date();
-  target.setHours(18, 0, 0, 0);
-  if(target <= now) target.setDate(target.getDate() + 1);
-  const delay = target - now;
+
+  // --- Rappel matin 9h ---
+  const morning = new Date();
+  morning.setHours(9, 0, 0, 0);
+  if(morning <= now) morning.setDate(morning.getDate() + 1);
   setTimeout(() => {
     if(localStorage.getItem('fq_notif') === 'true') {
-      const msgs = [
-        'Tu n\'as pas encore bougé aujourd\'hui 💪',
-        'Le boss de la semaine t\'attend !',
-        'Ta série est en danger — entraîne-toi !',
-        'Un peu de sport ce soir ? 🏃',
-        'Tes familiers s\'ennuient sans toi 🐾',
+      const morningMsgs = [
+        'Bonne journée ! Et si tu commençais par une séance ? 💪',
+        'Le meilleur moment pour s\'entraîner, c\'est maintenant ! 🏃',
+        'Ton corps t\'attend — lance une session ! ⚡',
+        'Démarre ta journée du bon pied avec FitQuest 🔥',
+        'Les champions s\'entraînent le matin. Tu l\'es ? 👑',
       ];
-      const msg = msgs[Math.floor(Math.random() * msgs.length)];
-      sendNotification('⚡ FitQuest', msg);
-      scheduleReminderNotification(); // reprogrammer pour le lendemain
+      sendNotification('☀️ FitQuest — Bonjour !', morningMsgs[Math.floor(Math.random() * morningMsgs.length)]);
+      scheduleReminderNotification();
     }
-  }, delay);
+  }, morning - now);
+
+  // --- Rappel soir 18h ---
+  const evening = new Date();
+  evening.setHours(18, 0, 0, 0);
+  if(evening <= now) evening.setDate(evening.getDate() + 1);
+  setTimeout(() => {
+    if(localStorage.getItem('fq_notif') === 'true') {
+      // Envoyer seulement si pas de séance aujourd'hui
+      const today = new Date().toDateString();
+      const didTrain = (state.allSessionDays || []).includes(today);
+      if(!didTrain) {
+        const eveningMsgs = [
+          'Tu n\'as pas encore bougé aujourd\'hui 💪',
+          'Le boss de la semaine t\'attend !',
+          'Ta série est en danger — entraîne-toi !',
+          'Un peu de sport ce soir ? 🏃',
+          'Tes familiers s\'ennuient sans toi 🐾',
+        ];
+        sendNotification('⚡ FitQuest', eveningMsgs[Math.floor(Math.random() * eveningMsgs.length)]);
+      }
+    }
+  }, evening - now);
 }
 
 // ============================================================
