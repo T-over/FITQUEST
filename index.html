@@ -2295,143 +2295,143 @@ body::after {
 // ============================================================
 
 const LEVELS = [
-  {name:'Novice',      xp:0,     emoji:'🧗',  class:'warrior',     desc:'Le voyage commence ici.'},
-  {name:'Apprenti',   xp:100,   emoji:'🥊',  class:'warrior',     desc:'Tu commences à trouver ton rythme.'},
-  {name:'Athlète',    xp:250,   emoji:'🏅',  class:'warrior',     desc:'Tes efforts portent leurs fruits.'},
-  {name:'Guerrier',   xp:500,   emoji:'⚔️',   class:'warrior',     desc:'Tu es un combattant confirmé.'},
-  {name:'Champion',   xp:900,   emoji:'🏆',  class:'warrior',     desc:'Peu peuvent te suivre.'},
-  {name:'Titan',      xp:1400,  emoji:'💪',  class:'powerlifter', desc:'Ta force est légendaire.'},
-  {name:'Powerlifter',xp:1900,  emoji:'🏋️',  class:'powerlifter', desc:'Tu soulèves ce que les autres regardent.'},
-  {name:'Faucon',     xp:2500,  emoji:'🦅',  class:'runner',      desc:'Tu cours comme le vent.'},
-  {name:'Marathon',   xp:3200,  emoji:'🏃',  class:'runner',      desc:'Tu enchaînes les km sans effort.'},
-  {name:'Hybride',    xp:4000,  emoji:'🌀',  class:'hybrid',      desc:'Force et endurance réunies.'},
-  {name:'Légende',    xp:5000,  emoji:'⚡',  class:'warrior',     desc:'Une force de la nature.'},
-  {name:'Demi-Dieu',  xp:6500,  emoji:'🌟',  class:'warrior',     desc:'Au-delà du commun des mortels.'},
-  {name:'Immortel',   xp:8500,  emoji:'🔱',  class:'warrior',     desc:'Inébranlable. Indépassable.'},
-  {name:'OVNI',       xp:11000, emoji:'👾',  class:'hybrid',      desc:'Hors-catégorie. Hors-norme.'},
-  {name:'Transcendé', xp:15000, emoji:'🌈',  class:'hybrid',      desc:'Tu as dépassé tes propres limites.'},
+  {name:'Novice',      xp:0,      emoji:'🧗',  class:'warrior',     desc:'Le voyage commence ici.'},
+  {name:'Apprenti',   xp:200,    emoji:'🥊',  class:'warrior',     desc:'Tu commences à trouver ton rythme.'},
+  {name:'Athlète',    xp:500,    emoji:'🏅',  class:'warrior',     desc:'Tes efforts portent leurs fruits.'},
+  {name:'Guerrier',   xp:1000,   emoji:'⚔️',  class:'warrior',     desc:'Tu es un combattant confirmé.'},
+  {name:'Champion',   xp:2000,   emoji:'🏆',  class:'warrior',     desc:'Peu peuvent te suivre.'},
+  {name:'Titan',      xp:3500,   emoji:'💪',  class:'powerlifter', desc:'Ta force est légendaire.'},
+  {name:'Powerlifter',xp:5500,   emoji:'🏋️',  class:'powerlifter', desc:'Tu soulèves ce que les autres regardent.'},
+  {name:'Faucon',     xp:8000,   emoji:'🦅',  class:'runner',      desc:'Tu cours comme le vent.'},
+  {name:'Marathon',   xp:11000,  emoji:'🏃',  class:'runner',      desc:'Tu enchaînes les km sans effort.'},
+  {name:'Hybride',    xp:15000,  emoji:'🌀',  class:'hybrid',      desc:'Force et endurance réunies.'},
+  {name:'Légende',    xp:20000,  emoji:'⚡',  class:'warrior',     desc:'Une force de la nature.'},
+  {name:'Demi-Dieu',  xp:27000,  emoji:'🌟',  class:'warrior',     desc:'Au-delà du commun des mortels.'},
+  {name:'Immortel',   xp:35000,  emoji:'🔱',  class:'warrior',     desc:'Inébranlable. Indépassable.'},
+  {name:'OVNI',       xp:45000,  emoji:'👾',  class:'hybrid',      desc:'Hors-catégorie. Hors-norme.'},
+  {name:'Transcendé', xp:60000,  emoji:'🌈',  class:'hybrid',      desc:'Tu as dépassé tes propres limites.'},
 ];
 
 const QUESTS_DATA = [
   // ===== COURSE — DISTANCE (20) =====
-  {id:'run1',  cat:'course', name:'Premiers Pas',        desc:'Cours 1 km.',                                      icon:'👟', type:'run',         target:1,    unit:'km',      xp:50,   diff:'easy',   reward:'50 or'},
-  {id:'run2',  cat:'course', name:'5K Fighter',           desc:'Cours 5 km en une séance.',                        icon:'🏃', type:'single_run',  target:5,    unit:'km',      xp:120,  diff:'easy',   reward:'60 or'},
-  {id:'run3',  cat:'course', name:'Le Classique',         desc:'Accumule 10 km de course.',                        icon:'🗺️', type:'run',         target:10,   unit:'km',      xp:150,  diff:'easy',   reward:'75 or'},
-  {id:'run4',  cat:'course', name:'15K Warrior',          desc:'Cours 15 km au total.',                            icon:'⚡', type:'run',         target:15,   unit:'km',      xp:200,  diff:'medium', reward:'100 or'},
-  {id:'run5',  cat:'course', name:'Vingt Kilomètres',     desc:'Cours 20 km au total.',                            icon:'🌄', type:'run',         target:20,   unit:'km',      xp:250,  diff:'medium', reward:'125 or'},
-  {id:'run6',  cat:'course', name:'Semi-Marathon',        desc:'Accumule 21 km de course.',                        icon:'🏅', type:'run',         target:21,   unit:'km',      xp:400,  diff:'hard',   reward:'Titre: Semi'},
-  {id:'run7',  cat:'course', name:'30K Club',             desc:'Cours 30 km au total.',                            icon:'🌟', type:'run',         target:30,   unit:'km',      xp:350,  diff:'hard',   reward:'175 or'},
-  {id:'run8',  cat:'course', name:'50K Legend',           desc:'Cours 50 km au total.',                            icon:'🌍', type:'run',         target:50,   unit:'km',      xp:600,  diff:'hard',   reward:'Titre: Coureur'},
-  {id:'run9',  cat:'course', name:'Marathon',             desc:'Cours 42 km au total.',                            icon:'🏆', type:'run',         target:42,   unit:'km',      xp:700,  diff:'epic',   reward:'Titre: Marathonien'},
-  {id:'run10', cat:'course', name:'100K Club',            desc:'Cours 100 km au total.',                           icon:'🏔️', type:'run',         target:100,  unit:'km',      xp:1200, diff:'epic',   reward:'Titre: Ultra'},
-  {id:'run11', cat:'course', name:'200K Legend',          desc:'Cours 200 km au total.',                           icon:'🚀', type:'run',         target:200,  unit:'km',      xp:2500, diff:'epic',   reward:'Titre: Ultramarathonien'},
-  {id:'run12', cat:'course', name:'Longue Sortie',        desc:'Cours 10 km en une seule séance.',                 icon:'🦅', type:'single_run',  target:10,   unit:'km',      xp:300,  diff:'hard',   reward:'Titre: Endurant'},
-  {id:'run13', cat:'course', name:'Sortie de 15',         desc:'Cours 15 km en une seule séance.',                 icon:'🔥', type:'single_run',  target:15,   unit:'km',      xp:500,  diff:'epic',   reward:'250 or'},
-  {id:'run14', cat:'course', name:'Speed Demon',          desc:'Cours en mode intervalles 3 fois.',                icon:'⚡', type:'run_interval', target:3,   unit:'fois',    xp:200,  diff:'medium', reward:'Badge: Sprinter'},
-  {id:'run15', cat:'course', name:'Trailblazer',          desc:'Fais 2 sorties trail.',                            icon:'🌲', type:'run_trail',    target:2,   unit:'trails',  xp:250,  diff:'medium', reward:'Badge: Traileur'},
-  {id:'run16', cat:'course', name:'Trail Master',         desc:'Fais 5 sorties trail.',                            icon:'⛰️', type:'run_trail',    target:5,   unit:'trails',  xp:450,  diff:'hard',   reward:'225 or'},
-  {id:'run17', cat:'course', name:'Explorateur GPS',      desc:'Révèle 50 zones sur la carte.',                    icon:'🗺️', type:'map_cells',    target:50,  unit:'zones',   xp:250,  diff:'medium', reward:'125 or'},
-  {id:'run18', cat:'course', name:'Cartographe',          desc:'Révèle 200 zones sur la carte.',                   icon:'🌐', type:'map_cells',    target:200, unit:'zones',   xp:500,  diff:'hard',   reward:'Titre: Cartographe'},
-  {id:'run19', cat:'course', name:'Maître Explorateur',   desc:'Révèle 500 zones sur la carte.',                   icon:'🌍', type:'map_cells',    target:500, unit:'zones',   xp:1000, diff:'epic',   reward:'Titre: Voyageur'},
-  {id:'run20', cat:'course', name:'Conquérant',           desc:'Révèle 1000 zones sur la carte.',                  icon:'👑', type:'map_cells',    target:1000,unit:'zones',   xp:2000, diff:'epic',   reward:'Titre: Conquérant'},
+  {id:'run1',  cat:'course', name:'Premiers Pas',        desc:'Cours 1 km.',                                      icon:'👟', type:'run',         target:1,    unit:'km',      xp:12,   diff:'easy',   reward:'50 or'},
+  {id:'run2',  cat:'course', name:'5K Fighter',           desc:'Cours 5 km en une séance.',                        icon:'🏃', type:'single_run',  target:5,    unit:'km',      xp:30,  diff:'easy',   reward:'60 or'},
+  {id:'run3',  cat:'course', name:'Le Classique',         desc:'Accumule 10 km de course.',                        icon:'🗺️', type:'run',         target:10,   unit:'km',      xp:38,  diff:'easy',   reward:'75 or'},
+  {id:'run4',  cat:'course', name:'15K Warrior',          desc:'Cours 15 km au total.',                            icon:'⚡', type:'run',         target:15,   unit:'km',      xp:50,  diff:'medium', reward:'100 or'},
+  {id:'run5',  cat:'course', name:'Vingt Kilomètres',     desc:'Cours 20 km au total.',                            icon:'🌄', type:'run',         target:20,   unit:'km',      xp:62,  diff:'medium', reward:'125 or'},
+  {id:'run6',  cat:'course', name:'Semi-Marathon',        desc:'Accumule 21 km de course.',                        icon:'🏅', type:'run',         target:21,   unit:'km',      xp:100,  diff:'hard',   reward:'Titre: Semi'},
+  {id:'run7',  cat:'course', name:'30K Club',             desc:'Cours 30 km au total.',                            icon:'🌟', type:'run',         target:30,   unit:'km',      xp:88,  diff:'hard',   reward:'175 or'},
+  {id:'run8',  cat:'course', name:'50K Legend',           desc:'Cours 50 km au total.',                            icon:'🌍', type:'run',         target:50,   unit:'km',      xp:150,  diff:'hard',   reward:'Titre: Coureur'},
+  {id:'run9',  cat:'course', name:'Marathon',             desc:'Cours 42 km au total.',                            icon:'🏆', type:'run',         target:42,   unit:'km',      xp:175,  diff:'epic',   reward:'Titre: Marathonien'},
+  {id:'run10', cat:'course', name:'100K Club',            desc:'Cours 100 km au total.',                           icon:'🏔️', type:'run',         target:100,  unit:'km',      xp:300, diff:'epic',   reward:'Titre: Ultra'},
+  {id:'run11', cat:'course', name:'200K Legend',          desc:'Cours 200 km au total.',                           icon:'🚀', type:'run',         target:200,  unit:'km',      xp:625, diff:'epic',   reward:'Titre: Ultramarathonien'},
+  {id:'run12', cat:'course', name:'Longue Sortie',        desc:'Cours 10 km en une seule séance.',                 icon:'🦅', type:'single_run',  target:10,   unit:'km',      xp:75,  diff:'hard',   reward:'Titre: Endurant'},
+  {id:'run13', cat:'course', name:'Sortie de 15',         desc:'Cours 15 km en une seule séance.',                 icon:'🔥', type:'single_run',  target:15,   unit:'km',      xp:125,  diff:'epic',   reward:'250 or'},
+  {id:'run14', cat:'course', name:'Speed Demon',          desc:'Cours en mode intervalles 3 fois.',                icon:'⚡', type:'run_interval', target:3,   unit:'fois',    xp:50,  diff:'medium', reward:'Badge: Sprinter'},
+  {id:'run15', cat:'course', name:'Trailblazer',          desc:'Fais 2 sorties trail.',                            icon:'🌲', type:'run_trail',    target:2,   unit:'trails',  xp:62,  diff:'medium', reward:'Badge: Traileur'},
+  {id:'run16', cat:'course', name:'Trail Master',         desc:'Fais 5 sorties trail.',                            icon:'⛰️', type:'run_trail',    target:5,   unit:'trails',  xp:112,  diff:'hard',   reward:'225 or'},
+  {id:'run17', cat:'course', name:'Explorateur GPS',      desc:'Révèle 50 zones sur la carte.',                    icon:'🗺️', type:'map_cells',    target:50,  unit:'zones',   xp:62,  diff:'medium', reward:'125 or'},
+  {id:'run18', cat:'course', name:'Cartographe',          desc:'Révèle 200 zones sur la carte.',                   icon:'🌐', type:'map_cells',    target:200, unit:'zones',   xp:125,  diff:'hard',   reward:'Titre: Cartographe'},
+  {id:'run19', cat:'course', name:'Maître Explorateur',   desc:'Révèle 500 zones sur la carte.',                   icon:'🌍', type:'map_cells',    target:500, unit:'zones',   xp:250, diff:'epic',   reward:'Titre: Voyageur'},
+  {id:'run20', cat:'course', name:'Conquérant',           desc:'Révèle 1000 zones sur la carte.',                  icon:'👑', type:'map_cells',    target:1000,unit:'zones',   xp:500, diff:'epic',   reward:'Titre: Conquérant'},
 
   // ===== COURSE — RÉGULARITÉ (12) =====
-  {id:'rcr1',  cat:'course', name:'Première Sortie',      desc:'Fais ta première course.',                         icon:'🏁', type:'run_sessions', target:1,   unit:'séances', xp:50,   diff:'easy',   reward:'25 or'},
-  {id:'rcr2',  cat:'course', name:'Série de 3',           desc:'Cours 3 fois cette semaine.',                      icon:'🔁', type:'run_sessions', target:3,   unit:'séances', xp:180,  diff:'medium', reward:'Badge: Régularité'},
-  {id:'rcr3',  cat:'course', name:'5 Sorties',            desc:'Cours 5 fois au total.',                           icon:'🌅', type:'run_sessions', target:5,   unit:'séances', xp:150,  diff:'easy',   reward:'75 or'},
-  {id:'rcr4',  cat:'course', name:'Habitué',              desc:'Cours 10 fois au total.',                          icon:'🔩', type:'run_sessions', target:10,  unit:'séances', xp:250,  diff:'medium', reward:'125 or'},
-  {id:'rcr5',  cat:'course', name:'Coureur Régulier',     desc:'Cours 20 fois au total.',                          icon:'🌟', type:'run_sessions', target:20,  unit:'séances', xp:400,  diff:'hard',   reward:'200 or'},
-  {id:'rcr6',  cat:'course', name:'Vétéran de la Route',  desc:'Cours 50 fois au total.',                          icon:'🏆', type:'run_sessions', target:50,  unit:'séances', xp:800,  diff:'epic',   reward:'Titre: Vétéran'},
+  {id:'rcr1',  cat:'course', name:'Première Sortie',      desc:'Fais ta première course.',                         icon:'🏁', type:'run_sessions', target:1,   unit:'séances', xp:12,   diff:'easy',   reward:'25 or'},
+  {id:'rcr2',  cat:'course', name:'Série de 3',           desc:'Cours 3 fois cette semaine.',                      icon:'🔁', type:'run_sessions', target:3,   unit:'séances', xp:45,  diff:'medium', reward:'Badge: Régularité'},
+  {id:'rcr3',  cat:'course', name:'5 Sorties',            desc:'Cours 5 fois au total.',                           icon:'🌅', type:'run_sessions', target:5,   unit:'séances', xp:38,  diff:'easy',   reward:'75 or'},
+  {id:'rcr4',  cat:'course', name:'Habitué',              desc:'Cours 10 fois au total.',                          icon:'🔩', type:'run_sessions', target:10,  unit:'séances', xp:62,  diff:'medium', reward:'125 or'},
+  {id:'rcr5',  cat:'course', name:'Coureur Régulier',     desc:'Cours 20 fois au total.',                          icon:'🌟', type:'run_sessions', target:20,  unit:'séances', xp:100,  diff:'hard',   reward:'200 or'},
+  {id:'rcr6',  cat:'course', name:'Vétéran de la Route',  desc:'Cours 50 fois au total.',                          icon:'🏆', type:'run_sessions', target:50,  unit:'séances', xp:200,  diff:'epic',   reward:'Titre: Vétéran'},
 
   // ===== MUSCU — SÉANCES (12) =====
-  {id:'ms1',  cat:'muscu', name:'Initiation Fer',         desc:'Réalise ta première séance de muscu.',             icon:'🏋️', type:'lift_sessions', target:1,  unit:'séances', xp:60,   diff:'easy',   reward:'30 or'},
-  {id:'ms2',  cat:'muscu', name:'3 Séances',              desc:'Fais 3 séances de muscu.',                         icon:'💪', type:'lift_sessions', target:3,  unit:'séances', xp:100,  diff:'easy',   reward:'50 or'},
-  {id:'ms3',  cat:'muscu', name:'Routine Béton',          desc:'Fais 5 séances de muscu.',                         icon:'🔩', type:'lift_sessions', target:5,  unit:'séances', xp:180,  diff:'easy',   reward:'Badge: Habitué'},
-  {id:'ms4',  cat:'muscu', name:'10 Séances',             desc:'Fais 10 séances de muscu.',                        icon:'⚒️', type:'lift_sessions', target:10, unit:'séances', xp:300,  diff:'medium', reward:'150 or'},
-  {id:'ms5',  cat:'muscu', name:'20 Séances',             desc:'Fais 20 séances de muscu.',                        icon:'🔱', type:'lift_sessions', target:20, unit:'séances', xp:500,  diff:'hard',   reward:'Titre: Forgeron'},
-  {id:'ms6',  cat:'muscu', name:'Iron Man',               desc:'30 séances de muscu totales.',                     icon:'🤖', type:'lift_sessions', target:30, unit:'séances', xp:700,  diff:'epic',   reward:'Titre: Iron Man'},
-  {id:'ms7',  cat:'muscu', name:'50 Séances',             desc:'50 séances de muscu.',                             icon:'⚔️', type:'lift_sessions', target:50, unit:'séances', xp:1200, diff:'epic',   reward:'Titre: Titan'},
-  {id:'ms8',  cat:'muscu', name:'Centurion Muscu',        desc:'100 séances de muscu.',                            icon:'💎', type:'lift_sessions', target:100,unit:'séances', xp:2500, diff:'epic',   reward:'Titre: Centurion'},
-  {id:'ms9',  cat:'muscu', name:'AI Validé x3',           desc:'Valide 3 exercices avec la caméra IA.',            icon:'📷', type:'ai_validated',  target:3,  unit:'exos',    xp:200,  diff:'medium', reward:'Badge: Précis'},
-  {id:'ms10', cat:'muscu', name:'AI Validé x10',          desc:'Valide 10 exercices avec la caméra IA.',           icon:'🎯', type:'ai_validated',  target:10, unit:'exos',    xp:400,  diff:'hard',   reward:'Titre: Précis'},
-  {id:'ms11', cat:'muscu', name:'Polyvalent',             desc:'Fais 5 exercices différents.',                     icon:'🌀', type:'diff_exos',     target:5,  unit:'exos',    xp:150,  diff:'easy',   reward:'75 or'},
-  {id:'ms12', cat:'muscu', name:'Expert Poly',            desc:'Fais 10 exercices différents.',                    icon:'🌐', type:'diff_exos',     target:10, unit:'exos',    xp:300,  diff:'medium', reward:'Titre: Polyvalent'},
+  {id:'ms1',  cat:'muscu', name:'Initiation Fer',         desc:'Réalise ta première séance de muscu.',             icon:'🏋️', type:'lift_sessions', target:1,  unit:'séances', xp:15,   diff:'easy',   reward:'30 or'},
+  {id:'ms2',  cat:'muscu', name:'3 Séances',              desc:'Fais 3 séances de muscu.',                         icon:'💪', type:'lift_sessions', target:3,  unit:'séances', xp:25,  diff:'easy',   reward:'50 or'},
+  {id:'ms3',  cat:'muscu', name:'Routine Béton',          desc:'Fais 5 séances de muscu.',                         icon:'🔩', type:'lift_sessions', target:5,  unit:'séances', xp:45,  diff:'easy',   reward:'Badge: Habitué'},
+  {id:'ms4',  cat:'muscu', name:'10 Séances',             desc:'Fais 10 séances de muscu.',                        icon:'⚒️', type:'lift_sessions', target:10, unit:'séances', xp:75,  diff:'medium', reward:'150 or'},
+  {id:'ms5',  cat:'muscu', name:'20 Séances',             desc:'Fais 20 séances de muscu.',                        icon:'🔱', type:'lift_sessions', target:20, unit:'séances', xp:125,  diff:'hard',   reward:'Titre: Forgeron'},
+  {id:'ms6',  cat:'muscu', name:'Iron Man',               desc:'30 séances de muscu totales.',                     icon:'🤖', type:'lift_sessions', target:30, unit:'séances', xp:175,  diff:'epic',   reward:'Titre: Iron Man'},
+  {id:'ms7',  cat:'muscu', name:'50 Séances',             desc:'50 séances de muscu.',                             icon:'⚔️', type:'lift_sessions', target:50, unit:'séances', xp:300, diff:'epic',   reward:'Titre: Titan'},
+  {id:'ms8',  cat:'muscu', name:'Centurion Muscu',        desc:'100 séances de muscu.',                            icon:'💎', type:'lift_sessions', target:100,unit:'séances', xp:625, diff:'epic',   reward:'Titre: Centurion'},
+  {id:'ms9',  cat:'muscu', name:'AI Validé x3',           desc:'Valide 3 exercices avec la caméra IA.',            icon:'📷', type:'ai_validated',  target:3,  unit:'exos',    xp:50,  diff:'medium', reward:'Badge: Précis'},
+  {id:'ms10', cat:'muscu', name:'AI Validé x10',          desc:'Valide 10 exercices avec la caméra IA.',           icon:'🎯', type:'ai_validated',  target:10, unit:'exos',    xp:100,  diff:'hard',   reward:'Titre: Précis'},
+  {id:'ms11', cat:'muscu', name:'Polyvalent',             desc:'Fais 5 exercices différents.',                     icon:'🌀', type:'diff_exos',     target:5,  unit:'exos',    xp:38,  diff:'easy',   reward:'75 or'},
+  {id:'ms12', cat:'muscu', name:'Expert Poly',            desc:'Fais 10 exercices différents.',                    icon:'🌐', type:'diff_exos',     target:10, unit:'exos',    xp:75,  diff:'medium', reward:'Titre: Polyvalent'},
 
   // ===== MUSCU — EXERCICES SPÉCIFIQUES (20) =====
-  {id:'mx1',  cat:'muscu', name:'Roi des Pompes',         desc:'Cumule 50 pompes.',                                icon:'💪', type:'total_pushups', target:50,  unit:'pompes', xp:150,  diff:'easy',   reward:'75 or'},
-  {id:'mx2',  cat:'muscu', name:'100 Pompes',             desc:'Cumule 100 pompes.',                               icon:'🔥', type:'total_pushups', target:100, unit:'pompes', xp:300,  diff:'medium', reward:'150 or'},
-  {id:'mx3',  cat:'muscu', name:'500 Pompes',             desc:'Cumule 500 pompes.',                               icon:'⚡', type:'total_pushups', target:500, unit:'pompes', xp:700,  diff:'epic',   reward:'Titre: Pompe King'},
-  {id:'mx4',  cat:'muscu', name:'Roi du Squat',           desc:'Effectue 10 séries de squats.',                   icon:'🦵', type:'squat_sets',    target:10,  unit:'séries', xp:180,  diff:'medium', reward:'90 or'},
-  {id:'mx5',  cat:'muscu', name:'Squat Master',           desc:'Effectue 30 séries de squats.',                   icon:'🦾', type:'squat_sets',    target:30,  unit:'séries', xp:400,  diff:'hard',   reward:'200 or'},
-  {id:'mx6',  cat:'muscu', name:'King Press',             desc:'Fais 10 séries de développé couché.',              icon:'🤜', type:'bench_sets',    target:10,  unit:'séries', xp:180,  diff:'medium', reward:'90 or'},
-  {id:'mx7',  cat:'muscu', name:'Bench Master',           desc:'Fais 30 séries de développé couché.',              icon:'💎', type:'bench_sets',    target:30,  unit:'séries', xp:400,  diff:'hard',   reward:'200 or'},
-  {id:'mx8',  cat:'muscu', name:'Soulevé de Terre',       desc:'Fais 5 séries de soulevé de terre.',               icon:'🏗️', type:'deadlift_sets', target:5,   unit:'séries', xp:200,  diff:'medium', reward:'100 or'},
-  {id:'mx9',  cat:'muscu', name:'Deadlift Master',        desc:'Fais 20 séries de soulevé de terre.',              icon:'💀', type:'deadlift_sets', target:20,  unit:'séries', xp:450,  diff:'hard',   reward:'225 or'},
-  {id:'mx10', cat:'muscu', name:'Pull Up Rookie',         desc:'Fais des tractions 3 fois.',                       icon:'🤸', type:'pullup_sets',   target:3,   unit:'fois',   xp:150,  diff:'easy',   reward:'75 or'},
-  {id:'mx11', cat:'muscu', name:'Pull Up Master',         desc:'Fais des tractions 10 fois.',                      icon:'⬆️', type:'pullup_sets',   target:10,  unit:'fois',   xp:350,  diff:'hard',   reward:'Titre: Pull'},
-  {id:'mx12', cat:'muscu', name:'Dips Rookie',            desc:'Fais des dips 3 fois.',                            icon:'🔽', type:'dip_sets',      target:3,   unit:'fois',   xp:150,  diff:'easy',   reward:'75 or'},
-  {id:'mx13', cat:'muscu', name:'Gainage de Fer',         desc:'Fais du gainage 5 fois.',                          icon:'🧱', type:'plank_sets',    target:5,   unit:'fois',   xp:120,  diff:'easy',   reward:'60 or'},
-  {id:'mx14', cat:'muscu', name:'Core Master',            desc:'Fais du gainage 20 fois.',                         icon:'⚙️', type:'plank_sets',    target:20,  unit:'fois',   xp:350,  diff:'hard',   reward:'175 or'},
-  {id:'mx15', cat:'muscu', name:'Jambes d\'Acier',        desc:'Fais 10 séries de leg press.',                     icon:'🦾', type:'legpress_sets', target:10,  unit:'séries', xp:200,  diff:'medium', reward:'100 or'},
-  {id:'mx16', cat:'muscu', name:'Curl Rookie',            desc:'Fais des curls biceps 5 fois.',                    icon:'💪', type:'arm_sessions',  target:5,   unit:'fois',   xp:120,  diff:'easy',   reward:'60 or'},
-  {id:'mx17', cat:'muscu', name:'Bras de Titan',          desc:'Fais des curls biceps 20 fois.',                   icon:'🦾', type:'arm_sessions',  target:20,  unit:'fois',   xp:300,  diff:'hard',   reward:'Titre: Bras'},
-  {id:'mx18', cat:'muscu', name:'Dos Béton',              desc:'Fais rowing + tirage 5 fois.',                     icon:'🔙', type:'back_sessions', target:5,   unit:'fois',   xp:180,  diff:'medium', reward:'90 or'},
-  {id:'mx19', cat:'muscu', name:'Dos de Guerrier',        desc:'Fais rowing + tirage 15 fois.',                    icon:'⚔️', type:'back_sessions', target:15,  unit:'fois',   xp:400,  diff:'hard',   reward:'200 or'},
-  {id:'mx20', cat:'muscu', name:'Crunch Machine',         desc:'Fais des crunchs 10 fois.',                        icon:'🔥', type:'crunch_sets',   target:10,  unit:'fois',   xp:150,  diff:'easy',   reward:'75 or'},
+  {id:'mx1',  cat:'muscu', name:'Roi des Pompes',         desc:'Cumule 50 pompes.',                                icon:'💪', type:'total_pushups', target:50,  unit:'pompes', xp:38,  diff:'easy',   reward:'75 or'},
+  {id:'mx2',  cat:'muscu', name:'100 Pompes',             desc:'Cumule 100 pompes.',                               icon:'🔥', type:'total_pushups', target:100, unit:'pompes', xp:75,  diff:'medium', reward:'150 or'},
+  {id:'mx3',  cat:'muscu', name:'500 Pompes',             desc:'Cumule 500 pompes.',                               icon:'⚡', type:'total_pushups', target:500, unit:'pompes', xp:175,  diff:'epic',   reward:'Titre: Pompe King'},
+  {id:'mx4',  cat:'muscu', name:'Roi du Squat',           desc:'Effectue 10 séries de squats.',                   icon:'🦵', type:'squat_sets',    target:10,  unit:'séries', xp:45,  diff:'medium', reward:'90 or'},
+  {id:'mx5',  cat:'muscu', name:'Squat Master',           desc:'Effectue 30 séries de squats.',                   icon:'🦾', type:'squat_sets',    target:30,  unit:'séries', xp:100,  diff:'hard',   reward:'200 or'},
+  {id:'mx6',  cat:'muscu', name:'King Press',             desc:'Fais 10 séries de développé couché.',              icon:'🤜', type:'bench_sets',    target:10,  unit:'séries', xp:45,  diff:'medium', reward:'90 or'},
+  {id:'mx7',  cat:'muscu', name:'Bench Master',           desc:'Fais 30 séries de développé couché.',              icon:'💎', type:'bench_sets',    target:30,  unit:'séries', xp:100,  diff:'hard',   reward:'200 or'},
+  {id:'mx8',  cat:'muscu', name:'Soulevé de Terre',       desc:'Fais 5 séries de soulevé de terre.',               icon:'🏗️', type:'deadlift_sets', target:5,   unit:'séries', xp:50,  diff:'medium', reward:'100 or'},
+  {id:'mx9',  cat:'muscu', name:'Deadlift Master',        desc:'Fais 20 séries de soulevé de terre.',              icon:'💀', type:'deadlift_sets', target:20,  unit:'séries', xp:112,  diff:'hard',   reward:'225 or'},
+  {id:'mx10', cat:'muscu', name:'Pull Up Rookie',         desc:'Fais des tractions 3 fois.',                       icon:'🤸', type:'pullup_sets',   target:3,   unit:'fois',   xp:38,  diff:'easy',   reward:'75 or'},
+  {id:'mx11', cat:'muscu', name:'Pull Up Master',         desc:'Fais des tractions 10 fois.',                      icon:'⬆️', type:'pullup_sets',   target:10,  unit:'fois',   xp:88,  diff:'hard',   reward:'Titre: Pull'},
+  {id:'mx12', cat:'muscu', name:'Dips Rookie',            desc:'Fais des dips 3 fois.',                            icon:'🔽', type:'dip_sets',      target:3,   unit:'fois',   xp:38,  diff:'easy',   reward:'75 or'},
+  {id:'mx13', cat:'muscu', name:'Gainage de Fer',         desc:'Fais du gainage 5 fois.',                          icon:'🧱', type:'plank_sets',    target:5,   unit:'fois',   xp:30,  diff:'easy',   reward:'60 or'},
+  {id:'mx14', cat:'muscu', name:'Core Master',            desc:'Fais du gainage 20 fois.',                         icon:'⚙️', type:'plank_sets',    target:20,  unit:'fois',   xp:88,  diff:'hard',   reward:'175 or'},
+  {id:'mx15', cat:'muscu', name:'Jambes d\'Acier',        desc:'Fais 10 séries de leg press.',                     icon:'🦾', type:'legpress_sets', target:10,  unit:'séries', xp:50,  diff:'medium', reward:'100 or'},
+  {id:'mx16', cat:'muscu', name:'Curl Rookie',            desc:'Fais des curls biceps 5 fois.',                    icon:'💪', type:'arm_sessions',  target:5,   unit:'fois',   xp:30,  diff:'easy',   reward:'60 or'},
+  {id:'mx17', cat:'muscu', name:'Bras de Titan',          desc:'Fais des curls biceps 20 fois.',                   icon:'🦾', type:'arm_sessions',  target:20,  unit:'fois',   xp:75,  diff:'hard',   reward:'Titre: Bras'},
+  {id:'mx18', cat:'muscu', name:'Dos Béton',              desc:'Fais rowing + tirage 5 fois.',                     icon:'🔙', type:'back_sessions', target:5,   unit:'fois',   xp:45,  diff:'medium', reward:'90 or'},
+  {id:'mx19', cat:'muscu', name:'Dos de Guerrier',        desc:'Fais rowing + tirage 15 fois.',                    icon:'⚔️', type:'back_sessions', target:15,  unit:'fois',   xp:100,  diff:'hard',   reward:'200 or'},
+  {id:'mx20', cat:'muscu', name:'Crunch Machine',         desc:'Fais des crunchs 10 fois.',                        icon:'🔥', type:'crunch_sets',   target:10,  unit:'fois',   xp:38,  diff:'easy',   reward:'75 or'},
 
   // ===== HYBRIDE (15) =====
-  {id:'hy1',  cat:'hybride', name:'Premier Mix',          desc:'Cours ET fais muscu la même semaine.',             icon:'🌀', type:'hybrid_week',   target:1,   unit:'semaine', xp:200, diff:'medium', reward:'100 or'},
-  {id:'hy2',  cat:'hybride', name:'Semaine Complète',     desc:'Cours + muscu 3 semaines de suite.',               icon:'📅', type:'hybrid_weeks',  target:3,   unit:'semaines',xp:400, diff:'hard',   reward:'Titre: Complet'},
-  {id:'hy3',  cat:'hybride', name:'Le Grand Mélange',     desc:'Cours 10 km ET fais 5 séances muscu.',            icon:'⚔️', type:'combo',         target:1,   unit:'combo',   xp:500, diff:'epic',   reward:'Badge: Hybride'},
-  {id:'hy4',  cat:'hybride', name:'Cardio + Force',       desc:'Cours 20 km ET fais 10 séances muscu.',           icon:'🔱', type:'combo2',        target:1,   unit:'combo',   xp:800, diff:'epic',   reward:'300 or'},
-  {id:'hy5',  cat:'hybride', name:'5 Jours Actifs',       desc:'Sois actif 5 jours distincts.',                   icon:'📆', type:'active_days',   target:5,   unit:'jours',   xp:250, diff:'medium', reward:'125 or'},
-  {id:'hy6',  cat:'hybride', name:'10 Jours Actifs',      desc:'Sois actif 10 jours distincts.',                  icon:'🌟', type:'active_days',   target:10,  unit:'jours',   xp:400, diff:'hard',   reward:'200 or'},
-  {id:'hy7',  cat:'hybride', name:'Streak 7 Jours',       desc:'7 jours d\'entraînement consécutifs.',            icon:'🔥', type:'streak',        target:7,   unit:'jours',   xp:400, diff:'hard',   reward:'Bouclier streak'},
-  {id:'hy8',  cat:'hybride', name:'Streak 14 Jours',      desc:'14 jours consécutifs.',                           icon:'💎', type:'streak',        target:14,  unit:'jours',   xp:700, diff:'epic',   reward:'Titre: Discipline'},
-  {id:'hy9',  cat:'hybride', name:'Streak 30 Jours',      desc:'30 jours consécutifs.',                           icon:'🏆', type:'streak',        target:30,  unit:'jours',   xp:1500,diff:'epic',   reward:'Titre: Légende'},
-  {id:'hy10', cat:'hybride', name:'Cardio-Poids',         desc:'Cours + soulève le même jour 3 fois.',            icon:'⚡', type:'same_day_combo', target:3,  unit:'fois',    xp:350, diff:'hard',   reward:'175 or'},
-  {id:'hy11', cat:'hybride', name:'PPL Week',             desc:'Fais une semaine Push Pull Legs complète.',        icon:'📋', type:'ppl_week',      target:1,   unit:'semaine', xp:300, diff:'hard',   reward:'150 or'},
-  {id:'hy12', cat:'hybride', name:'Mois Actif',           desc:'Sois actif 20 jours dans le mois.',               icon:'📅', type:'active_days',   target:20,  unit:'jours',   xp:800, diff:'epic',   reward:'Titre: Assidu'},
-  {id:'hy13', cat:'hybride', name:'Full Body Week',       desc:'Travaille 4 groupes musculaires cette semaine.',   icon:'🌐', type:'diff_exos',     target:4,   unit:'groupes', xp:200, diff:'medium', reward:'100 or'},
-  {id:'hy14', cat:'hybride', name:'Biathlon',             desc:'Cours 5 km ET fais 3 séances muscu.',             icon:'🎯', type:'biathlon',      target:1,   unit:'combo',   xp:300, diff:'medium', reward:'150 or'},
-  {id:'hy15', cat:'hybride', name:'Triathlon Fitness',    desc:'Course + Muscu + Gainage dans la même semaine.',   icon:'🌟', type:'trio_week',     target:1,   unit:'semaine', xp:450, diff:'hard',   reward:'225 or'},
+  {id:'hy1',  cat:'hybride', name:'Premier Mix',          desc:'Cours ET fais muscu la même semaine.',             icon:'🌀', type:'hybrid_week',   target:1,   unit:'semaine', xp:50, diff:'medium', reward:'100 or'},
+  {id:'hy2',  cat:'hybride', name:'Semaine Complète',     desc:'Cours + muscu 3 semaines de suite.',               icon:'📅', type:'hybrid_weeks',  target:3,   unit:'semaines',xp:100, diff:'hard',   reward:'Titre: Complet'},
+  {id:'hy3',  cat:'hybride', name:'Le Grand Mélange',     desc:'Cours 10 km ET fais 5 séances muscu.',            icon:'⚔️', type:'combo',         target:1,   unit:'combo',   xp:125, diff:'epic',   reward:'Badge: Hybride'},
+  {id:'hy4',  cat:'hybride', name:'Cardio + Force',       desc:'Cours 20 km ET fais 10 séances muscu.',           icon:'🔱', type:'combo2',        target:1,   unit:'combo',   xp:200, diff:'epic',   reward:'300 or'},
+  {id:'hy5',  cat:'hybride', name:'5 Jours Actifs',       desc:'Sois actif 5 jours distincts.',                   icon:'📆', type:'active_days',   target:5,   unit:'jours',   xp:62, diff:'medium', reward:'125 or'},
+  {id:'hy6',  cat:'hybride', name:'10 Jours Actifs',      desc:'Sois actif 10 jours distincts.',                  icon:'🌟', type:'active_days',   target:10,  unit:'jours',   xp:100, diff:'hard',   reward:'200 or'},
+  {id:'hy7',  cat:'hybride', name:'Streak 7 Jours',       desc:'7 jours d\'entraînement consécutifs.',            icon:'🔥', type:'streak',        target:7,   unit:'jours',   xp:100, diff:'hard',   reward:'Bouclier streak'},
+  {id:'hy8',  cat:'hybride', name:'Streak 14 Jours',      desc:'14 jours consécutifs.',                           icon:'💎', type:'streak',        target:14,  unit:'jours',   xp:175, diff:'epic',   reward:'Titre: Discipline'},
+  {id:'hy9',  cat:'hybride', name:'Streak 30 Jours',      desc:'30 jours consécutifs.',                           icon:'🏆', type:'streak',        target:30,  unit:'jours',   xp:375,diff:'epic',   reward:'Titre: Légende'},
+  {id:'hy10', cat:'hybride', name:'Cardio-Poids',         desc:'Cours + soulève le même jour 3 fois.',            icon:'⚡', type:'same_day_combo', target:3,  unit:'fois',    xp:88, diff:'hard',   reward:'175 or'},
+  {id:'hy11', cat:'hybride', name:'PPL Week',             desc:'Fais une semaine Push Pull Legs complète.',        icon:'📋', type:'ppl_week',      target:1,   unit:'semaine', xp:75, diff:'hard',   reward:'150 or'},
+  {id:'hy12', cat:'hybride', name:'Mois Actif',           desc:'Sois actif 20 jours dans le mois.',               icon:'📅', type:'active_days',   target:20,  unit:'jours',   xp:200, diff:'epic',   reward:'Titre: Assidu'},
+  {id:'hy13', cat:'hybride', name:'Full Body Week',       desc:'Travaille 4 groupes musculaires cette semaine.',   icon:'🌐', type:'diff_exos',     target:4,   unit:'groupes', xp:50, diff:'medium', reward:'100 or'},
+  {id:'hy14', cat:'hybride', name:'Biathlon',             desc:'Cours 5 km ET fais 3 séances muscu.',             icon:'🎯', type:'biathlon',      target:1,   unit:'combo',   xp:75, diff:'medium', reward:'150 or'},
+  {id:'hy15', cat:'hybride', name:'Triathlon Fitness',    desc:'Course + Muscu + Gainage dans la même semaine.',   icon:'🌟', type:'trio_week',     target:1,   unit:'semaine', xp:112, diff:'hard',   reward:'225 or'},
 
   // ===== ÉPIQUES (18) =====
-  {id:'ep1',  cat:'epiques', name:'BESTMODE',             desc:'30 séances de sport au total.',                    icon:'👹', type:'total_sessions', target:30,  unit:'séances', xp:800,  diff:'epic', reward:'Titre: Bestmode'},
-  {id:'ep2',  cat:'epiques', name:'CENTURION',            desc:'100 séances de sport au total.',                   icon:'⚔️', type:'total_sessions', target:100, unit:'séances', xp:2000, diff:'epic', reward:'Titre: Centurion'},
-  {id:'ep3',  cat:'epiques', name:'IMMORTEL',             desc:'200 séances de sport au total.',                   icon:'☠️', type:'total_sessions', target:200, unit:'séances', xp:4000, diff:'epic', reward:'Titre: Immortel'},
-  {id:'ep4',  cat:'epiques', name:'5 000 XP',             desc:'Atteins 5 000 XP total.',                          icon:'⭐', type:'total_xp',       target:5000, unit:'XP',    xp:500,  diff:'hard', reward:'250 or'},
-  {id:'ep5',  cat:'epiques', name:'10 000 XP',            desc:'Atteins 10 000 XP total.',                         icon:'🌟', type:'total_xp',       target:10000,unit:'XP',    xp:1000, diff:'epic', reward:'Titre: Grand Maître'},
-  {id:'ep6',  cat:'epiques', name:'25 000 XP',            desc:'Atteins 25 000 XP total.',                         icon:'💎', type:'total_xp',       target:25000,unit:'XP',    xp:2000, diff:'epic', reward:'Titre: Transcendé'},
-  {id:'ep7',  cat:'epiques', name:'Niveau 5',             desc:'Atteins le niveau 5.',                             icon:'🏅', type:'level',          target:5,    unit:'niveau', xp:300,  diff:'medium',reward:'150 or'},
-  {id:'ep8',  cat:'epiques', name:'Niveau 10',            desc:'Atteins le niveau 10.',                            icon:'🌟', type:'level',          target:10,   unit:'niveau', xp:800,  diff:'epic', reward:'Titre: Vétéran'},
-  {id:'ep9',  cat:'epiques', name:'Niveau 15',            desc:'Atteins le niveau 15.',                            icon:'👑', type:'level',          target:15,   unit:'niveau', xp:2000, diff:'epic', reward:'Titre: Légende'},
-  {id:'ep10', cat:'epiques', name:'Boss Slayer',          desc:'Bats 3 boss de la semaine.',                       icon:'💀', type:'boss_kills',     target:3,    unit:'boss',   xp:700,  diff:'epic', reward:'Titre: Boss Slayer'},
-  {id:'ep11', cat:'epiques', name:'Boss Hunter',          desc:'Bats 10 boss de la semaine.',                      icon:'🎯', type:'boss_kills',     target:10,   unit:'boss',   xp:1500, diff:'epic', reward:'Titre: Chasseur'},
-  {id:'ep12', cat:'epiques', name:'Collectionneur',       desc:'Possède 10 familiers.',                            icon:'🐾', type:'mounts_owned',   target:10,   unit:'familiers',xp:500,diff:'hard', reward:'250 or'},
-  {id:'ep13', cat:'epiques', name:'Dresseur Maître',      desc:'Possède 25 familiers.',                            icon:'🦁', type:'mounts_owned',   target:25,   unit:'familiers',xp:1000,diff:'epic',reward:'Titre: Dresseur'},
-  {id:'ep14', cat:'epiques', name:'Quêteur Bronze',       desc:'Complète 5 quêtes.',                               icon:'📜', type:'quests_done',    target:5,    unit:'quêtes', xp:200,  diff:'easy', reward:'100 or'},
-  {id:'ep15', cat:'epiques', name:'Quêteur Argent',       desc:'Complète 15 quêtes.',                              icon:'📜', type:'quests_done',    target:15,   unit:'quêtes', xp:500,  diff:'hard', reward:'Titre: Quêteur'},
-  {id:'ep16', cat:'epiques', name:'Quêteur Or',           desc:'Complète 30 quêtes.',                              icon:'📜', type:'quests_done',    target:30,   unit:'quêtes', xp:1200, diff:'epic', reward:'Titre: Complétiste'},
-  {id:'ep17', cat:'epiques', name:'ASCENDANCE',           desc:'Atteins le niveau maximum.',                       icon:'🌌', type:'level',          target:15,   unit:'niveau', xp:5000, diff:'epic', reward:'Titre: Dieu du Sport'},
-  {id:'ep18', cat:'epiques', name:'500 KM TOTAL',         desc:'Cours 500 km au total.',                           icon:'🌎', type:'run',            target:500,  unit:'km',     xp:5000, diff:'epic', reward:'Titre: Légende'},
+  {id:'ep1',  cat:'epiques', name:'BESTMODE',             desc:'30 séances de sport au total.',                    icon:'👹', type:'total_sessions', target:30,  unit:'séances', xp:200,  diff:'epic', reward:'Titre: Bestmode'},
+  {id:'ep2',  cat:'epiques', name:'CENTURION',            desc:'100 séances de sport au total.',                   icon:'⚔️', type:'total_sessions', target:100, unit:'séances', xp:500, diff:'epic', reward:'Titre: Centurion'},
+  {id:'ep3',  cat:'epiques', name:'IMMORTEL',             desc:'200 séances de sport au total.',                   icon:'☠️', type:'total_sessions', target:200, unit:'séances', xp:1000, diff:'epic', reward:'Titre: Immortel'},
+  {id:'ep4',  cat:'epiques', name:'5 000 XP',             desc:'Atteins 5 000 XP total.',                          icon:'⭐', type:'total_xp',       target:5000, unit:'XP',    xp:125,  diff:'hard', reward:'250 or'},
+  {id:'ep5',  cat:'epiques', name:'10 000 XP',            desc:'Atteins 10 000 XP total.',                         icon:'🌟', type:'total_xp',       target:10000,unit:'XP',    xp:250, diff:'epic', reward:'Titre: Grand Maître'},
+  {id:'ep6',  cat:'epiques', name:'25 000 XP',            desc:'Atteins 25 000 XP total.',                         icon:'💎', type:'total_xp',       target:25000,unit:'XP',    xp:500, diff:'epic', reward:'Titre: Transcendé'},
+  {id:'ep7',  cat:'epiques', name:'Niveau 5',             desc:'Atteins le niveau 5.',                             icon:'🏅', type:'level',          target:5,    unit:'niveau', xp:75,  diff:'medium',reward:'150 or'},
+  {id:'ep8',  cat:'epiques', name:'Niveau 10',            desc:'Atteins le niveau 10.',                            icon:'🌟', type:'level',          target:10,   unit:'niveau', xp:200,  diff:'epic', reward:'Titre: Vétéran'},
+  {id:'ep9',  cat:'epiques', name:'Niveau 15',            desc:'Atteins le niveau 15.',                            icon:'👑', type:'level',          target:15,   unit:'niveau', xp:500, diff:'epic', reward:'Titre: Légende'},
+  {id:'ep10', cat:'epiques', name:'Boss Slayer',          desc:'Bats 3 boss de la semaine.',                       icon:'💀', type:'boss_kills',     target:3,    unit:'boss',   xp:175,  diff:'epic', reward:'Titre: Boss Slayer'},
+  {id:'ep11', cat:'epiques', name:'Boss Hunter',          desc:'Bats 10 boss de la semaine.',                      icon:'🎯', type:'boss_kills',     target:10,   unit:'boss',   xp:375, diff:'epic', reward:'Titre: Chasseur'},
+  {id:'ep12', cat:'epiques', name:'Collectionneur',       desc:'Possède 10 familiers.',                            icon:'🐾', type:'mounts_owned',   target:10,   unit:'familiers',xp:125,diff:'hard', reward:'250 or'},
+  {id:'ep13', cat:'epiques', name:'Dresseur Maître',      desc:'Possède 25 familiers.',                            icon:'🦁', type:'mounts_owned',   target:25,   unit:'familiers',xp:250,diff:'epic',reward:'Titre: Dresseur'},
+  {id:'ep14', cat:'epiques', name:'Quêteur Bronze',       desc:'Complète 5 quêtes.',                               icon:'📜', type:'quests_done',    target:5,    unit:'quêtes', xp:50,  diff:'easy', reward:'100 or'},
+  {id:'ep15', cat:'epiques', name:'Quêteur Argent',       desc:'Complète 15 quêtes.',                              icon:'📜', type:'quests_done',    target:15,   unit:'quêtes', xp:125,  diff:'hard', reward:'Titre: Quêteur'},
+  {id:'ep16', cat:'epiques', name:'Quêteur Or',           desc:'Complète 30 quêtes.',                              icon:'📜', type:'quests_done',    target:30,   unit:'quêtes', xp:300, diff:'epic', reward:'Titre: Complétiste'},
+  {id:'ep17', cat:'epiques', name:'ASCENDANCE',           desc:'Atteins le niveau maximum.',                       icon:'🌌', type:'level',          target:15,   unit:'niveau', xp:1250, diff:'epic', reward:'Titre: Dieu du Sport'},
+  {id:'ep18', cat:'epiques', name:'500 KM TOTAL',         desc:'Cours 500 km au total.',                           icon:'🌎', type:'run',            target:500,  unit:'km',     xp:1250, diff:'epic', reward:'Titre: Légende'},
 
   // ===== DÉFIS (15) =====
-  {id:'so1',  cat:'social', name:'Matin Difficile',       desc:'Enregistre une séance avant 9h.',                  icon:'🌅', type:'morning_session',target:1,   unit:'fois',   xp:150,  diff:'medium', reward:'75 or'},
-  {id:'so2',  cat:'social', name:'Guerrier du Matin',     desc:'Enregistre 5 séances avant 9h.',                   icon:'☀️', type:'morning_session',target:5,   unit:'fois',   xp:400,  diff:'hard',   reward:'Titre: Lève-tôt'},
-  {id:'so3',  cat:'social', name:'Nuit de Guerrier',      desc:'T\'entraîne après 21h.',                           icon:'🌙', type:'night_session',  target:1,   unit:'fois',   xp:150,  diff:'medium', reward:'75 or'},
-  {id:'so4',  cat:'social', name:'Weekend Warrior',       desc:'Entraîne-toi samedi ET dimanche.',                  icon:'🏖️', type:'weekend_train', target:1,   unit:'weekend',xp:200,  diff:'medium', reward:'100 or'},
-  {id:'so5',  cat:'social', name:'5 Weekends de Suite',   desc:'Entraîne-toi 5 weekends consécutifs.',             icon:'🏆', type:'weekend_train', target:5,   unit:'weekends',xp:500, diff:'epic',   reward:'250 or'},
-  {id:'so6',  cat:'social', name:'Météo Hostile',         desc:'Cours sous la pluie ou par temps froid.',           icon:'🌧️', type:'weather_run',   target:1,   unit:'fois',   xp:200,  diff:'medium', reward:'Badge: Courageux'},
-  {id:'so7',  cat:'social', name:'Vitesse Éclair',        desc:'Cours 5 km en moins de 30 min.',                   icon:'⚡', type:'fast_5k',       target:1,   unit:'fois',   xp:400,  diff:'hard',   reward:'Titre: Rapide'},
-  {id:'so8',  cat:'social', name:'Sans Repos',            desc:'Fais 2 séances en un seul jour.',                  icon:'💥', type:'double_session', target:1,  unit:'jour',   xp:250,  diff:'hard',   reward:'125 or'},
-  {id:'so9',  cat:'social', name:'1000 Or',               desc:'Accumule 1000 pièces d\'or.',                      icon:'💰', type:'gold',          target:1000, unit:'or',     xp:200,  diff:'medium', reward:'Badge: Riche'},
-  {id:'so10', cat:'social', name:'5000 Or',               desc:'Accumule 5000 pièces d\'or.',                      icon:'👑', type:'gold',          target:5000, unit:'or',     xp:500,  diff:'epic',   reward:'Titre: Millionnaire'},
-  {id:'so11', cat:'social', name:'Boss du Lundi',         desc:'Bats le boss de la semaine un lundi.',             icon:'😤', type:'boss_kills',    target:1,   unit:'boss',   xp:200,  diff:'medium', reward:'100 or'},
-  {id:'so12', cat:'social', name:'Semaine Parfaite',      desc:'7 jours actifs la même semaine.',                  icon:'🌟', type:'perfect_week',  target:1,   unit:'semaine',xp:600,  diff:'epic',   reward:'Titre: Parfait'},
-  {id:'so13', cat:'social', name:'Retour en Force',       desc:'Reprends après 3 jours de pause.',                 icon:'💪', type:'comeback',      target:1,   unit:'fois',   xp:150,  diff:'easy',   reward:'75 or'},
-  {id:'so14', cat:'social', name:'No Pain No Gain',       desc:'Fais 3 séances en 3 jours consécutifs.',           icon:'🔥', type:'streak',        target:3,   unit:'jours',  xp:150,  diff:'easy',   reward:'75 or'},
-  {id:'so15', cat:'social', name:'Machine de Guerre',     desc:'50 séances de sport au total.',                    icon:'🤖', type:'total_sessions', target:50, unit:'séances',xp:1000, diff:'epic',  reward:'400 or'},
+  {id:'so1',  cat:'social', name:'Matin Difficile',       desc:'Enregistre une séance avant 9h.',                  icon:'🌅', type:'morning_session',target:1,   unit:'fois',   xp:38,  diff:'medium', reward:'75 or'},
+  {id:'so2',  cat:'social', name:'Guerrier du Matin',     desc:'Enregistre 5 séances avant 9h.',                   icon:'☀️', type:'morning_session',target:5,   unit:'fois',   xp:100,  diff:'hard',   reward:'Titre: Lève-tôt'},
+  {id:'so3',  cat:'social', name:'Nuit de Guerrier',      desc:'T\'entraîne après 21h.',                           icon:'🌙', type:'night_session',  target:1,   unit:'fois',   xp:38,  diff:'medium', reward:'75 or'},
+  {id:'so4',  cat:'social', name:'Weekend Warrior',       desc:'Entraîne-toi samedi ET dimanche.',                  icon:'🏖️', type:'weekend_train', target:1,   unit:'weekend',xp:50,  diff:'medium', reward:'100 or'},
+  {id:'so5',  cat:'social', name:'5 Weekends de Suite',   desc:'Entraîne-toi 5 weekends consécutifs.',             icon:'🏆', type:'weekend_train', target:5,   unit:'weekends',xp:125, diff:'epic',   reward:'250 or'},
+  {id:'so6',  cat:'social', name:'Météo Hostile',         desc:'Cours sous la pluie ou par temps froid.',           icon:'🌧️', type:'weather_run',   target:1,   unit:'fois',   xp:50,  diff:'medium', reward:'Badge: Courageux'},
+  {id:'so7',  cat:'social', name:'Vitesse Éclair',        desc:'Cours 5 km en moins de 30 min.',                   icon:'⚡', type:'fast_5k',       target:1,   unit:'fois',   xp:100,  diff:'hard',   reward:'Titre: Rapide'},
+  {id:'so8',  cat:'social', name:'Sans Repos',            desc:'Fais 2 séances en un seul jour.',                  icon:'💥', type:'double_session', target:1,  unit:'jour',   xp:62,  diff:'hard',   reward:'125 or'},
+  {id:'so9',  cat:'social', name:'1000 Or',               desc:'Accumule 1000 pièces d\'or.',                      icon:'💰', type:'gold',          target:1000, unit:'or',     xp:50,  diff:'medium', reward:'Badge: Riche'},
+  {id:'so10', cat:'social', name:'5000 Or',               desc:'Accumule 5000 pièces d\'or.',                      icon:'👑', type:'gold',          target:5000, unit:'or',     xp:125,  diff:'epic',   reward:'Titre: Millionnaire'},
+  {id:'so11', cat:'social', name:'Boss du Lundi',         desc:'Bats le boss de la semaine un lundi.',             icon:'😤', type:'boss_kills',    target:1,   unit:'boss',   xp:50,  diff:'medium', reward:'100 or'},
+  {id:'so12', cat:'social', name:'Semaine Parfaite',      desc:'7 jours actifs la même semaine.',                  icon:'🌟', type:'perfect_week',  target:1,   unit:'semaine',xp:150,  diff:'epic',   reward:'Titre: Parfait'},
+  {id:'so13', cat:'social', name:'Retour en Force',       desc:'Reprends après 3 jours de pause.',                 icon:'💪', type:'comeback',      target:1,   unit:'fois',   xp:38,  diff:'easy',   reward:'75 or'},
+  {id:'so14', cat:'social', name:'No Pain No Gain',       desc:'Fais 3 séances en 3 jours consécutifs.',           icon:'🔥', type:'streak',        target:3,   unit:'jours',  xp:38,  diff:'easy',   reward:'75 or'},
+  {id:'so15', cat:'social', name:'Machine de Guerre',     desc:'50 séances de sport au total.',                    icon:'🤖', type:'total_sessions', target:50, unit:'séances',xp:250, diff:'epic',  reward:'400 or'},
 ];
 
 
@@ -2513,31 +2513,31 @@ const TITLES = [
 ];
 
 const DAILY_QUESTS = [
-  {name:'Cours 3 km aujourd\'hui', icon:'🏃', xp:80, reward:'80 XP'},
-  {name:'Fais une séance muscu complète', icon:'🏋️', xp:90, reward:'90 XP'},
-  {name:'Cours 5 km non-stop', icon:'💨', xp:130, reward:'130 XP'},
-  {name:'Réalise 10 séries aujourd\'hui', icon:'💪', xp:100, reward:'100 XP'},
-  {name:'Sortie de 30 minutes minimum', icon:'⏱️', xp:70, reward:'70 XP'},
-  {name:'Squats x3 séries aujourd\'hui', icon:'🦵', xp:60, reward:'60 XP'},
-  {name:'Tractions ou dips x5 séries', icon:'🤸', xp:75, reward:'75 XP'},
+  {name:'Cours 3 km aujourd\'hui', icon:'🏃', xp:20, reward:'80 XP'},
+  {name:'Fais une séance muscu complète', icon:'🏋️', xp:22, reward:'90 XP'},
+  {name:'Cours 5 km non-stop', icon:'💨', xp:32, reward:'130 XP'},
+  {name:'Réalise 10 séries aujourd\'hui', icon:'💪', xp:25, reward:'100 XP'},
+  {name:'Sortie de 30 minutes minimum', icon:'⏱️', xp:18, reward:'70 XP'},
+  {name:'Squats x3 séries aujourd\'hui', icon:'🦵', xp:15, reward:'60 XP'},
+  {name:'Tractions ou dips x5 séries', icon:'🤸', xp:19, reward:'75 XP'},
 ];
 
 const WEEKLY_CHALLENGES = [
-  {id:'wc0', name:'Semaine Cardio', icon:'🏃', desc:'Cours 15 km cette semaine', type:'run', target:15, unit:'km', xp:300},
-  {id:'wc1', name:'Semaine Fer', icon:'🏋️', desc:'Fais 5 séances muscu cette semaine', type:'lift_sessions_week', target:5, unit:'séances', xp:350},
-  {id:'wc2', name:'Semaine Hybride', icon:'🌀', desc:'Cours 8 km ET fais 3 séances muscu', type:'hybrid_week', target:1, unit:'combo', xp:400},
-  {id:'wc3', name:'Semaine Endurance', icon:'🗺️', desc:'Cours 25 km cette semaine', type:'run', target:25, unit:'km', xp:500},
-  {id:'wc4', name:'Semaine Force', icon:'💪', desc:'10 séries de squats cette semaine', type:'squat_week', target:10, unit:'séries', xp:300},
-  {id:'wc5', name:'Semaine Régularité', icon:'🔥', desc:'Entraîne-toi 6 jours cette semaine', type:'days_week', target:6, unit:'jours', xp:450},
-  {id:'wc6', name:'Full Body Week', icon:'⚡', desc:'3 séances full body cette semaine', type:'lift_sessions_week', target:3, unit:'séances', xp:280},
+  {id:'wc0', name:'Semaine Cardio',    icon:'🏃', desc:'Cours 15 km cette semaine',              type:'run',               target:15, unit:'km',      xp:80},
+  {id:'wc1', name:'Semaine Fer',       icon:'🏋️', desc:'Fais 5 séances muscu cette semaine',     type:'lift_sessions_week', target:5,  unit:'séances', xp:100},
+  {id:'wc2', name:'Semaine Hybride',   icon:'🌀', desc:'Cours 8 km ET fais 3 séances muscu',     type:'hybrid_week',        target:1,  unit:'combo',   xp:120},
+  {id:'wc3', name:'Semaine Endurance', icon:'🗺️', desc:'Cours 25 km cette semaine',              type:'run',               target:25, unit:'km',      xp:150},
+  {id:'wc4', name:'Semaine Force',     icon:'💪', desc:'10 séries de squats cette semaine',      type:'squat_week',        target:10, unit:'séries',  xp:80},
+  {id:'wc5', name:'Semaine Régularité',icon:'🔥', desc:'Entraîne-toi 6 jours cette semaine',    type:'days_week',         target:6,  unit:'jours',   xp:130},
+  {id:'wc6', name:'Full Body Week',    icon:'⚡', desc:'3 séances full body cette semaine',      type:'lift_sessions_week', target:3,  unit:'séances', xp:80},
 ];
 
 const BOSS_DATA = [
-  {id:'b0', name:'Le Fantôme du Canapé', icon:'👻', desc:'3 entraînements cette semaine pour le vaincre', hp:300, xpReward:500, type:'total_week', target:3},
-  {id:'b1', name:'Baron Fatigue', icon:'🧟', desc:'Cours 10 km cette semaine', hp:400, xpReward:600, type:'run_week', target:10},
-  {id:'b2', name:'Seigneur Flemme', icon:'😴', desc:'5 séances de sport cette semaine', hp:500, xpReward:700, type:'total_week', target:5},
-  {id:'b3', name:'Titan de Fer', icon:'🤖', desc:'Fais 8 séances muscu cette semaine', hp:600, xpReward:900, type:'lift_week', target:8},
-  {id:'b4', name:'ULTRABOSS', icon:'💀', desc:'10 entraînements cette semaine', hp:999, xpReward:1500, type:'total_week', target:10},
+  {id:'b0', name:'Le Fantôme du Canapé', icon:'👻', desc:'3 entraînements cette semaine pour le vaincre', hp:300, xpReward:100, type:'total_week', target:3},
+  {id:'b1', name:'Baron Fatigue',        icon:'🧟', desc:'Cours 10 km cette semaine',                    hp:400, xpReward:150, type:'run_week',   target:10},
+  {id:'b2', name:'Seigneur Flemme',      icon:'😴', desc:'5 séances de sport cette semaine',             hp:500, xpReward:200, type:'total_week', target:5},
+  {id:'b3', name:'Titan de Fer',         icon:'🤖', desc:'Fais 8 séances muscu cette semaine',           hp:600, xpReward:250, type:'lift_week',  target:8},
+  {id:'b4', name:'ULTRABOSS',            icon:'💀', desc:'10 entraînements cette semaine',               hp:999, xpReward:400, type:'total_week', target:10},
 ];
 
 const SHOP_ITEMS = [
@@ -3122,7 +3122,7 @@ function claimQuest(e, qid) {
   haptic('levelup');
   showReward(q.icon, 'Quête accomplie !', q.xp, q.reward);
   addXP(q.xp, 'Quête: '+q.name);
-  setTimeout(() => addGold(Math.round(q.xp * 0.3), 'Quête: '+q.name), 400);
+  setTimeout(() => addGold(Math.round(q.xp * 0.5), 'Quête: '+q.name), 400); // 50% de l'XP en or
   setTimeout(() => renderQuests(currentQTab), 100);
 }
 
@@ -3209,9 +3209,9 @@ function logRun() {
   state.weeklyLifts[adjusted] = state.weeklyLifts[adjusted] || 0;
 
   // XP calc
-  let xp = Math.round(dist * 20);
-  if(feel === 'hard') xp = Math.round(xp * 1.3);
-  if(feel === 'max') xp = Math.round(xp * 1.5);
+  let xp = Math.round(dist * 8);         // 8 XP/km (était 20)
+  if(feel === 'hard') xp = Math.round(xp * 1.2);
+  if(feel === 'max')  xp = Math.round(xp * 1.4);
 
   // streak
   updateStreak();
@@ -3235,7 +3235,7 @@ function logRun() {
   document.getElementById('run-dist').value = '';
   document.getElementById('run-time').value = '';
   addXP(xp, 'Course '+dist+'km');
-  const goldEarned = Math.max(5, Math.round(dist * 10));
+  const goldEarned = Math.max(1, Math.round(dist * 2)); // 2 or/km (était 10)
   setTimeout(() => addGold(goldEarned, 'Course '+dist+'km'), 400);
   renderDashboard();
   checkQuestProgress();
@@ -3288,8 +3288,8 @@ function logLift() {
   const adjusted = dayIdx === 0 ? 6 : dayIdx - 1;
   state.weeklyLifts[adjusted] = (state.weeklyLifts[adjusted] || 0) + 1;
 
-  let xp = 40 + (sets * reps * 0.5);
-  if(weight > 0) xp += weight * 0.2;
+  let xp = 10 + Math.round(sets * reps * 0.15); // 10 XP base + 0.15 par rep (était 40 + 0.5)
+  if(weight > 0) xp += Math.round(weight * 0.05); // 0.05 XP/kg (était 0.2)
   xp = Math.round(xp);
 
   updateStreak();
@@ -3321,7 +3321,7 @@ function logLift() {
   if(box) { box.style.background = 'rgba(255,60,172,0.1)'; box.style.borderColor = 'rgba(255,60,172,0.4)'; }
   if(text) { text.style.color = 'var(--accent2)'; text.textContent = 'Validation caméra IA requise'; }
   addXP(xp, exo);
-  const goldEarned = Math.max(5, Math.round(xp * 0.3));
+  const goldEarned = Math.max(1, Math.round(xp * 0.1)); // 10% de l'XP en or (était 30%)
   setTimeout(() => addGold(goldEarned, exo), 400);
   renderDashboard();
   checkQuestProgress();
@@ -3833,8 +3833,7 @@ function updateBossProgress(sessions, kmRun, lifts) {
   if(prog >= boss.target && !state.weeklyBossDefeated) {
     state.weeklyBossDefeated = true;
     addXP(boss.xpReward, '👹 Boss vaincu !');
-    addXP(boss.xpReward, '👹 Boss vaincu !');
-    setTimeout(() => addGold(Math.round(boss.xpReward * 0.4), 'Boss vaincu'), 400);
+    setTimeout(() => addGold(Math.round(boss.xpReward * 0.2), 'Boss vaincu'), 400);
     setTimeout(() => showToast('success', '👹 BOSS VAINCU ! +'+ boss.xpReward +' XP !'), 800);
   }
   saveState();
@@ -3884,8 +3883,7 @@ function updateWeeklyChallenge() {
   if(prog >= wc.target && !state.weeklyChallengeDone) {
     state.weeklyChallengeDone = true;
     addXP(wc.xp, '⚡ Défi hebdo accompli !');
-    addXP(wc.xp, '⚡ Défi hebdo !');
-    setTimeout(() => addGold(Math.round(wc.xp * 0.4), 'Défi hebdo'), 400);
+    setTimeout(() => addGold(Math.round(wc.xp * 0.2), 'Défi hebdo'), 400);
     setTimeout(() => showToast('success', '⚡ DÉFI HEBDO ACCOMPLI ! +' + wc.xp + ' XP !'), 1000);
   }
   renderWeeklyChallenge();
@@ -4026,7 +4024,7 @@ function buyShopItem(el) {
     if(id === 'bonus_xp2') { state.xpBoost = true; showToast('success', '⚡ XP x2 activé pour la prochaine séance !'); }
     else if(id === 'bonus_streak') { state.streakShield = true; showToast('success', '🛡️ Série protégée pour 1 jour !'); }
     else if(id === 'bonus_gold') { state.goldBoost = true; showToast('success', '💰 Or x2 pendant 24h !'); state.goldBoostTime = Date.now(); }
-    else if(id === 'bonus_lucky') { const bonusXP = Math.round(Math.random()*200+50); addXP(bonusXP, '🍀 Chance bonus !'); showToast('success', '🍀 Bonus mystère : +' + bonusXP + ' XP !'); }
+    else if(id === 'bonus_lucky') { const bonusXP = Math.round(Math.random()*50+10); addXP(bonusXP, '🍀 Chance bonus !'); showToast('success', '🍀 Bonus mystère : +' + bonusXP + ' XP !'); }
     saveState(); renderShop(); return;
   }
 
@@ -5902,13 +5900,13 @@ const FOG_CELL_SIZE = 0.002; // ~200m par cellule
 const REVEAL_RADIUS = 3; // cellules révélées autour de la position
 
 const MAP_MILESTONES = [
-  {cells:1,    label:'Premier pas',      icon:'👣', xp:50},
-  {cells:10,   label:'Explorateur',      icon:'🗺️', xp:100},
-  {cells:50,   label:'Cartographe',      icon:'📍', xp:200},
-  {cells:100,  label:'Aventurier',       icon:'⛺', xp:300},
-  {cells:250,  label:'Ranger des Villes',icon:'🌆', xp:500},
-  {cells:500,  label:'Maître Explorateur',icon:'🌍', xp:800},
-  {cells:1000, label:'LÉGENDAIRE',       icon:'🏆', xp:1500},
+  {cells:1,    label:'Premier pas',      icon:'👣', xp:12},
+  {cells:10,   label:'Explorateur',      icon:'🗺️', xp:25},
+  {cells:50,   label:'Cartographe',      icon:'📍', xp:50},
+  {cells:100,  label:'Aventurier',       icon:'⛺', xp:75},
+  {cells:250,  label:'Ranger des Villes',icon:'🌆', xp:125},
+  {cells:500,  label:'Maître Explorateur',icon:'🌍', xp:200},
+  {cells:1000, label:'LÉGENDAIRE',       icon:'🏆', xp:375},
 ];
 
 function initLeafletMap(lat, lng) {
