@@ -1445,6 +1445,7 @@ body::after {
 .cal-day.run-day { background:rgba(0,245,255,0.15); color:var(--accent); }
 .cal-day.lift-day { background:rgba(255,60,172,0.15); color:var(--accent2); }
 .cal-day.both-day { background:rgba(255,215,0,0.15); color:var(--accent3); }
+.cal-day.rest-day { background:rgba(168,85,247,0.12); color:var(--xp-color); }
 .cal-day-num { font-weight:700; font-size:11px; }
 .cal-dot { width:4px; height:4px; border-radius:50%; background:currentColor; }
 .cal-detail-item { padding:8px 0; border-bottom:1px solid var(--border); font-size:13px; }
@@ -1966,6 +1967,21 @@ body::after {
     <div class="big-stat">
       <div class="big-stat-val green-col" id="st-quests-done">0</div>
       <div class="big-stat-label">QUÊTES FAITES</div>
+    </div>
+  </div>
+
+  <div class="big-stat-row">
+    <div class="big-stat">
+      <div class="big-stat-val" style="color:var(--xp-color)" id="st-rest-days">0</div>
+      <div class="big-stat-label">💤 JOURS REPOS</div>
+    </div>
+    <div class="big-stat">
+      <div class="big-stat-val" style="color:var(--accent3)" id="st-active-days">0</div>
+      <div class="big-stat-label">📅 JOURS ACTIFS</div>
+    </div>
+    <div class="big-stat">
+      <div class="big-stat-val" style="color:var(--accent4)" id="st-rest-ratio">0%</div>
+      <div class="big-stat-label">⚖️ RATIO REPOS</div>
     </div>
   </div>
 
@@ -2781,6 +2797,7 @@ function loadState() {
     weeklyKmThisWeek: 0,
     weeklyLiftsThisWeek: 0,
     weeklyLiftDaysLog: [],
+    restDays: [],         // dates marquées comme jour de repos (format toLocaleDateString fr-FR)
     // CARTE FOG OF WAR
     exploredCells: [],    // cellules révélées [{lat, lng}]
     exploredKm: 0,
@@ -3404,6 +3421,18 @@ function renderStats() {
   document.getElementById('st-total-seances').textContent = state.liftSessions;
   document.getElementById('st-total-xp').textContent = state.totalXP;
   document.getElementById('st-quests-done').textContent = state.questsDone;
+
+  // Jours de repos stats
+  const restDays = (state.restDays||[]).length;
+  const activeDays = (state.allSessionDays||[]).length;
+  const totalTracked = restDays + activeDays;
+  const restRatio = totalTracked > 0 ? Math.round(restDays / totalTracked * 100) : 0;
+  const el_rest = document.getElementById('st-rest-days');
+  const el_active = document.getElementById('st-active-days');
+  const el_ratio = document.getElementById('st-rest-ratio');
+  if(el_rest) el_rest.textContent = restDays;
+  if(el_active) el_active.textContent = activeDays;
+  if(el_ratio) el_ratio.textContent = restRatio + '%';
 
   // Run chart
   const days = ['L','M','M','J','V','S','D'];
@@ -4254,13 +4283,15 @@ function renderCalendar() {
     const dateStr = new Date(calYear, calMonth, d).toLocaleDateString('fr-FR');
     const isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
     const workouts = (state.workouts||[]).filter(w => w.date === dateStr);
+    const isRest = (state.restDays||[]).includes(dateStr);
     const hasRun = workouts.some(w => w.type === 'run');
     const hasLift = workouts.some(w => w.type === 'lift');
     let cls = '';
     if(hasRun && hasLift) cls = 'both-day';
     else if(hasRun) cls = 'run-day';
     else if(hasLift) cls = 'lift-day';
-    const dot = workouts.length > 0 ? '<div class="cal-dot"></div>' : '';
+    else if(isRest) cls = 'rest-day';
+    const dot = workouts.length > 0 ? '<div class="cal-dot"></div>' : (isRest ? '<div style="font-size:8px;line-height:1">💤</div>' : '');
     cells += `<div class="cal-day ${cls} ${isToday?'today':''}" onclick="calShowDay('${dateStr}')">
       <div class="cal-day-num">${d}</div>${dot}
     </div>`;
@@ -4273,42 +4304,51 @@ function calShowDay(dateStr) {
   const el = document.getElementById('cal-day-detail');
   if(!el) return;
 
-  if(workouts.length === 0) {
-    el.innerHTML = `<div style="color:var(--text2);font-size:13px">Aucune séance le ${dateStr}.</div>`;
+  const isRest = (state.restDays||[]).includes(dateStr);
+  const hasWorkouts = workouts.length > 0;
+
+  const restBtn = !hasWorkouts
+    ? `<button onclick="toggleRestDay('${dateStr}')" style="width:100%;padding:10px;border-radius:var(--radius);border:1px solid ${isRest?'rgba(168,85,247,0.6)':'var(--border)'};background:${isRest?'rgba(168,85,247,0.15)':'var(--bg3)'};color:${isRest?'var(--xp-color)':'var(--text2)'};cursor:pointer;font-size:13px;font-weight:700;margin-bottom:10px">
+        ${isRest ? '💤 Jour de repos — cliquer pour annuler' : '😴 Marquer comme jour de repos'}
+      </button>`
+    : '';
+
+  if(isRest && !hasWorkouts) {
+    el.innerHTML = restBtn + `
+      <div style="text-align:center;padding:12px;background:rgba(168,85,247,0.08);border-radius:var(--radius);border:1px solid rgba(168,85,247,0.2)">
+        <div style="font-size:32px;margin-bottom:6px">💤</div>
+        <div style="font-weight:700;color:var(--xp-color);font-size:15px">Jour de repos</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">Le repos fait partie de l'entraînement 🧠</div>
+      </div>`;
     return;
   }
 
-  // Cherche les sessions timer de ce jour (même format de date)
+  if(!hasWorkouts) {
+    el.innerHTML = restBtn + `<div style="color:var(--text2);font-size:13px;padding:4px 0">Aucune séance le ${dateStr}.</div>`;
+    return;
+  }
+
   const sessions = (state.sessionLog||[]).filter(s => s.date === dateStr);
   let sessionBanner = '';
-
   if(sessions.length > 0) {
     const totalSec = sessions.reduce((sum, s) => sum + (s.duration || 0), 0);
     const totalMin = Math.floor(totalSec / 60);
     const remSec = totalSec % 60;
-    const timeStr = totalMin > 0
-      ? totalMin + ' min' + (remSec > 0 ? ' ' + remSec + 's' : '')
-      : totalSec + ' sec';
+    const timeStr = totalMin > 0 ? totalMin + ' min' + (remSec > 0 ? ' ' + remSec + 's' : '') : totalSec + ' sec';
     const sessionList = sessions.map(s =>
       `<div style="font-size:11px;color:var(--text2);margin-top:3px">⏱️ Démarrée à ${s.startTime} — ${s.durationMin} min</div>`
     ).join('');
-    sessionBanner = `
-      <div style="background:linear-gradient(135deg,rgba(0,245,255,0.1),rgba(168,85,247,0.1));border:1px solid rgba(0,245,255,0.35);border-radius:var(--radius);padding:12px;margin-bottom:10px">
-        <div style="font-size:24px;font-weight:900;font-family:'Exo 2',sans-serif;color:var(--accent)">⏱️ ${timeStr} de sport</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">${sessions.length} session${sessions.length > 1 ? 's' : ''} ce jour</div>
-        ${sessionList}
-      </div>`;
+    sessionBanner = `<div style="background:linear-gradient(135deg,rgba(0,245,255,0.1),rgba(168,85,247,0.1));border:1px solid rgba(0,245,255,0.35);border-radius:var(--radius);padding:12px;margin-bottom:10px">
+      <div style="font-size:22px;font-weight:900;font-family:'Exo 2',sans-serif;color:var(--accent)">⏱️ ${timeStr} de sport</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:2px">${sessions.length} session${sessions.length > 1 ? 's' : ''} ce jour</div>
+      ${sessionList}</div>`;
   } else {
-    // Pas de timer utilisé ce jour — on estime la durée par le nombre d'exos
     const est = workouts.length * 5;
-    sessionBanner = `
-      <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:var(--radius);padding:10px;margin-bottom:10px">
-        <div style="font-size:13px;color:var(--text2)">⏱️ Durée estimée : ~${est} min <span style="font-size:10px">(lance le timer pour mesurer précisément)</span></div>
-      </div>`;
+    sessionBanner = `<div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:var(--radius);padding:10px;margin-bottom:10px">
+      <div style="font-size:13px;color:var(--text2)">⏱️ Durée estimée : ~${est} min</div></div>`;
   }
 
   const totalXP = workouts.reduce((sum, w) => sum + (w.xp || 0), 0);
-
   el.innerHTML = sessionBanner + workouts.map(w => `
     <div class="cal-detail-item">
       <span style="margin-right:8px">${w.type==='run'?'🏃':'🏋️'}</span>
@@ -4318,6 +4358,23 @@ function calShowDay(dateStr) {
       Total : +${totalXP} XP • ${workouts.length} exercice${workouts.length > 1 ? 's' : ''}
     </div>`;
 }
+
+function toggleRestDay(dateStr) {
+  if(!state.restDays) state.restDays = [];
+  const idx = state.restDays.indexOf(dateStr);
+  if(idx === -1) {
+    state.restDays.push(dateStr);
+    showToast('success', '💤 Jour de repos marqué — récupère bien !');
+    haptic('light');
+  } else {
+    state.restDays.splice(idx, 1);
+    showToast('info', '↩️ Jour de repos annulé');
+  }
+  saveState();
+  renderCalendar();
+  calShowDay(dateStr);
+}
+
 
 function calPrev() {
   calMonth--;
