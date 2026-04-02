@@ -1440,6 +1440,7 @@ body::after {
 .cal-day.run-day { background:rgba(0,245,255,0.15); color:var(--accent); }
 .cal-day.lift-day { background:rgba(255,60,172,0.15); color:var(--accent2); }
 .cal-day.both-day { background:rgba(255,215,0,0.15); color:var(--accent3); }
+.cal-day.rest-day { background:rgba(168,85,247,0.12); color:var(--xp-color); }
 .cal-day-num { font-weight:700; font-size:11px; }
 .cal-dot { width:4px; height:4px; border-radius:50%; background:currentColor; }
 .cal-detail-item { padding:8px 0; border-bottom:1px solid var(--border); font-size:13px; }
@@ -2294,7 +2295,8 @@ function loadState() {
     weeklySquatsThisWeek: 0,
     lastWeekReset: null,
     weeklyDaysLog: [], // dates des jours d'entraînement cette semaine
-    sessionLog: [],    // [{date, duration, startTime}] historique des séances
+    sessionLog: [],
+    restDays: [],
     activeProgram: null,
     programDay: 0,
     ownedMounts: [],
@@ -3105,38 +3107,61 @@ function stopSession() {
 // ============================================================
 function requestNotificationPermission() {
   if(!('Notification' in window)) {
-    showToast('info', '⚠️ Notifications non supportées sur cet appareil');
+    showToast('info', '⚠️ Notifications non supportées');
     return;
   }
   Notification.requestPermission().then(permission => {
     if(permission === 'granted') {
-      showToast('success', '🔔 Notifications activées !');
-      scheduleReminderNotification();
       localStorage.setItem('fq_notif', 'true');
+      showToast('success', '🔔 Notifications activées !');
+      setTimeout(() => {
+        try {
+          new Notification('🔔 FitQuest — Notifications activées !', {
+            body: 'Bravo ! Tu vas pouvoir te donner à fond. On te rappellera chaque jour à 9h et 18h 💪🔥',
+            icon: '/FITQUEST/icon-192.png'
+          });
+        } catch(e) {
+          new Notification('🔔 FitQuest', { body: 'Notifications activées ! On te rappellera chaque jour 💪' });
+        }
+      }, 500);
+      scheduleReminderNotification();
     } else {
-      showToast('info', '🔕 Notifications refusées');
+      showToast('info', '🔕 Notifications refusées — active-les dans les paramètres Android');
     }
   });
 }
 
 function scheduleReminderNotification() {
   if(Notification.permission !== 'granted') return;
-  // Notify every day at 18h if no workout logged today
+  if(localStorage.getItem('fq_notif') !== 'true') return;
   const now = new Date();
-  const todayKey = now.toLocaleDateString('fr-FR');
-  const lastWorkout = state.workouts.length > 0 ? state.workouts[state.workouts.length-1].date : null;
-  if(lastWorkout !== todayKey) {
-    // Show reminder after 3 seconds (demo) — in real use would be a service worker
-    setTimeout(() => {
-      if(Notification.permission === 'granted') {
-        new Notification('💪 FitQuest', {
-          body: 'Tu n\'as pas encore fait de sport aujourd\'hui. Lance une quête !',
-          icon: '/FITQUEST/icon-192.png'
-        });
+
+  // Rappel matin 9h
+  const morning = new Date(); morning.setHours(9,0,0,0);
+  if(morning <= now) morning.setDate(morning.getDate()+1);
+  setTimeout(() => {
+    if(Notification.permission==='granted' && localStorage.getItem('fq_notif')==='true') {
+      const msgs = ["Bonne journée ! Une séance ce matin ? 💪","Le meilleur moment c'est maintenant ! 🏃","Tes familiers t'attendent 🐾","Démarre fort avec FitQuest ⚡","Les champions s'entraînent le matin 👑"];
+      new Notification('☀️ FitQuest', {body:msgs[Math.floor(Math.random()*msgs.length)],icon:'/FITQUEST/icon-192.png'});
+      scheduleReminderNotification();
+    }
+  }, morning - now);
+
+  // Rappel soir 18h
+  const evening = new Date(); evening.setHours(18,0,0,0);
+  if(evening <= now) evening.setDate(evening.getDate()+1);
+  setTimeout(() => {
+    if(Notification.permission==='granted' && localStorage.getItem('fq_notif')==='true') {
+      const today = new Date().toDateString();
+      const didTrain = (state.allSessionDays||[]).includes(today);
+      if(!didTrain) {
+        const msgs = ["Tu n'as pas encore bougé aujourd'hui 💪","Le boss de la semaine t'attend !","Ta série est en danger !","Un peu de sport ce soir ? 🏃","Tes familiers s'ennuient 🐾"];
+        new Notification('⚡ FitQuest', {body:msgs[Math.floor(Math.random()*msgs.length)],icon:'/FITQUEST/icon-192.png'});
       }
-    }, 3000);
-  }
+    }
+  }, evening - now);
 }
+
 
 // ============================================================
 // EXPORT / IMPORT
@@ -3700,13 +3725,17 @@ function renderCalendar() {
     const dateStr = new Date(calYear, calMonth, d).toLocaleDateString('fr-FR');
     const isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
     const workouts = (state.workouts||[]).filter(w => w.date === dateStr);
+    const isRest = (state.restDays||[]).includes(dateStr);
     const hasRun = workouts.some(w => w.type === 'run');
     const hasLift = workouts.some(w => w.type === 'lift');
     let cls = '';
     if(hasRun && hasLift) cls = 'both-day';
     else if(hasRun) cls = 'run-day';
     else if(hasLift) cls = 'lift-day';
-    const dot = workouts.length > 0 ? '<div class="cal-dot"></div>' : '';
+    else if(isRest) cls = 'rest-day';
+    const dot = workouts.length > 0
+      ? '<div class="cal-dot"></div>'
+      : isRest ? '<div style="font-size:8px;line-height:1.2;text-align:center">💤</div>' : '';
     cells += `<div class="cal-day ${cls} ${isToday?'today':''}" onclick="calShowDay('${dateStr}')">
       <div class="cal-day-num">${d}</div>${dot}
     </div>`;
@@ -3719,50 +3748,72 @@ function calShowDay(dateStr) {
   const el = document.getElementById('cal-day-detail');
   if(!el) return;
 
-  if(workouts.length === 0) {
-    el.innerHTML = `<div style="color:var(--text2);font-size:13px">Aucune séance le ${dateStr}.</div>`;
+  const isRest = (state.restDays||[]).includes(dateStr);
+
+  // Bouton repos — toujours visible si pas de séance
+  const restBtn = workouts.length === 0 ? `
+    <button onclick="toggleRestDay('${dateStr}')" style="width:100%;padding:10px;margin-bottom:10px;border-radius:var(--radius);
+      border:1px solid ${isRest ? 'rgba(168,85,247,0.6)' : 'var(--border)'};
+      background:${isRest ? 'rgba(168,85,247,0.15)' : 'var(--bg3)'};
+      color:${isRest ? 'var(--xp-color)' : 'var(--text2)'};
+      cursor:pointer;font-size:13px;font-weight:700">
+      ${isRest ? '💤 Jour de repos — appuie pour annuler' : '😴 Marquer comme jour de repos'}
+    </button>` : '';
+
+  if(isRest && workouts.length === 0) {
+    el.innerHTML = restBtn + `
+      <div style="text-align:center;padding:16px;background:rgba(168,85,247,0.08);border-radius:var(--radius);border:1px solid rgba(168,85,247,0.2)">
+        <div style="font-size:36px;margin-bottom:8px">💤</div>
+        <div style="font-weight:700;color:var(--xp-color);font-size:16px">Jour de repos</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:6px">Le repos fait partie de l'entraînement 🧠<br>Tes muscles récupèrent et se renforcent.</div>
+      </div>`;
     return;
   }
 
-  // Cherche les sessions timer de ce jour (même format de date)
+  if(workouts.length === 0) {
+    el.innerHTML = restBtn + `<div style="color:var(--text2);font-size:13px">Aucune séance le ${dateStr}.</div>`;
+    return;
+  }
+
+  // Sessions timer
   const sessions = (state.sessionLog||[]).filter(s => s.date === dateStr);
   let sessionBanner = '';
-
   if(sessions.length > 0) {
     const totalSec = sessions.reduce((sum, s) => sum + (s.duration || 0), 0);
     const totalMin = Math.floor(totalSec / 60);
     const remSec = totalSec % 60;
-    const timeStr = totalMin > 0
-      ? totalMin + ' min' + (remSec > 0 ? ' ' + remSec + 's' : '')
-      : totalSec + ' sec';
-    const sessionList = sessions.map(s =>
-      `<div style="font-size:11px;color:var(--text2);margin-top:3px">⏱️ Démarrée à ${s.startTime} — ${s.durationMin} min</div>`
-    ).join('');
+    const timeStr = totalMin > 0 ? totalMin + ' min' + (remSec > 0 ? ' ' + remSec + 's' : '') : totalSec + ' sec';
     sessionBanner = `
       <div style="background:linear-gradient(135deg,rgba(0,245,255,0.1),rgba(168,85,247,0.1));border:1px solid rgba(0,245,255,0.35);border-radius:var(--radius);padding:12px;margin-bottom:10px">
-        <div style="font-size:24px;font-weight:900;font-family:'Exo 2',sans-serif;color:var(--accent)">⏱️ ${timeStr} de sport</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">${sessions.length} session${sessions.length > 1 ? 's' : ''} ce jour</div>
-        ${sessionList}
-      </div>`;
-  } else {
-    // Pas de timer utilisé ce jour — on estime la durée par le nombre d'exos
-    const est = workouts.length * 5;
-    sessionBanner = `
-      <div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:var(--radius);padding:10px;margin-bottom:10px">
-        <div style="font-size:13px;color:var(--text2)">⏱️ Durée estimée : ~${est} min <span style="font-size:10px">(lance le timer pour mesurer précisément)</span></div>
+        <div style="font-size:22px;font-weight:900;font-family:'Exo 2',sans-serif;color:var(--accent)">⏱️ ${timeStr} de sport</div>
+        ${sessions.map(s=>`<div style="font-size:11px;color:var(--text2);margin-top:3px">⏱️ Démarrée à ${s.startTime} — ${s.durationMin} min</div>`).join('')}
       </div>`;
   }
 
   const totalXP = workouts.reduce((sum, w) => sum + (w.xp || 0), 0);
-
   el.innerHTML = sessionBanner + workouts.map(w => `
     <div class="cal-detail-item">
       <span style="margin-right:8px">${w.type==='run'?'🏃':'🏋️'}</span>
       <strong>${w.name}</strong> — ${w.details} <span style="color:var(--xp-color)">+${w.xp} XP</span>
     </div>`).join('') +
     `<div style="text-align:right;margin-top:8px;font-size:12px;color:var(--accent3);font-family:'Share Tech Mono',monospace">
-      Total : +${totalXP} XP • ${workouts.length} exercice${workouts.length > 1 ? 's' : ''}
+      Total : +${totalXP} XP • ${workouts.length} exercice${workouts.length>1?'s':''}
     </div>`;
+}
+
+function toggleRestDay(dateStr) {
+  if(!state.restDays) state.restDays = [];
+  const idx = state.restDays.indexOf(dateStr);
+  if(idx === -1) {
+    state.restDays.push(dateStr);
+    showToast('success', '💤 Jour de repos marqué !');
+  } else {
+    state.restDays.splice(idx, 1);
+    showToast('info', '↩️ Jour de repos annulé');
+  }
+  saveState();
+  renderCalendar();
+  calShowDay(dateStr);
 }
 
 function calPrev() {
