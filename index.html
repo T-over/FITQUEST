@@ -1621,6 +1621,26 @@ body::after {
 .mount-cat-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
 .mount-cat-tab { padding:5px 12px; border-radius:20px; border:1px solid var(--border); background:var(--bg3); color:var(--text2); cursor:pointer; font-size:11px; }
 .mount-cat-tab.active { border-color:var(--xp-color); color:var(--xp-color); background:rgba(168,85,247,0.1); }
+/* ===== DESIGN IMPROVEMENTS ===== */
+.page { animation: pageIn 0.25s ease; }
+@keyframes pageIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.card { transition: transform 0.15s, box-shadow 0.15s; }
+.card:active { transform:scale(0.98); }
+.submit-btn { transition: transform 0.1s, filter 0.15s; }
+.submit-btn:active { transform:scale(0.96); filter:brightness(0.9); }
+.quest-card { transition: transform 0.15s; }
+.quest-card:active { transform:scale(0.98); }
+.mount-card { transition: transform 0.15s, box-shadow 0.3s; }
+.mount-card:active { transform:translateY(-2px); box-shadow:0 4px 20px rgba(0,245,255,0.2); }
+.shop-item { transition: transform 0.15s; }
+.shop-item:active { transform:scale(0.95); }
+.cal-day { transition: background 0.2s, transform 0.1s; }
+.cal-day:active { transform:scale(0.92); }
+@keyframes repFlash { 0%{box-shadow:0 0 0 4px rgba(57,255,20,0.8)} 100%{box-shadow:none} }
+.rep-flash { animation: repFlash 0.4s ease; }
+.quest-prog-fill, .boss-hp-fill { transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+.xp-float { position:fixed; font-family:'Exo 2',sans-serif; font-weight:900; font-size:20px; color:var(--xp-color); pointer-events:none; z-index:9990; text-shadow:0 0 10px rgba(168,85,247,0.8); animation:xpRise 1.2s ease forwards; }
+@keyframes xpRise { 0%{opacity:1;transform:translateY(0) scale(1)} 60%{opacity:1;transform:translateY(-50px) scale(1.2)} 100%{opacity:0;transform:translateY(-90px) scale(0.8)} }
 </style>
 </head>
 <body>
@@ -1857,21 +1877,21 @@ body::after {
     <div class="form-group">
       <label class="form-label">EXERCICE</label>
       <select class="form-select form-input" id="lift-exo" onchange="updateExoIllustration()">
-        <option>Pompes 📷</option>
-        <option>Développé couché 📷</option>
-        <option>Squat 📷</option>
-        <option>Soulevé de terre 📷</option>
-        <option>Développé militaire 📷</option>
-        <option>Tractions 📷</option>
-        <option>Dips 📷</option>
-        <option>Curl biceps 📷</option>
-        <option>Triceps poulie 📷</option>
-        <option>Leg press 📷</option>
-        <option>Rowing barre 📷</option>
-        <option>Tirage poulie haute 📷</option>
-        <option>Extensions lombaires 📷</option>
-        <option>Crunchs 📷</option>
-        <option>Gainage 📷</option>
+        <option>Pompes</option>
+        <option>Développé couché</option>
+        <option>Squat</option>
+        <option>Soulevé de terre</option>
+        <option>Développé militaire</option>
+        <option>Tractions</option>
+        <option>Dips</option>
+        <option>Curl biceps</option>
+        <option>Triceps poulie</option>
+        <option>Leg press</option>
+        <option>Rowing barre</option>
+        <option>Tirage poulie haute</option>
+        <option>Extensions lombaires</option>
+        <option>Crunchs</option>
+        <option>Gainage</option>
         <option>Autre</option>
       </select>
     </div>
@@ -1881,17 +1901,7 @@ body::after {
       <input class="form-input" type="text" id="custom-exo-name" placeholder="Ex: Curl marteau, Hip thrust..." maxlength="30">
     </div>
     <!-- BOUTON CAMERA IA (visible seulement pour les exos caméra) -->
-    <div id="camera-validate-section" style="display:none;margin-bottom:12px">
-      <div id="camera-status-box" style="background:rgba(255,60,172,0.1);border:1px solid rgba(255,60,172,0.4);border-radius:var(--radius);padding:12px;text-align:center;margin-bottom:10px">
-        <div style="font-size:28px;margin-bottom:4px">📷</div>
-        <div style="font-size:13px;font-weight:700;color:var(--accent2)" id="camera-status-text">Validation caméra IA requise</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:4px" id="camera-status-desc">Cet exercice doit être vérifié par la caméra pour être validé</div>
-      </div>
-      <button class="submit-btn" style="background:linear-gradient(135deg,var(--accent2),var(--xp-color));color:#fff;padding:14px" onclick="openPoseCamera()">
-        📷 LANCER L'ANALYSE IA
-        <span id="camera-target-label" style="display:block;font-size:11px;opacity:0.8;margin-top:2px">Remplis d'abord le nombre de reps</span>
-      </button>
-    </div>
+    
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">SÉRIES</label>
@@ -2271,6 +2281,9 @@ body::after {
   </div>
 </div>
 
+<!-- GUIDED SESSION MODAL -->
+<div id="guided-session-modal" style="display:none;position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,0.9);align-items:center;justify-content:center;padding:16px"></div>
+
 <!-- LEVEL UP FULLSCREEN SPECTACULAIRE -->
 <div id="levelup-fullscreen">
   <div class="lu-stars" id="lu-stars"></div>
@@ -2452,25 +2465,61 @@ const QUESTS_DATA = [
 
 
 const ACHIEVEMENTS = [
-  {id:'first_run',  name:'Premier Souffle',   desc:'Ta première course',           icon:'👟', secret:false, condition: s => s.totalKm >= 0.1},
-  {id:'first_lift', name:'Premier Acier',     desc:'Ta première séance muscu',     icon:'🏋️', secret:false, condition: s => s.liftSessions >= 1},
-  {id:'5km',        name:'5K Fighter',        desc:'Courir 5 km',                  icon:'🏃', secret:false, condition: s => s.totalKm >= 5},
-  {id:'10km',       name:'Décathlon',         desc:'10 km cumulés',                icon:'🗺️', secret:false, condition: s => s.totalKm >= 10},
-  {id:'50km',       name:'Demi-Centurion',    desc:'50 km cumulés',                icon:'🌍', secret:false, condition: s => s.totalKm >= 50},
-  {id:'streak3',    name:'Série de 3',        desc:'3 jours consécutifs',          icon:'🔥', secret:false, condition: s => s.maxStreak >= 3},
-  {id:'streak7',    name:'Semaine de fer',    desc:'7 jours consécutifs',          icon:'💎', secret:false, condition: s => s.maxStreak >= 7},
-  {id:'level5',     name:'Champion',          desc:'Atteindre niveau 5',           icon:'🏆', secret:false, condition: s => s.level >= 5},
-  {id:'quest5',     name:'Faiseur de quêtes', desc:'5 quêtes terminées',           icon:'📜', secret:false, condition: s => s.questsDone >= 5},
-  {id:'lift10',     name:'Forgeron',          desc:'10 séances muscu',             icon:'⚒️', secret:false, condition: s => s.liftSessions >= 10},
-  {id:'speedster',  name:'Speedster',         desc:'10 km en moins de 60 min',     icon:'⚡', secret:false, condition: s => s.fastRun},
-  {id:'hybrid',     name:'Hybride',           desc:'10km courus + 5 séances muscu',icon:'🌀', secret:false, condition: s => s.totalKm >= 10 && s.liftSessions >= 5},
+  // COURSE
+  {id:'first_run',    name:'Premier Souffle',     desc:'Ta première course',                icon:'👟', secret:false, condition: s => s.totalKm >= 0.1},
+  {id:'5km',          name:'5K Fighter',           desc:'Courir 5 km au total',              icon:'🏃', secret:false, condition: s => s.totalKm >= 5},
+  {id:'10km',         name:'Décathlon',            desc:'10 km cumulés',                     icon:'🗺️', secret:false, condition: s => s.totalKm >= 10},
+  {id:'21km',         name:'Semi-Marathonien',     desc:'21 km cumulés',                     icon:'🏅', secret:false, condition: s => s.totalKm >= 21},
+  {id:'42km',         name:'Marathonien',          desc:'42 km cumulés',                     icon:'🏆', secret:false, condition: s => s.totalKm >= 42},
+  {id:'50km',         name:'Demi-Centurion',       desc:'50 km cumulés',                     icon:'🌍', secret:false, condition: s => s.totalKm >= 50},
+  {id:'100km',        name:'Ultra Coureur',        desc:'100 km cumulés',                    icon:'🏔️', secret:false, condition: s => s.totalKm >= 100},
+  {id:'run10sessions',name:'Habitué des Pistes',   desc:'10 séances de course',              icon:'🔁', secret:false, condition: s => (s.runSessions||0) >= 10},
+  // MUSCU
+  {id:'first_lift',   name:'Premier Acier',        desc:'Première séance muscu',             icon:'🏋️', secret:false, condition: s => s.liftSessions >= 1},
+  {id:'lift5',        name:'Routine Béton',        desc:'5 séances muscu',                   icon:'💪', secret:false, condition: s => s.liftSessions >= 5},
+  {id:'lift10',       name:'Forgeron',             desc:'10 séances muscu',                  icon:'⚒️', secret:false, condition: s => s.liftSessions >= 10},
+  {id:'lift25',       name:'Iron Man',             desc:'25 séances muscu',                  icon:'🔩', secret:false, condition: s => s.liftSessions >= 25},
+  {id:'lift50',       name:'Titan de Fer',         desc:'50 séances muscu',                  icon:'🔱', secret:false, condition: s => s.liftSessions >= 50},
+  {id:'pushup100',    name:'Maître des Pompes',    desc:'100 pompes cumulées',               icon:'💪', secret:false, condition: s => (s.totalPushups||0) >= 100},
+  {id:'pushup500',    name:'Machine à Pompes',     desc:'500 pompes cumulées',               icon:'🔥', secret:false, condition: s => (s.totalPushups||0) >= 500},
+  {id:'ai3',          name:'Sous l\'Œil de l\'IA', desc:'3 exos validés par l\'IA caméra',   icon:'📷', secret:false, condition: s => (s.aiValidatedCount||0) >= 3},
+  {id:'ai10',         name:'Perfection Technique', desc:'10 exos validés par l\'IA caméra', icon:'🎯', secret:false, condition: s => (s.aiValidatedCount||0) >= 10},
+  // PROGRESSION
+  {id:'level3',       name:'Apprenti Confirmé',   desc:'Atteindre niveau 3',                icon:'⚔️', secret:false, condition: s => (s.level||0) >= 3},
+  {id:'level5',       name:'Champion',            desc:'Atteindre niveau 5',                icon:'🏆', secret:false, condition: s => (s.level||0) >= 5},
+  {id:'level8',       name:'Demi-Dieu',           desc:'Atteindre niveau 8',                icon:'🌟', secret:false, condition: s => (s.level||0) >= 8},
+  {id:'level10',      name:'Transcendé',          desc:'Atteindre niveau 10',               icon:'🌈', secret:false, condition: s => (s.level||0) >= 10},
+  {id:'xp1000',       name:'Mille XP',            desc:'Atteindre 1000 XP total',           icon:'⭐', secret:false, condition: s => (s.totalXP||0) >= 1000},
+  {id:'xp5000',       name:'Cinq Mille',          desc:'Atteindre 5000 XP total',           icon:'💫', secret:false, condition: s => (s.totalXP||0) >= 5000},
+  // RÉGULARITÉ
+  {id:'streak3',      name:'Série de 3',          desc:'3 jours consécutifs',               icon:'🔥', secret:false, condition: s => (s.maxStreak||0) >= 3},
+  {id:'streak7',      name:'Semaine de Fer',      desc:'7 jours consécutifs',               icon:'💎', secret:false, condition: s => (s.maxStreak||0) >= 7},
+  {id:'streak14',     name:'Deux Semaines',       desc:'14 jours consécutifs',              icon:'🔱', secret:false, condition: s => (s.maxStreak||0) >= 14},
+  {id:'restdays5',    name:'Sage Récupérateur',   desc:'5 jours de repos planifiés',        icon:'💤', secret:false, condition: s => (s.restDays||[]).length >= 5},
+  {id:'sessions10',   name:'Vétéran',             desc:'10 séances démarrées',              icon:'📅', secret:false, condition: s => (s.totalSessions||0) >= 10},
+  // QUÊTES & SHOP
+  {id:'quest5',       name:'Faiseur de Quêtes',  desc:'5 quêtes terminées',                icon:'📜', secret:false, condition: s => (s.questsDone||0) >= 5},
+  {id:'quest15',      name:'Chasseur de Quêtes', desc:'15 quêtes terminées',               icon:'⚔️', secret:false, condition: s => (s.questsDone||0) >= 15},
+  {id:'mount5',       name:'Dresseur',           desc:'Posséder 5 familiers',              icon:'🐾', secret:false, condition: s => (s.ownedMounts||[]).length >= 5},
+  {id:'mount15',      name:'Maître Dresseur',    desc:'Posséder 15 familiers',             icon:'🦁', secret:false, condition: s => (s.ownedMounts||[]).length >= 15},
+  {id:'gold500',      name:'Petit Épargnant',    desc:'Avoir 500 pièces d\'or',            icon:'💰', secret:false, condition: s => (s.gold||0) >= 500},
+  // EXPLORATION
+  {id:'map50',        name:'Explorateur',        desc:'Révéler 50 zones sur la carte',     icon:'🗺️', secret:false, condition: s => (s.exploredCells||[]).length >= 50},
+  {id:'map200',       name:'Cartographe',        desc:'Révéler 200 zones',                 icon:'🌐', secret:false, condition: s => (s.exploredCells||[]).length >= 200},
+  // HYBRIDE
+  {id:'hybrid',       name:'Hybride',            desc:'10km + 5 séances muscu',            icon:'🌀', secret:false, condition: s => s.totalKm >= 10 && s.liftSessions >= 5},
+  {id:'allround',     name:'All-Rounder',        desc:'Course + Muscu + Carte débloquées', icon:'🎯', secret:false, condition: s => s.totalKm > 0 && s.liftSessions > 0 && (s.exploredCells||[]).length > 0},
   // SECRETS
-  {id:'secret_night',  name:'???',  desc:'Succès secret', icon:'🌙', secret:true, revealName:'Guerrier de la Nuit',  revealDesc:'T\'entraîner après 22h',     condition: s => s.nightWorkout},
-  {id:'secret_100',    name:'???',  desc:'Succès secret', icon:'💯', secret:true, revealName:'Centurion XP',         revealDesc:'Dépasser 10 000 XP total',  condition: s => s.totalXP >= 10000},
-  {id:'secret_boss5',  name:'???',  desc:'Succès secret', icon:'💀', secret:true, revealName:'Tueur de Boss',        revealDesc:'Vaincre 5 boss hebdo',      condition: s => (s.totalBossKills||0) >= 5},
-  {id:'secret_craft',  name:'???',  desc:'Succès secret', icon:'⚗️', secret:true, revealName:'Alchimiste',           revealDesc:'Crafter 3 objets',          condition: s => (s.totalCrafts||0) >= 3},
-  {id:'secret_streak30',name:'???', desc:'Succès secret', icon:'🔱', secret:true, revealName:'Inextinguible',        revealDesc:'30 jours de série',         condition: s => s.maxStreak >= 30},
-  {id:'secret_mount',  name:'???',  desc:'Succès secret', icon:'🐲', secret:true, revealName:'Dresseur Légendaire',  revealDesc:'Posséder le Dragon de Feu', condition: s => (s.ownedMounts||[]).includes('mount_dragon')},
+  {id:'secret_night',     name:'???', desc:'Succès secret', icon:'🌙', secret:true, revealName:'Guerrier de la Nuit',   revealDesc:'S\'entraîner après 22h',          condition: s => s.nightWorkout},
+  {id:'secret_100',       name:'???', desc:'Succès secret', icon:'💯', secret:true, revealName:'Centurion XP',           revealDesc:'Dépasser 10 000 XP total',        condition: s => s.totalXP >= 10000},
+  {id:'secret_boss5',     name:'???', desc:'Succès secret', icon:'💀', secret:true, revealName:'Tueur de Boss',          revealDesc:'Vaincre 5 boss hebdo',            condition: s => (s.totalBossKills||0) >= 5},
+  {id:'secret_craft',     name:'???', desc:'Succès secret', icon:'⚗️', secret:true, revealName:'Alchimiste',             revealDesc:'Crafter 3 objets',                condition: s => (s.totalCrafts||0) >= 3},
+  {id:'secret_streak30',  name:'???', desc:'Succès secret', icon:'🔱', secret:true, revealName:'Inextinguible',          revealDesc:'30 jours de série',               condition: s => s.maxStreak >= 30},
+  {id:'secret_dragon',    name:'???', desc:'Succès secret', icon:'🐲', secret:true, revealName:'Dresseur Légendaire',    revealDesc:'Posséder le Dragon de Feu',       condition: s => (s.ownedMounts||[]).includes('m_dragon')},
+  {id:'secret_earlybird', name:'???', desc:'Succès secret', icon:'🌅', secret:true, revealName:'Lève-Tôt',              revealDesc:'S\'entraîner avant 7h du matin',  condition: s => s.earlyBird},
+  {id:'secret_200km',     name:'???', desc:'Succès secret', icon:'🚀', secret:true, revealName:'Ultramarathonien',       revealDesc:'200 km de course cumulés',        condition: s => s.totalKm >= 200},
+  {id:'secret_perfectweek',name:'???',desc:'Succès secret', icon:'🌟', secret:true, revealName:'Semaine Parfaite',       revealDesc:'7 jours actifs la même semaine',  condition: s => (s.perfectWeeks||0) >= 1},
+  {id:'secret_ai20',      name:'???', desc:'Succès secret', icon:'🤖', secret:true, revealName:'Machine de Précision',   revealDesc:'20 exercices validés par l\'IA',  condition: s => (s.aiValidatedCount||0) >= 20},
 ];
 
 const CRAFT_RECIPES = [
@@ -2593,26 +2642,79 @@ const SHOP_ITEMS = [
 
 const PROGRAMS = [
   {
-    id:'ppl', name:'PPL — Push Pull Legs', icon:'🏋️', weeks:6, desc:'Programme 3 jours/semaine. Développe force et volume.',
+    id:'ppl', name:'PPL — Push Pull Legs', icon:'🏋️', weeks:8, desc:'Force et volume. 3 jours/semaine, repos entre chaque séance.',
     days:[
-      {name:'PUSH 💪', exercises:['Développé couché 4×8','Développé militaire 3×10','Écarté haltères 3×12','Triceps poulie 3×15','Lateral raises 3×15']},
-      {name:'PULL 🔙', exercises:['Tractions 4×8','Rowing barre 4×8','Tirage poulie haute 3×10','Curl biceps 3×12','Face pulls 3×15']},
-      {name:'LEGS 🦵', exercises:['Squat 4×8','Leg press 3×10','Fentes 3×12','Soulevé de terre 3×8','Mollets 4×15']},
+      {name:'PUSH 💪', icon:'💪', focus:'Poitrine, Épaules, Triceps', exercises:[
+        {name:'Développé couché',      sets:4, reps:8,  rest:120, tip:'Dos plaqué, descends jusqu\'à la poitrine'},
+        {name:'Développé militaire',   sets:3, reps:10, rest:90,  tip:'Core gainé, pousse vertical'},
+        {name:'Dips 📷',               sets:3, reps:10, rest:90,  tip:'Descends à 90°, coudes proches'},
+        {name:'Triceps poulie 📷',     sets:3, reps:12, rest:60,  tip:'Coudes fixes, extension complète'},
+      ]},
+      {name:'PULL 🔙', icon:'🔙', focus:'Dos, Biceps', exercises:[
+        {name:'Tractions 📷',          sets:4, reps:8,  rest:120, tip:'Omoplates rentrées, monte menton au-dessus'},
+        {name:'Rowing barre 📷',       sets:4, reps:8,  rest:90,  tip:'Dos à 45°, tire vers le nombril'},
+        {name:'Tirage poulie haute 📷',sets:3, reps:10, rest:90,  tip:'Tire vers le haut de la poitrine'},
+        {name:'Curl biceps 📷',        sets:3, reps:12, rest:60,  tip:'Coudes fixes contre le corps'},
+      ]},
+      {name:'LEGS 🦵', icon:'🦵', focus:'Jambes, Fessiers', exercises:[
+        {name:'Squat 📷',              sets:4, reps:8,  rest:120, tip:'Pieds largeur épaules, cuisses parallèles'},
+        {name:'Leg press 📷',          sets:3, reps:10, rest:90,  tip:'Pieds à hauteur épaules, ne verrouille pas'},
+        {name:'Soulevé de terre 📷',   sets:3, reps:8,  rest:120, tip:'Dos droit, barre proche du corps'},
+        {name:'Extensions lombaires 📷',sets:3,reps:15, rest:60,  tip:'Mouvement lent et contrôlé'},
+      ]},
     ]
   },
   {
-    id:'fullbody', name:'Full Body 3×/semaine', icon:'🌀', weeks:4, desc:'Idéal débutant. Corps entier à chaque séance.',
+    id:'fullbody', name:'Full Body Débutant', icon:'🌀', weeks:4, desc:'Idéal pour commencer. Corps entier à chaque séance, 3×/semaine.',
     days:[
-      {name:'JOUR A 🅰️', exercises:['Squat 3×10','Développé couché 3×10','Tractions 3×8','Rowing haltère 3×10','Gainage 3×30s']},
-      {name:'JOUR B 🅱️', exercises:['Soulevé de terre 3×8','Développé militaire 3×10','Leg press 3×12','Curl biceps 3×12','Triceps 3×12']},
+      {name:'JOUR A 🅰️', icon:'🅰️', focus:'Corps complet — Tirage & Poussée', exercises:[
+        {name:'Squat 📷',              sets:3, reps:10, rest:90,  tip:'Genoux dans l\'axe, dos droit'},
+        {name:'Développé couché',      sets:3, reps:10, rest:90,  tip:'Amplitude complète'},
+        {name:'Tractions 📷',          sets:3, reps:6,  rest:90,  tip:'Aide-toi d\'une résistance si besoin'},
+        {name:'Gainage 📷',            sets:3, reps:30, rest:60,  tip:'Corps droit, respire normalement'},
+      ]},
+      {name:'JOUR B 🅱️', icon:'🅱️', focus:'Corps complet — Force & Endurance', exercises:[
+        {name:'Soulevé de terre 📷',   sets:3, reps:8,  rest:120, tip:'PRIORITÉ dos droit'},
+        {name:'Développé militaire 📷',sets:3, reps:10, rest:90,  tip:'Ne cambre pas le dos'},
+        {name:'Curl biceps 📷',        sets:3, reps:12, rest:60,  tip:'Coudes fixes'},
+        {name:'Crunchs 📷',            sets:3, reps:15, rest:45,  tip:'Expire en montant'},
+      ]},
     ]
   },
   {
-    id:'runner', name:'Plan Course 5km→10km', icon:'🏃', weeks:8, desc:'Progression graduelle pour doubler ta distance.',
+    id:'runner', name:'Plan Course 5km→10km', icon:'🏃', weeks:8, desc:'Progression graduelle pour doubler ta distance. Alterne course et récup.',
     days:[
-      {name:'ENDURANCE 🐢', exercises:['Footing lent 20-30min','Zone 2 — conversation possible','Récupération active']},
-      {name:'INTERVALLES ⚡', exercises:['Échauffement 5min','4×400m rapide, récup 90s','Retour au calme 5min']},
-      {name:'LONGUE SORTIE 🗺️', exercises:['Course longue +10% chaque semaine','Allure confortable','Hydratation obligatoire']},
+      {name:'ENDURANCE 🐢', icon:'🐢', focus:'Zone 2 — Cardio de base', exercises:[
+        {name:'Échauffement marche',   sets:1, reps:5,  rest:0,   tip:'5 min de marche rapide'},
+        {name:'Footing lent',          sets:1, reps:25, rest:0,   tip:'Allure conversation, tu dois pouvoir parler'},
+        {name:'Retour au calme',       sets:1, reps:5,  rest:0,   tip:'5 min marche, étirements'},
+      ]},
+      {name:'INTERVALLES ⚡', icon:'⚡', focus:'Vitesse & VO2Max', exercises:[
+        {name:'Échauffement footing',  sets:1, reps:10, rest:0,   tip:'10 min allure facile'},
+        {name:'Répétitions rapides',   sets:4, reps:2,  rest:90,  tip:'400m à 85% — récup 90s entre chaque'},
+        {name:'Retour au calme',       sets:1, reps:5,  rest:0,   tip:'Finir par 5 min facile'},
+      ]},
+      {name:'LONGUE SORTIE 🗺️', icon:'🗺️', focus:'Endurance fondamentale', exercises:[
+        {name:'Sortie longue +10%',    sets:1, reps:45, rest:0,   tip:'Ajoute 10% de distance chaque semaine'},
+        {name:'Hydratation',           sets:1, reps:1,  rest:0,   tip:'Bois toutes les 20 min'},
+      ]},
+    ]
+  },
+  {
+    id:'hiit', name:'HIIT — Cardio Intense', icon:'⚡', weeks:4, desc:'Brûle des calories rapidement. Séances courtes et explosives.',
+    days:[
+      {name:'CIRCUIT A 🔥', icon:'🔥', focus:'Cardio total body', exercises:[
+        {name:'Pompes 📷',             sets:3, reps:15, rest:30,  tip:'Enchaîne vite, maintiens la forme'},
+        {name:'Squat 📷',              sets:3, reps:20, rest:30,  tip:'Explose vers le haut'},
+        {name:'Crunchs 📷',            sets:3, reps:20, rest:30,  tip:'Abdos contractés'},
+        {name:'Gainage 📷',            sets:3, reps:30, rest:30,  tip:'30 secondes de tenu'},
+      ]},
+      {name:'CIRCUIT B 💥', icon:'💥', focus:'Force-endurance', exercises:[
+        {name:'Dips 📷',               sets:3, reps:12, rest:30,  tip:'Descends lentement, monte vite'},
+        {name:'Tractions 📷',          sets:3, reps:8,  rest:45,  tip:'Amplitude complète'},
+        {name:'Curl biceps 📷',        sets:3, reps:15, rest:30,  tip:'Tempo rapide'},
+        {name:'Extensions lombaires 📷',sets:3,reps:20, rest:30,  tip:'Mouvement contrôlé'},
+      ]},
     ]
   },
 ];
@@ -3278,14 +3380,6 @@ function logLift() {
 
   if(!sets || !reps) { showToast('info', '⚠️ Remplis les séries et répétitions'); return; }
 
-  // VÉRIFICATION CAMÉRA POUR TOUS LES EXOS AVEC 📷
-  if(exo.includes('📷') && !poseSessionValidated) {
-    const name = exo.replace(' 📷', '');
-    showToast('info', '📷 Lance l\'analyse IA pour valider : ' + name + ' !');
-    haptic('medium');
-    return;
-  }
-
   state.liftSessions++;
   if(!state.liftDaysLog) state.liftDaysLog = [];
   const todayLift = new Date().toDateString();
@@ -3332,7 +3426,6 @@ function logLift() {
   document.getElementById('lift-reps').value = '';
   document.getElementById('lift-weight').value = '';
   // Reset validation caméra
-  poseSessionValidated = false;
   const box = document.getElementById('camera-status-box');
   const text = document.getElementById('camera-status-text');
   if(box) { box.style.background = 'rgba(255,60,172,0.1)'; box.style.borderColor = 'rgba(255,60,172,0.4)'; }
@@ -4076,15 +4169,41 @@ function renderPrograms() {
     const isActive = state.activeProgram === p.id;
     const dayIdx = isActive ? (state.programDay % p.days.length) : 0;
     const today = p.days[dayIdx];
-    return `<div class="prog-card ${isActive ? 'active-prog' : ''}" onclick="selectProgram('${p.id}')">
-      <div class="prog-header"><div class="prog-icon">${p.icon}</div><div><div class="prog-name">${p.name}</div><div class="prog-weeks">📅 ${p.weeks} semaines</div></div></div>
-      <div class="prog-desc">${p.desc}</div>
-      ${isActive ? `<div style="font-size:11px;color:var(--accent);margin-bottom:6px">▶ PROGRAMME ACTIF — Jour ${(state.programDay % p.days.length)+1}/${p.days.length}</div>
-      <div class="prog-day-card">
-        <div class="prog-day-title">${today.name}</div>
-        ${today.exercises.map(e => `<div class="prog-exercise">• ${e}</div>`).join('')}
+    return `<div class="prog-card ${isActive ? 'active-prog' : ''}">
+      <div class="prog-header">
+        <div class="prog-icon">${p.icon}</div>
+        <div>
+          <div class="prog-name">${p.name}</div>
+          <div class="prog-weeks">📅 ${p.weeks} semaines</div>
+        </div>
       </div>
-      <button class="submit-btn run-color" style="margin-top:10px;padding:10px" onclick="nextProgramDay(event)">✅ JOUR TERMINÉ → SUIVANT</button>` : ''}
+      <div class="prog-desc">${p.desc}</div>
+      ${isActive ? `
+        <div style="font-size:11px;color:var(--accent);margin-bottom:8px;font-weight:700">
+          ▶ ACTIF — Séance ${(state.programDay % p.days.length)+1}/${p.days.length}
+        </div>
+        <div class="prog-day-card">
+          <div class="prog-day-title">${today.name}</div>
+          <div style="font-size:11px;color:var(--text2);margin-bottom:8px">🎯 ${today.focus||''}</div>
+          ${today.exercises.map(e => typeof e === 'string'
+            ? `<div class="prog-exercise">• ${e}</div>`
+            : `<div class="prog-exercise" style="display:flex;justify-content:space-between">
+                <span>• ${e.name.replace(' 📷','')}</span>
+                <span style="color:var(--accent3);font-size:11px;font-family:monospace">${e.sets}×${e.reps}</span>
+               </div>`
+          ).join('')}
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="submit-btn run-color" style="flex:2;padding:10px;margin:0" onclick="startGuidedSession('${p.id}',${dayIdx},event)">
+            🚀 SÉANCE GUIDÉE
+          </button>
+          <button class="submit-btn" style="flex:1;padding:10px;margin:0;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:12px" onclick="nextProgramDay(event)">
+            ⏭️ Passer
+          </button>
+        </div>`
+      : `<button class="submit-btn" style="padding:8px;margin-top:8px;background:rgba(0,245,255,0.1);border:1px solid rgba(0,245,255,0.3);color:var(--accent)" onclick="selectProgram('${p.id}')">
+          ▶ CHOISIR CE PROGRAMME
+        </button>`}
     </div>`;
   }).join('');
 }
@@ -4095,17 +4214,110 @@ function selectProgram(id) {
   state.programDay = 0;
   saveState();
   renderPrograms();
-  showToast('success', '📋 Programme activé !');
+  showToast('success', '📋 Programme activé ! Lance ta première séance guidée.');
+  haptic('success');
 }
 
 function nextProgramDay(e) {
-  e.stopPropagation();
+  if(e && e.stopPropagation) e.stopPropagation();
   state.programDay++;
   saveState();
   renderPrograms();
-  addXP(50, '📋 Jour de programme complété');
-  showToast('success', '💪 Jour suivant débloqué ! +50 XP');
+  addXP(12, '📋 Séance de programme');
+  showToast('success', '💪 Séance suivante débloquée !');
 }
+
+function startGuidedSession(programId, dayIdx, e) {
+  if(e && e.stopPropagation) e.stopPropagation();
+  const prog = PROGRAMS.find(p => p.id === programId);
+  if(!prog) return;
+  const day = prog.days[dayIdx];
+  const modal = document.getElementById('guided-session-modal');
+  if(!modal) return;
+
+  let currentExo = 0;
+  let currentSet = 1;
+  let restTimer = null;
+
+  function renderStep() {
+    if(currentExo >= day.exercises.length) {
+      modal.innerHTML = `<div style="background:var(--bg2);border-radius:16px;padding:28px 20px;text-align:center;max-width:340px;width:90%">
+        <div style="font-size:64px;margin-bottom:12px">🏆</div>
+        <div style="font-family:'Exo 2',sans-serif;font-weight:900;font-size:22px;color:var(--accent4)">SÉANCE TERMINÉE !</div>
+        <div style="color:var(--text2);margin:10px 0 20px">${day.name} — ${day.exercises.length} exercices</div>
+        <button id="gs-finish-btn" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--accent4),#00a000);border:none;border-radius:var(--radius);color:#000;font-weight:900;font-size:15px;cursor:pointer">✅ TERMINER</button>
+      </div>`;
+      document.getElementById('gs-finish-btn').onclick = () => {
+        modal.style.display = 'none';
+        nextProgramDay({stopPropagation:()=>{}});
+        showToast('success','🏆 Séance guidée terminée ! +12 XP 💪');
+      };
+      playSound('quest'); haptic('levelup'); return;
+    }
+
+    const exo = day.exercises[currentExo];
+    const name = typeof exo === 'string' ? exo : exo.name;
+    const sets = typeof exo === 'object' ? exo.sets : 3;
+    const reps = typeof exo === 'object' ? exo.reps : 10;
+    const rest = typeof exo === 'object' ? exo.rest : 60;
+    const tip  = typeof exo === 'object' ? exo.tip : '';
+
+    const dots = day.exercises.map((_,i) =>
+      `<span style="color:${i<currentExo?'var(--accent4)':i===currentExo?'var(--accent)':'var(--muted)'}">
+        ${i<currentExo?'●':i===currentExo?'▶':'○'}
+      </span>`
+    ).join(' ');
+
+    modal.innerHTML = `<div style="background:var(--bg2);border-radius:16px;padding:20px;max-width:360px;width:90%;max-height:90vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-size:11px;color:var(--text2)">${day.name} · Ex. ${currentExo+1}/${day.exercises.length}</div>
+        <button id="gs-close" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px">✕</button>
+      </div>
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-family:'Exo 2',sans-serif;font-weight:900;font-size:22px;color:var(--accent);margin-bottom:6px">${name.replace(' 📷','')}</div>
+        <div style="font-size:36px;font-weight:900;color:var(--accent2)">Série ${currentSet}/${sets}</div>
+        <div style="font-size:28px;color:var(--accent3);font-family:monospace;margin-top:4px">${reps} reps</div>
+        ${tip?`<div style="font-size:12px;color:var(--text2);margin-top:8px;padding:8px 12px;background:var(--bg3);border-radius:8px;text-align:left">💡 ${tip}</div>`:''}
+      </div>
+      <div style="text-align:center;font-size:18px;letter-spacing:4px;margin-bottom:14px">${dots}</div>
+      <button id="gs-next-btn" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--radius);color:#000;font-weight:900;font-size:15px;cursor:pointer">
+        ${currentSet < sets ? `✅ SÉRIE ${currentSet} FAITE — repos ${rest}s` : '➡️ EXERCICE SUIVANT'}
+      </button>
+    </div>`;
+
+    document.getElementById('gs-close').onclick = () => modal.style.display = 'none';
+    document.getElementById('gs-next-btn').onclick = () => {
+      haptic('success'); playSound('rep');
+      if(currentSet < sets) {
+        currentSet++;
+        let cd = rest;
+        const btn = document.getElementById('gs-next-btn');
+        if(!btn) return;
+        btn.style.background = 'var(--bg3)';
+        btn.style.color = 'var(--text)';
+        btn.textContent = `⏱️ Repos... ${cd}s`;
+        btn.onclick = null;
+        restTimer = setInterval(() => {
+          cd--;
+          const b = document.getElementById('gs-next-btn');
+          if(b) b.textContent = `⏱️ Repos... ${cd}s`;
+          if(cd <= 0) {
+            clearInterval(restTimer);
+            playSound('xp'); haptic('medium');
+            renderStep();
+          }
+        }, 1000);
+      } else {
+        currentExo++; currentSet = 1;
+        renderStep();
+      }
+    };
+  }
+
+  modal.style.display = 'flex';
+  renderStep();
+}
+
 
 // ============================================================
 // MINUTEUR DE REPOS
@@ -4169,822 +4381,7 @@ function updateExoIllustration() {
   // Champ nom perso si "Autre"
   const customWrap = document.getElementById('custom-exo-name-wrap');
   if(customWrap) customWrap.style.display = (exo === 'Autre') ? 'block' : 'none';
-
-  const needsCamera = exo.includes('📷');
-  const cameraSection = document.getElementById('camera-validate-section');
-  const desc = document.getElementById('camera-status-desc');
-  const statusBox = document.getElementById('camera-status-box');
-  const statusText = document.getElementById('camera-status-text');
-
-  if(cameraSection) cameraSection.style.display = needsCamera ? 'block' : 'none';
-
-  if(needsCamera) {
-    if(statusBox) { statusBox.style.background = 'rgba(255,60,172,0.1)'; statusBox.style.borderColor = 'rgba(255,60,172,0.4)'; }
-    if(statusText) { statusText.style.color = 'var(--accent2)'; statusText.textContent = 'Validation caméra IA requise'; }
-    if(desc) desc.textContent = exoKey + ' doit être vérifié par la caméra IA pour être validé';
-  }
-
-  poseSessionValidated = false;
-  updateCameraTargetLabel();
 }
-
-// ============================================================
-// MONTURES
-// ============================================================
-
-// ============================================================
-// OBJECTIFS PERSONNALISÉS
-// ============================================================
-function addGoal() {
-  const type = document.getElementById('goal-type').value;
-  const target = parseInt(document.getElementById('goal-target').value);
-  if(!target || target <= 0) { showToast('info', '⚠️ Saisis une cible valide'); return; }
-  if(!state.goals) state.goals = [];
-  const labels = {km:'Courir', sessions:'Séances', xp:'Gagner XP', streak:'Série'};
-  const units  = {km:'km', sessions:'séances', xp:'XP', streak:'jours'};
-  const monthStart = new Date(); monthStart.setDate(1);
-  state.goals.push({
-    id: Date.now(),
-    type, target,
-    label: labels[type],
-    unit: units[type],
-    createdAt: new Date().toLocaleDateString('fr-FR'),
-  });
-  document.getElementById('goal-target').value = '';
-  saveState();
-  renderGoals();
-  showToast('success', '🎯 Objectif ajouté !');
-}
-
-function deleteGoal(id) {
-  state.goals = (state.goals||[]).filter(g => g.id !== id);
-  saveState(); renderGoals();
-}
-
-function getGoalProgress(g) {
-  if(g.type === 'km') return state.totalKm;
-  if(g.type === 'sessions') return state.totalSessions;
-  if(g.type === 'xp') return state.totalXP;
-  if(g.type === 'streak') return state.streak;
-  return 0;
-}
-
-function renderGoals() {
-  const el = document.getElementById('goals-list');
-  if(!el) return;
-  if(!state.goals || state.goals.length === 0) {
-    el.innerHTML = '<div style="color:var(--text2);font-size:12px;text-align:center;padding:12px">Aucun objectif défini.</div>';
-    return;
-  }
-  el.innerHTML = state.goals.map(g => {
-    const prog = getGoalProgress(g);
-    const pct = Math.min(100, Math.round(prog / g.target * 100));
-    const done = pct >= 100;
-    return `<div class="goal-card ${done?'done':''}">
-      <button class="goal-delete" onclick="deleteGoal(${g.id})">✕</button>
-      <div class="goal-header">
-        <div class="goal-name">${done?'✅ ':''} ${g.label} ${g.target} ${g.unit}</div>
-        <div class="goal-pct">${pct}%</div>
-      </div>
-      <div class="goal-bar"><div class="goal-fill" style="width:${pct}%"></div></div>
-      <div class="goal-detail">${prog.toFixed ? prog.toFixed(1) : prog} / ${g.target} ${g.unit}</div>
-    </div>`;
-  }).join('');
-}
-
-// ============================================================
-// CALENDRIER
-// ============================================================
-let calYear = new Date().getFullYear();
-let calMonth = new Date().getMonth();
-
-function renderCalendar() {
-  const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-  document.getElementById('cal-title').textContent = months[calMonth] + ' ' + calYear;
-
-  const headersEl = document.getElementById('cal-headers');
-  const gridEl = document.getElementById('cal-grid');
-  const days = ['L','M','M','J','V','S','D'];
-  headersEl.innerHTML = days.map(d => `<div class="cal-head">${d}</div>`).join('');
-
-  const firstDay = new Date(calYear, calMonth, 1);
-  const lastDay = new Date(calYear, calMonth + 1, 0);
-  const startDow = (firstDay.getDay() + 6) % 7; // Monday = 0
-  const today = new Date();
-
-  let cells = '';
-  // Prev month filler
-  for(let i = 0; i < startDow; i++) {
-    const d = new Date(calYear, calMonth, -startDow + i + 1);
-    cells += `<div class="cal-day other-month"><div class="cal-day-num">${d.getDate()}</div></div>`;
-  }
-  // Current month
-  for(let d = 1; d <= lastDay.getDate(); d++) {
-    const dateStr = new Date(calYear, calMonth, d).toLocaleDateString('fr-FR');
-    const isToday = d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
-    const workouts = (state.workouts||[]).filter(w => w.date === dateStr);
-    const isRest = (state.restDays||[]).includes(dateStr);
-    const hasRun = workouts.some(w => w.type === 'run');
-    const hasLift = workouts.some(w => w.type === 'lift');
-    let cls = '';
-    if(hasRun && hasLift) cls = 'both-day';
-    else if(hasRun) cls = 'run-day';
-    else if(hasLift) cls = 'lift-day';
-    else if(isRest) cls = 'rest-day';
-    const dot = workouts.length > 0 ? '<div class="cal-dot"></div>' : (isRest ? '<div style="font-size:8px;line-height:1">💤</div>' : '');
-    cells += `<div class="cal-day ${cls} ${isToday?'today':''}" onclick="calShowDay('${dateStr}')">
-      <div class="cal-day-num">${d}</div>${dot}
-    </div>`;
-  }
-  gridEl.innerHTML = cells;
-}
-
-function calShowDay(dateStr) {
-  const workouts = (state.workouts||[]).filter(w => w.date === dateStr);
-  const el = document.getElementById('cal-day-detail');
-  if(!el) return;
-
-  const isRest = (state.restDays||[]).includes(dateStr);
-  const hasWorkouts = workouts.length > 0;
-
-  const restBtn = !hasWorkouts
-    ? `<button onclick="toggleRestDay('${dateStr}')" style="width:100%;padding:10px;border-radius:var(--radius);border:1px solid ${isRest?'rgba(168,85,247,0.6)':'var(--border)'};background:${isRest?'rgba(168,85,247,0.15)':'var(--bg3)'};color:${isRest?'var(--xp-color)':'var(--text2)'};cursor:pointer;font-size:13px;font-weight:700;margin-bottom:10px">
-        ${isRest ? '💤 Jour de repos — cliquer pour annuler' : '😴 Marquer comme jour de repos'}
-      </button>`
-    : '';
-
-  if(isRest && !hasWorkouts) {
-    el.innerHTML = restBtn + `
-      <div style="text-align:center;padding:12px;background:rgba(168,85,247,0.08);border-radius:var(--radius);border:1px solid rgba(168,85,247,0.2)">
-        <div style="font-size:32px;margin-bottom:6px">💤</div>
-        <div style="font-weight:700;color:var(--xp-color);font-size:15px">Jour de repos</div>
-        <div style="font-size:12px;color:var(--text2);margin-top:4px">Le repos fait partie de l'entraînement 🧠</div>
-      </div>`;
-    return;
-  }
-
-  if(!hasWorkouts) {
-    el.innerHTML = restBtn + `<div style="color:var(--text2);font-size:13px;padding:4px 0">Aucune séance le ${dateStr}.</div>`;
-    return;
-  }
-
-  const sessions = (state.sessionLog||[]).filter(s => s.date === dateStr);
-  let sessionBanner = '';
-  if(sessions.length > 0) {
-    const totalSec = sessions.reduce((sum, s) => sum + (s.duration || 0), 0);
-    const totalMin = Math.floor(totalSec / 60);
-    const remSec = totalSec % 60;
-    const timeStr = totalMin > 0 ? totalMin + ' min' + (remSec > 0 ? ' ' + remSec + 's' : '') : totalSec + ' sec';
-    const sessionList = sessions.map(s =>
-      `<div style="font-size:11px;color:var(--text2);margin-top:3px">⏱️ Démarrée à ${s.startTime} — ${s.durationMin} min</div>`
-    ).join('');
-    sessionBanner = `<div style="background:linear-gradient(135deg,rgba(0,245,255,0.1),rgba(168,85,247,0.1));border:1px solid rgba(0,245,255,0.35);border-radius:var(--radius);padding:12px;margin-bottom:10px">
-      <div style="font-size:22px;font-weight:900;font-family:'Exo 2',sans-serif;color:var(--accent)">⏱️ ${timeStr} de sport</div>
-      <div style="font-size:11px;color:var(--text2);margin-top:2px">${sessions.length} session${sessions.length > 1 ? 's' : ''} ce jour</div>
-      ${sessionList}</div>`;
-  } else {
-    const est = workouts.length * 5;
-    sessionBanner = `<div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:var(--radius);padding:10px;margin-bottom:10px">
-      <div style="font-size:13px;color:var(--text2)">⏱️ Durée estimée : ~${est} min</div></div>`;
-  }
-
-  const totalXP = workouts.reduce((sum, w) => sum + (w.xp || 0), 0);
-  el.innerHTML = sessionBanner + workouts.map(w => `
-    <div class="cal-detail-item">
-      <span style="margin-right:8px">${w.type==='run'?'🏃':'🏋️'}</span>
-      <strong>${w.name}</strong> — ${w.details} <span style="color:var(--xp-color)">+${w.xp} XP</span>
-    </div>`).join('') +
-    `<div style="text-align:right;margin-top:8px;font-size:12px;color:var(--accent3);font-family:'Share Tech Mono',monospace">
-      Total : +${totalXP} XP • ${workouts.length} exercice${workouts.length > 1 ? 's' : ''}
-    </div>`;
-}
-
-function toggleRestDay(dateStr) {
-  if(!state.restDays) state.restDays = [];
-  const idx = state.restDays.indexOf(dateStr);
-  if(idx === -1) {
-    state.restDays.push(dateStr);
-    showToast('success', '💤 Jour de repos marqué — récupère bien !');
-    haptic('light');
-  } else {
-    state.restDays.splice(idx, 1);
-    showToast('info', '↩️ Jour de repos annulé');
-  }
-  saveState();
-  renderCalendar();
-  calShowDay(dateStr);
-}
-
-
-function calPrev() {
-  calMonth--;
-  if(calMonth < 0) { calMonth = 11; calYear--; }
-  renderCalendar();
-}
-function calNext() {
-  calMonth++;
-  if(calMonth > 11) { calMonth = 0; calYear++; }
-  renderCalendar();
-}
-
-// ============================================================
-// SERVICE WORKER (MODE HORS-LIGNE)
-// ============================================================
-function registerServiceWorker() {
-  if('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/FITQUEST/sw.js')
-      .then(() => console.log('SW actif — hors-ligne OK'))
-      .catch(e => console.log('SW erreur:', e));
-  }
-}
-
-// ============================================================
-// SPLASH SCREEN
-// ============================================================
-function hideSplash() {
-  const splash = document.getElementById('splash');
-  if(splash) {
-    setTimeout(() => {
-      splash.classList.add('hide');
-      setTimeout(() => splash.remove(), 700);
-    }, 1800);
-  }
-}
-
-// ============================================================
-// TRANSITIONS DE PAGE
-// ============================================================
-const _origNavigate = navigate;
-
-// ============================================================
-// VIBRATION HAPTIQUE
-// ============================================================
-function haptic(type) {
-  if(!navigator.vibrate) return;
-  if(type === 'light') navigator.vibrate(10);
-  else if(type === 'medium') navigator.vibrate(30);
-  else if(type === 'success') navigator.vibrate([20,50,20]);
-  else if(type === 'levelup') navigator.vibrate([50,100,50,100,100]);
-}
-
-// ============================================================
-// MÉTÉO & ÉVÉNEMENTS
-// ============================================================
-async function fetchWeather() {
-  const now = Date.now();
-  if(state.weatherCache && (now - state.weatherCacheTime) < 3600000) {
-    applyWeatherEvent(state.weatherCache);
-    return;
-  }
-  try {
-    const pos = await new Promise((res, rej) =>
-      navigator.geolocation.getCurrentPosition(res, rej, {timeout:5000})
-    );
-    const {latitude, longitude} = pos.coords;
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`;
-    const r = await fetch(url);
-    const data = await r.json();
-    const code = data.current_weather?.weathercode;
-    let condition = 'default';
-    if(code === 0 || code === 1) condition = 'clear';
-    else if(code >= 2 && code <= 3) condition = 'clouds';
-    else if(code >= 51 && code <= 67) condition = 'rain';
-    else if(code >= 71 && code <= 77) condition = 'snow';
-    else if(code >= 80 && code <= 82) condition = 'rain';
-    else if(code >= 95) condition = 'thunder';
-    else if(code >= 45 && code <= 48) condition = 'mist';
-    state.weatherCache = condition;
-    state.weatherCacheTime = now;
-    saveState();
-    applyWeatherEvent(condition);
-  } catch(e) {
-    applyWeatherEvent('default');
-  }
-}
-
-function applyWeatherEvent(condition) {
-  const event = WEATHER_EVENTS.find(w => w.condition === condition) || WEATHER_EVENTS.find(w => w.condition === 'default');
-  state.currentWeatherEvent = event;
-  const banner = document.getElementById('weather-banner');
-  const icon = document.getElementById('weather-icon');
-  const name = document.getElementById('weather-event-name');
-  const bonus = document.getElementById('weather-bonus');
-  if(banner) banner.style.display = 'block';
-  if(icon) icon.textContent = event.icon;
-  if(name) name.textContent = event.name;
-  if(bonus) bonus.textContent = '🎯 ' + event.bonus;
-}
-
-// ============================================================
-// COACH IA
-// ============================================================
-function updateCoach() {
-  const msg = document.getElementById('coach-msg');
-  const tip = document.getElementById('coach-tip');
-  if(!msg || !tip) return;
-
-  const totalSessions = state.totalSessions || 0;
-  const totalKm = state.totalKm || 0;
-  const streak = state.streak || 0;
-  const level = state.level || 0;
-  const liftSessions = state.liftSessions || 0;
-  const runSessions = state.runSessions || 0;
-
-  let message = '';
-  let advice = '';
-
-  if(totalSessions === 0) {
-    message = 'Bienvenue, guerrier ! Je suis ARIA, ton coach IA. Commence par une première séance pour que je puisse analyser ton profil.';
-    advice = '💡 Conseil : commence par une course légère ou une séance muscu pour t\'échauffer.';
-  } else if(streak === 0) {
-    message = 'Tu n\'as pas encore de série active. Reviens régulièrement — la constance est la clé du progrès !';
-    advice = '💡 Une séance courte vaut mieux que pas de séance. Même 20 minutes comptent !';
-  } else if(runSessions > liftSessions * 2) {
-    message = `Tu cours beaucoup (${totalKm.toFixed(1)} km) mais ton ratio muscu est faible. Ajoute du renforcement pour équilibrer.`;
-    advice = '💡 La muscu améliore tes performances en course. Essaie 1 séance muscu pour 2 courses.';
-  } else if(liftSessions > runSessions * 3) {
-    message = `Excellente progression en muscu ! Mais ton cardio est en retrait. ${liftSessions} séances muscu, ${runSessions} courses.`;
-    advice = '💡 30 min de cardio par semaine améliore ta récupération et ton endurance générale.';
-  } else if(streak >= 7) {
-    message = `🔥 INCROYABLE ! ${streak} jours de série. Tu es une machine. Attention à la récupération.`;
-    advice = '💡 Après 7 jours consécutifs, offre-toi 1 jour de récup active (marche, stretching).';
-  } else if(level >= 10) {
-    message = `Niveau ${level+1} — tu es dans l\'élite. Tes stats parlent d\'elles-mêmes : ${totalKm.toFixed(0)} km, ${liftSessions} séances muscu.`;
-    advice = '💡 À ce niveau, travaille la qualité plutôt que la quantité. Augmente les charges progressivement.';
-  } else {
-    message = `Bonne progression, ${state.name} ! ${totalSessions} séances au total, série actuelle : ${streak} jours.`;
-    advice = '💡 Objectif semaine : ' + (runSessions < liftSessions ? 'ajoute une course pour équilibrer.' : 'maintiens ta régularité !');
-  }
-
-  msg.textContent = message;
-  tip.textContent = advice;
-}
-
-// ============================================================
-// CRAFT
-// ============================================================
-function canCraft(recipe) {
-  return recipe.ingredients.every(ing => {
-    if(ing.item === 'gold') return (state.gold || 0) >= ing.amount;
-    if(ing.item === 'streak') return state.streak >= ing.amount;
-    if(ing.item === 'quests') return state.questsDone >= ing.amount;
-    if(ing.item === 'level') return (state.level || 0) >= ing.amount;
-    if(ing.item === 'mounts') return (state.ownedMounts || []).length >= ing.amount;
-    return false;
-  });
-}
-
-function getIngLabel(ing) {
-  if(ing.item === 'gold') return '💰 ' + ing.amount + ' or';
-  if(ing.item === 'streak') return '🔥 Série ≥ ' + ing.amount + ' jours';
-  if(ing.item === 'quests') return '📜 ' + ing.amount + ' quêtes faites';
-  if(ing.item === 'level') return '⭐ Niveau ≥ ' + (ing.amount + 1);
-  if(ing.item === 'mounts') return '🐾 ' + ing.amount + ' montures possédées';
-  return '';
-}
-
-function renderCraft() {
-  const grid = document.getElementById('craft-grid');
-  if(!grid) return;
-  if(!state.crafted) state.crafted = [];
-  grid.innerHTML = CRAFT_RECIPES.map(r => {
-    const craftable = canCraft(r);
-    const done = state.crafted.includes(r.id);
-    return `<div class="craft-card ${craftable && !done ? 'craftable' : ''}">
-      <div class="craft-result-icon">${r.icon}</div>
-      <div class="craft-name">${r.name}</div>
-      <div style="font-size:11px;color:var(--text2);margin-bottom:4px">${r.desc}</div>
-      <div class="craft-ingredients">${r.ingredients.map(i => getIngLabel(i)).join('<br>')}</div>
-      <button class="craft-btn" ${(!craftable || done) ? 'disabled' : ''} onclick="doCraft('${r.id}')">
-        ${done ? '✅ DÉJÀ CRAFTÉ' : craftable ? '⚗️ CRAFTER' : '🔒 INSUFFISANT'}
-      </button>
-    </div>`;
-  }).join('');
-}
-
-function doCraft(id) {
-  const recipe = CRAFT_RECIPES.find(r => r.id === id);
-  if(!recipe || !canCraft(recipe)) return;
-  if(!state.crafted) state.crafted = [];
-  if(state.crafted.includes(id)) return;
-  // Consume ingredients
-  recipe.ingredients.forEach(ing => {
-    if(ing.item === 'gold') state.gold -= ing.amount;
-  });
-  state.crafted.push(id);
-  state.totalCrafts = (state.totalCrafts || 0) + 1;
-  saveState();
-  recipe.effect();
-  haptic('success');
-  renderCraft();
-  checkAchievements();
-}
-
-// ============================================================
-// SUCCÈS SECRETS (override renderAchievements)
-// ============================================================
-
-
-// Track night workout
-function checkNightWorkout() {
-  const h = new Date().getHours();
-  if(h >= 22 || h < 3) { state.nightWorkout = true; saveState(); }
-}
-
-// ============================================================
-// MOTEUR D'ANALYSE UNIVERSEL
-// ============================================================
-
-// Config par exercice : joints à mesurer, seuils haut/bas, feedback
-const EXO_POSE_CONFIG = {
-  'Pompes': {
-    getAngleJoints: kp => [
-      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
-      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
-      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
-    ],
-    upAngle: 155, downAngle: 100,
-    upLabel:'HAUT', downLabel:'BAS',
-    tips: 'Dos droit, descends jusqu\'à 90° aux coudes',
-    checkForm: (angle, kp) => {
-      const ls = getKeypointByName(kp,'left_shoulder'), lh = getKeypointByName(kp,'left_hip'), lk = getKeypointByName(kp,'left_knee');
-      let score = 100; const fb = [];
-      if(ls?.score > 0.4 && lh?.score > 0.4 && lk?.score > 0.4) {
-        const bodyAngle = getAngle(ls, lh, lk);
-        if(bodyAngle < 160) { score -= 25; fb.push('❌ Redresse le dos'); } else fb.push('✅ Dos aligné');
-      }
-      if(angle < 90 && angle > 60) fb.push('✅ Bonne profondeur');
-      else if(angle > 115) { score -= 20; fb.push('⚠️ Descends plus bas'); }
-      return {score, fb};
-    }
-  },
-  'Tractions': {
-    getAngleJoints: kp => [
-      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
-      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
-      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
-    ],
-    upAngle: 100, downAngle: 155, // inversé vs pompes
-    upLabel:'HAUT', downLabel:'BAS',
-    tips: 'Omoplates rentrées, monte menton au-dessus de la barre',
-    checkForm: (angle, kp) => {
-      let score = 100; const fb = [];
-      const ls = getKeypointByName(kp,'left_shoulder'), lh = getKeypointByName(kp,'left_hip');
-      if(ls?.score > 0.4 && lh?.score > 0.4) {
-        const lean = Math.abs(ls.x - lh.x);
-        if(lean > 60) { score -= 20; fb.push('⚠️ Corps trop incliné'); } else fb.push('✅ Corps vertical');
-      }
-      if(angle < 90) fb.push('✅ Bonne hauteur');
-      if(angle > 160) fb.push('✅ Extension complète');
-      return {score, fb};
-    }
-  },
-  'Développé couché': {
-    getAngleJoints: kp => [
-      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
-      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
-      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
-    ],
-    upAngle: 155, downAngle: 100,
-    upLabel:'HAUT', downLabel:'BAS',
-    tips: 'Allonge-toi, dos plaqué, barre jusqu\'à la poitrine',
-    checkForm: (angle, kp) => {
-      let score = 100; const fb = [];
-      const ls = getKeypointByName(kp,'left_shoulder'), rs = getKeypointByName(kp,'right_shoulder');
-      if(ls?.score > 0.4 && rs?.score > 0.4) {
-        const diff = Math.abs(ls.y - rs.y);
-        if(diff > 30) { score -= 20; fb.push('⚠️ Épaules pas symétriques'); } else fb.push('✅ Épaules alignées');
-      }
-      if(angle < 95) fb.push('✅ Bonne descente');
-      else if(angle > 120 && angle < 155) { score -= 15; fb.push('⚠️ Descends la barre à la poitrine'); }
-      return {score, fb};
-    }
-  },
-  'Squat': {
-    getAngleJoints: kp => [
-      getKeypointByName(kp,'left_hip')   || getKeypointByName(kp,'right_hip'),
-      getKeypointByName(kp,'left_knee')  || getKeypointByName(kp,'right_knee'),
-      getKeypointByName(kp,'left_ankle') || getKeypointByName(kp,'right_ankle'),
-    ],
-    upAngle: 160, downAngle: 110,
-    upLabel:'DEBOUT', downLabel:'BAS',
-    tips: 'Pieds largeur épaules, descends cuisses parallèles au sol',
-    checkForm: (angle, kp) => {
-      let score = 100; const fb = [];
-      const ls = getKeypointByName(kp,'left_shoulder'), lh = getKeypointByName(kp,'left_hip');
-      if(ls?.score > 0.4 && lh?.score > 0.4) {
-        const torsoAngle = getAngle({x:lh.x,y:lh.y-50}, lh, ls);
-        if(torsoAngle < 70) { score -= 20; fb.push('⚠️ Garde le buste droit'); } else fb.push('✅ Buste droit');
-      }
-      if(angle < 110) fb.push('✅ Bonne profondeur');
-      else if(angle < 140 && angle > 110) { score -= 15; fb.push('⚠️ Descends plus bas (cuisses parallèles)'); }
-      return {score, fb};
-    }
-  },
-  'Curl biceps': {
-    getAngleJoints: kp => [
-      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
-      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
-      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
-    ],
-    upAngle: 60, downAngle: 155,
-    upLabel:'HAUT', downLabel:'BAS',
-    tips: 'Coudes fixes contre le corps, monte jusqu\'en haut',
-    checkForm: (angle, kp) => {
-      let score = 100; const fb = [];
-      const ls = getKeypointByName(kp,'left_shoulder'), le = getKeypointByName(kp,'left_elbow');
-      if(ls?.score > 0.4 && le?.score > 0.4) {
-        const elbowDrift = Math.abs(ls.x - le.x);
-        if(elbowDrift > 40) { score -= 25; fb.push('⚠️ Coudes fixes — ne te balance pas'); } else fb.push('✅ Coudes stables');
-      }
-      if(angle < 65) fb.push('✅ Bonne flexion');
-      if(angle > 150) fb.push('✅ Extension complète');
-      return {score, fb};
-    }
-  },
-  'Développé militaire': {
-    getAngleJoints: kp => [
-      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
-      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
-      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
-    ],
-    upAngle: 155, downAngle: 100,
-    upLabel:'HAUT', downLabel:'BAS',
-    tips: 'Core gainé, pousse la barre verticalement au-dessus de la tête',
-    checkForm: (angle, kp) => {
-      let score = 100; const fb = [];
-      const ls = getKeypointByName(kp,'left_shoulder'), lh = getKeypointByName(kp,'left_hip');
-      if(ls?.score > 0.4 && lh?.score > 0.4) {
-        const lean = ls.x - lh.x;
-        if(Math.abs(lean) > 35) { score -= 20; fb.push('⚠️ Reste droit, ne te cambre pas'); } else fb.push('✅ Corps droit');
-      }
-      if(angle > 155) fb.push('✅ Extension complète');
-      return {score, fb};
-    }
-  },
-  'Dips': {
-    getAngleJoints: kp => [
-      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
-      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
-      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
-    ],
-    upAngle: 155, downAngle: 95,
-    upLabel:'HAUT', downLabel:'BAS',
-    tips: 'Descends jusqu\'à 90°, coudes proches du corps',
-    checkForm: (angle, kp) => {
-      let score = 100; const fb = [];
-      if(angle < 100) fb.push('✅ Bonne profondeur');
-      else if(angle > 120 && angle < 155) { score -= 20; fb.push('⚠️ Descends plus bas (90°)'); }
-      if(angle > 155) fb.push('✅ Extension complète');
-      return {score, fb};
-    }
-  },
-  'Triceps poulie': {
-    getAngleJoints: kp => [
-      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
-      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
-      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
-    ],
-    upAngle: 95, downAngle: 155,
-    upLabel:'HAUT', downLabel:'BAS',
-    tips: 'Coudes collés au corps, extension complète vers le bas',
-    checkForm: (angle, kp) => {
-      let score = 100; const fb = [];
-      if(angle > 155) fb.push('✅ Extension complète');
-      else if(angle < 140) { score -= 20; fb.push('⚠️ Tends mieux les bras'); }
-      return {score, fb};
-    }
-  },
-  'Rowing barre': {
-    getAngleJoints: kp => [
-      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
-      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
-      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
-    ],
-    upAngle: 75, downAngle: 155,
-    upLabel:'TIRÉ', downLabel:'BAS',
-    tips: 'Dos à 45°, tire la barre vers le nombril',
-    checkForm: (angle, kp) => {
-      let score = 100; const fb = [];
-      const ls = getKeypointByName(kp,'left_shoulder'), lh = getKeypointByName(kp,'left_hip');
-      if(ls?.score > 0.4 && lh?.score > 0.4) {
-        const torso = Math.abs(ls.y - lh.y);
-        if(torso < 40) { score -= 20; fb.push('⚠️ Penche-toi à 45°'); } else fb.push('✅ Bonne inclinaison');
-      }
-      if(angle < 80) fb.push('✅ Bonne traction');
-      return {score, fb};
-    }
-  },
-  'Tirage poulie haute': {
-    getAngleJoints: kp => [
-      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
-      getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
-      getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
-    ],
-    upAngle: 155, downAngle: 80,
-    upLabel:'HAUT', downLabel:'TIRÉ',
-    tips: 'Tire la barre vers le haut de la poitrine, omoplates rentrées',
-    checkForm: (angle, kp) => {
-      let score = 100; const fb = [];
-      if(angle < 85) fb.push('✅ Bonne traction');
-      if(angle > 155) fb.push('✅ Extension complète');
-      return {score, fb};
-    }
-  },
-  'Soulevé de terre': {
-    getAngleJoints: kp => [
-      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
-      getKeypointByName(kp,'left_hip')      || getKeypointByName(kp,'right_hip'),
-      getKeypointByName(kp,'left_knee')     || getKeypointByName(kp,'right_knee'),
-    ],
-    upAngle: 165, downAngle: 100,
-    upLabel:'DEBOUT', downLabel:'BAS',
-    tips: 'Dos droit, barre proche du corps, pousse avec les jambes',
-    checkForm: (angle, kp) => {
-      let score = 100; const fb = [];
-      const ls = getKeypointByName(kp,'left_shoulder'), lh = getKeypointByName(kp,'left_hip');
-      if(ls?.score > 0.4 && lh?.score > 0.4) {
-        const spineAngle = Math.abs(ls.x - lh.x);
-        if(spineAngle > 50) { score -= 30; fb.push('❌ DANGER — Garde le dos droit !'); } else fb.push('✅ Dos droit');
-      }
-      if(angle > 160) fb.push('✅ Extension complète');
-      return {score, fb};
-    }
-  },
-  'Leg press': {
-    getAngleJoints: kp => [
-      getKeypointByName(kp,'left_hip')   || getKeypointByName(kp,'right_hip'),
-      getKeypointByName(kp,'left_knee')  || getKeypointByName(kp,'right_knee'),
-      getKeypointByName(kp,'left_ankle') || getKeypointByName(kp,'right_ankle'),
-    ],
-    upAngle: 155, downAngle: 90,
-    upLabel:'POUSSÉ', downLabel:'FLÉCHI',
-    tips: 'Pieds à largeur épaules, ne verrouille pas les genoux',
-    checkForm: (angle, kp) => {
-      let score = 100; const fb = [];
-      if(angle < 100) fb.push('✅ Bonne flexion');
-      if(angle > 150) fb.push('✅ Bonne extension');
-      return {score, fb};
-    }
-  },
-  'Extensions lombaires': {
-    getAngleJoints: kp => [
-      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
-      getKeypointByName(kp,'left_hip')      || getKeypointByName(kp,'right_hip'),
-      getKeypointByName(kp,'left_knee')     || getKeypointByName(kp,'right_knee'),
-    ],
-    upAngle: 170, downAngle: 110,
-    upLabel:'HAUT', downLabel:'BAS',
-    tips: 'Mouvement lent et contrôlé, ne sur-étends pas le dos',
-    checkForm: (angle, kp) => {
-      let score = 100; const fb = [];
-      if(angle > 165) { score -= 15; fb.push('⚠️ Ne sur-étends pas le dos'); } else if(angle > 145) fb.push('✅ Bonne extension');
-      return {score, fb};
-    }
-  },
-  'Crunchs': {
-    getAngleJoints: kp => [
-      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
-      getKeypointByName(kp,'left_hip')      || getKeypointByName(kp,'right_hip'),
-      getKeypointByName(kp,'left_knee')     || getKeypointByName(kp,'right_knee'),
-    ],
-    upAngle: 120, downAngle: 160,
-    upLabel:'MONTÉ', downLabel:'ALLONGÉ',
-    tips: 'Expire en montant, contracte les abdos, nuque neutre',
-    checkForm: (angle, kp) => {
-      let score = 100; const fb = [];
-      if(angle < 125) fb.push('✅ Bonne flexion abdominale');
-      else if(angle < 145) { score -= 15; fb.push('⚠️ Monte plus les épaules'); }
-      return {score, fb};
-    }
-  },
-  'Gainage': {
-    getAngleJoints: kp => [
-      getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
-      getKeypointByName(kp,'left_hip')      || getKeypointByName(kp,'right_hip'),
-      getKeypointByName(kp,'left_knee')     || getKeypointByName(kp,'right_knee'),
-    ],
-    upAngle: 999, downAngle: 999, // Gainage = tenue, pas de reps
-    isHold: true,
-    upLabel:'TENU', downLabel:'TENU',
-    tips: 'Corps droit, respire normalement, tiens la position',
-    checkForm: (angle, kp) => {
-      let score = 100; const fb = [];
-      if(angle > 160 && angle < 190) fb.push('✅ Alignement parfait');
-      else if(angle < 155) { score -= 25; fb.push('⚠️ Hanches trop basses'); }
-      else if(angle > 190) { score -= 25; fb.push('⚠️ Hanches trop hautes'); }
-      return {score, fb};
-    }
-  },
-};
-
-// Fallback générique
-const GENERIC_EXO_CONFIG = {
-  getAngleJoints: kp => [
-    getKeypointByName(kp,'left_shoulder') || getKeypointByName(kp,'right_shoulder'),
-    getKeypointByName(kp,'left_elbow')    || getKeypointByName(kp,'right_elbow'),
-    getKeypointByName(kp,'left_wrist')    || getKeypointByName(kp,'right_wrist'),
-  ],
-  upAngle: 155, downAngle: 90,
-  upLabel:'HAUT', downLabel:'BAS',
-  tips: 'Exécute avec contrôle et amplitude complète',
-  checkForm: () => ({score: 80, fb: ['✅ Mouvement détecté']})
-};
-
-function analyzeExercise(exoName, keypoints) {
-  const config = EXO_POSE_CONFIG[exoName] || GENERIC_EXO_CONFIG;
-  const [a, b, c] = config.getAngleJoints(keypoints);
-  if(!a || !b || !c) return null;
-  if(a.score < 0.4 || b.score < 0.4 || c.score < 0.4) return null;
-
-  const angle = getAngle(a, b, c);
-  const {score, fb} = config.checkForm(angle, keypoints);
-
-  // Pour le gainage, pas de reps — on compte le temps
-  if(config.isHold) {
-    return { angle, isUp: true, isDown: false, isHold: true, formScore: score, feedback: fb };
-  }
-
-  const isUp   = angle >= config.upAngle;
-  const isDown = angle <= config.downAngle;
-  return { angle, isUp, isDown, formScore: score, feedback: fb, upLabel: config.upLabel, downLabel: config.downLabel };
-}
-
-
-function analyzePullup(keypoints) {
-  const ls = getKeypointByName(keypoints, 'left_shoulder');
-  const rs = getKeypointByName(keypoints, 'right_shoulder');
-  const le = getKeypointByName(keypoints, 'left_elbow');
-  const re = getKeypointByName(keypoints, 'right_elbow');
-  const lw = getKeypointByName(keypoints, 'left_wrist');
-  const rw = getKeypointByName(keypoints, 'right_wrist');
-  const lh = getKeypointByName(keypoints, 'left_hip');
-  const rh = getKeypointByName(keypoints, 'right_hip');
-
-  const minConf = 0.4;
-  const hasLeft  = ls?.score > minConf && le?.score > minConf && lw?.score > minConf;
-  const hasRight = rs?.score > minConf && re?.score > minConf && rw?.score > minConf;
-  if(!hasLeft && !hasRight) return null;
-
-  const shoulder = hasLeft ? ls : rs;
-  const elbow    = hasLeft ? le : re;
-  const wrist    = hasLeft ? lw : rw;
-  const hip      = hasLeft ? lh : rh;
-
-  if(!shoulder || !elbow || !wrist) return null;
-
-  const elbowAngle = getAngle(shoulder, elbow, wrist);
-
-  const feedback = [];
-  let formScore = 100;
-
-  // Pour les tractions : en haut le coude est fléchi (~60-90°), en bas bras tendus (>155°)
-  const isUp   = elbowAngle < 100;   // bras très fléchis = en haut
-  const isDown = elbowAngle > 155;   // bras tendus = en bas (position de départ)
-
-  // Vérifier si les épaules sont au-dessus des poignets (bonne mécanique)
-  if(shoulder.y > wrist.y + 20 && isUp) {
-    feedback.push('✅ Bonne hauteur');
-  } else if(isUp && shoulder.y <= wrist.y + 20) {
-    formScore -= 20;
-    feedback.push('⚠️ Monte plus haut — menton au-dessus de la barre');
-  }
-
-  // Vérifier corps droit (pas trop de balancement)
-  if(hip?.score > minConf) {
-    const bodyLean = Math.abs(shoulder.x - hip.x);
-    if(bodyLean > 60) {
-      formScore -= 20;
-      feedback.push('⚠️ Corps trop incliné — reste vertical');
-    } else {
-      feedback.push('✅ Corps bien vertical');
-    }
-  }
-
-  // Extension complète en bas
-  if(isDown && elbowAngle < 160) {
-    formScore -= 15;
-    feedback.push('⚠️ Tends mieux les bras en bas');
-  } else if(isDown) {
-    feedback.push('✅ Bonne extension en bas');
-  }
-
-  formScore = Math.max(0, formScore);
-  return { elbowAngle, isUp, isDown, formScore, feedback };
-}
-
-
-let poseDetector = null;
-let poseStream = null;
-let poseAnimFrame = null;
-let poseRepCount = 0;
-let poseFormScore = 0;
-let posePhase = 'up';
-let poseValidReps = 0;
-let poseTargetReps = 0;
-let poseCurrentExo = 'pushup';
-let poseSessionValidated = false;
-let poseTotalFormScores = [];
 
 // Angles pour les pompes
 function getAngle(a, b, c) {
@@ -5073,7 +4470,7 @@ function analyzePushup(keypoints) {
   return { elbowAngle, isDown, isUp, formScore, feedback, bodyAlignment };
 }
 
-function drawSkeleton(ctx, keypoints, canvas) {
+function drawSkeleton(ctx, keypoints, canvas, formScore) {
   const connections = [
     ['left_shoulder','right_shoulder'],
     ['left_shoulder','left_elbow'],['left_elbow','left_wrist'],
@@ -5084,35 +4481,66 @@ function drawSkeleton(ctx, keypoints, canvas) {
     ['left_knee','left_ankle'],['right_knee','right_ankle'],
   ];
 
-  const scaleX = canvas.width / 640;
-  const scaleY = canvas.height / 480;
+  const scaleX = canvas.width / (canvas.videoWidth || 640);
+  const scaleY = canvas.height / (canvas.videoHeight || 480);
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Dessine les connexions
+  // Couleur selon le score de forme
+  const lineColor = formScore >= 80 ? 'rgba(57,255,20,0.9)'
+                  : formScore >= 60 ? 'rgba(0,245,255,0.9)'
+                  : formScore > 0   ? 'rgba(255,60,172,0.9)'
+                  : 'rgba(0,245,255,0.6)';
+
   connections.forEach(([a, b]) => {
     const kpA = getKeypointByName(keypoints, a);
     const kpB = getKeypointByName(keypoints, b);
-    if(kpA?.score > 0.4 && kpB?.score > 0.4) {
+    if(kpA?.score > 0.35 && kpB?.score > 0.35) {
       ctx.beginPath();
       ctx.moveTo(kpA.x * scaleX, kpA.y * scaleY);
       ctx.lineTo(kpB.x * scaleX, kpB.y * scaleY);
-      ctx.strokeStyle = 'rgba(0,245,255,0.8)';
+      ctx.strokeStyle = lineColor;
       ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
       ctx.stroke();
     }
   });
 
-  // Dessine les points
+  // Points avec taille selon confiance
   keypoints.forEach(kp => {
-    if(kp.score > 0.4) {
+    if(kp.score > 0.35) {
+      const r = kp.score > 0.75 ? 7 : 5;
       ctx.beginPath();
-      ctx.arc(kp.x * scaleX, kp.y * scaleY, 7, 0, 2 * Math.PI);
-      ctx.fillStyle = kp.score > 0.7 ? '#00f5ff' : '#ff3cac';
+      ctx.arc(kp.x * scaleX, kp.y * scaleY, r, 0, 2 * Math.PI);
+      ctx.fillStyle = kp.score > 0.7 ? '#fff' : 'rgba(255,255,255,0.6)';
       ctx.fill();
-      ctx.strokeStyle = '#fff';
+      ctx.strokeStyle = lineColor;
       ctx.lineWidth = 2;
       ctx.stroke();
+    }
+  });
+
+  // Afficher l'angle principal sur les coudes/genoux
+  const toShow = [
+    ['left_shoulder','left_elbow','left_wrist'],
+    ['right_shoulder','right_elbow','right_wrist'],
+    ['left_hip','left_knee','left_ankle'],
+    ['right_hip','right_knee','right_ankle'],
+  ];
+  toShow.forEach(([a,b,c]) => {
+    const kpA = getKeypointByName(keypoints,a);
+    const kpB = getKeypointByName(keypoints,b);
+    const kpC = getKeypointByName(keypoints,c);
+    if(kpA?.score>0.5 && kpB?.score>0.5 && kpC?.score>0.5) {
+      const angle = Math.round(getAngle(kpA,kpB,kpC));
+      ctx.fillStyle = 'rgba(0,0,0,0.7)';
+      const x = kpB.x * scaleX;
+      const y = kpB.y * scaleY;
+      ctx.fillRect(x-18, y-12, 36, 16);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 11px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(angle+'°', x, y);
     }
   });
 }
@@ -5121,8 +4549,10 @@ function updateCameraTargetLabel() {
   const reps = parseInt(document.getElementById('lift-reps').value) || 0;
   const label = document.getElementById('camera-target-label');
   if(!label) return;
+  const exo = (document.getElementById('lift-exo')?.value || '').replace(' 📷','');
+  const name = exo && exo !== 'Pompes' ? exo.toLowerCase() : 'reps';
   if(reps > 0) {
-    label.textContent = '🎯 Objectif : ' + reps + ' pompe' + (reps > 1 ? 's' : '') + ' à valider';
+    label.textContent = '🎯 Objectif : ' + reps + ' ' + name;
   } else {
     label.textContent = 'Remplis d\'abord le nombre de reps';
   }
@@ -5152,7 +4582,6 @@ async function openPoseCamera() {
   poseValidReps = 0;
   poseFormScore = 0;
   posePhase = 'up';
-  poseSessionValidated = false;
   poseTotalFormScores = [];
   updatePoseHUD();
 
@@ -5258,7 +4687,7 @@ async function runPoseLoop() {
       const poses = await poseDetector.estimatePoses(video);
       if(poses.length > 0) {
         const keypoints = poses[0].keypoints;
-        drawSkeleton(ctx, keypoints, canvas);
+        drawSkeleton(ctx, keypoints, canvas, poseFormScore);
 
         const analysis = analyzeExercise(poseCurrentExo, keypoints);
 
@@ -5293,6 +4722,9 @@ async function runPoseLoop() {
               if(analysis.formScore >= 60) {
                 poseValidReps++;
                 haptic('success'); playSound('rep');
+                // Flash vert sur le HUD
+                const hud = document.querySelector('#pose-modal [style*="border:2px solid var(--accent)"]');
+                if(hud) { hud.classList.add('rep-flash'); setTimeout(()=>hud.classList.remove('rep-flash'), 400); }
                 const remaining = target - poseValidReps;
                 if(remaining > 0) {
                   document.getElementById('pose-status-msg').textContent =
