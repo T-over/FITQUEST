@@ -1566,14 +1566,16 @@ body::after {
   </div>
 
   <!-- DAILY QUEST -->
-  <div class="daily-banner" onclick="goQuests()">
+  <div class="daily-banner" id="daily-banner">
     <div class="daily-icon" id="daily-icon">🎯</div>
     <div class="daily-content">
       <div class="daily-label">⚡ QUÊTE DU JOUR</div>
       <div class="daily-quest-name" id="daily-q-name">Chargement...</div>
       <div class="daily-reward" id="daily-q-reward">Récompense: —</div>
     </div>
-    <div class="daily-arrow">›</div>
+    <button id="daily-q-btn" onclick="claimDailyQuest()" style="padding:8px 14px;border:none;border-radius:var(--radius);font-weight:700;font-size:12px;cursor:pointer;flex-shrink:0">
+      VALIDER
+    </button>
   </div>
 
   <!-- STATS -->
@@ -2154,13 +2156,16 @@ const TITLES = [
 ];
 
 const DAILY_QUESTS = [
-  {name:'Cours 3 km aujourd\'hui', icon:'🏃', xp:80, reward:'80 XP'},
-  {name:'Fais une séance muscu complète', icon:'🏋️', xp:90, reward:'90 XP'},
-  {name:'Cours 5 km non-stop', icon:'💨', xp:130, reward:'130 XP'},
-  {name:'Réalise 10 séries aujourd\'hui', icon:'💪', xp:100, reward:'100 XP'},
-  {name:'Sortie de 30 minutes minimum', icon:'⏱️', xp:70, reward:'70 XP'},
-  {name:'Squats x3 séries aujourd\'hui', icon:'🦵', xp:60, reward:'60 XP'},
-  {name:'Tractions ou dips x5 séries', icon:'🤸', xp:75, reward:'75 XP'},
+  {name:'Cours 3 km aujourd\'hui',         icon:'🏃', xp:20, reward:'20 XP + 10 or', type:'run',       target:3},
+  {name:'Fais une séance muscu complète',  icon:'🏋️', xp:25, reward:'25 XP + 12 or', type:'session',   target:1},
+  {name:'Cours 5 km non-stop',             icon:'💨', xp:35, reward:'35 XP + 18 or', type:'run',       target:5},
+  {name:'Démarre une session aujourd\'hui',icon:'⏱️', xp:15, reward:'15 XP + 8 or',  type:'session',   target:1},
+  {name:'Fais 3 exercices différents',     icon:'💪', xp:20, reward:'20 XP + 10 or', type:'exos',      target:3},
+  {name:'Squats x3 séries aujourd\'hui',   icon:'🦵', xp:18, reward:'18 XP + 9 or',  type:'squat',     target:3},
+  {name:'30 minutes de sport minimum',     icon:'⏱️', xp:20, reward:'20 XP + 10 or', type:'duration',  target:30},
+  {name:'Cours 2 km en mode footing',      icon:'🌅', xp:15, reward:'15 XP + 8 or',  type:'run',       target:2},
+  {name:'Fais des pompes aujourd\'hui',    icon:'🤸', xp:18, reward:'18 XP + 9 or',  type:'pushups',   target:1},
+  {name:'Cours + muscu le même jour',      icon:'🌀', xp:40, reward:'40 XP + 20 or', type:'combo_day', target:1},
 ];
 
 const WEEKLY_CHALLENGES = [
@@ -2343,6 +2348,60 @@ function navigate(page, btn) {
   if(page === 'calendar') renderCalendar();
   window.scrollTo(0,0);
 }
+function isDailyQuestAchieved(dq) {
+  if(!dq) return false;
+  const today = new Date().toLocaleDateString('fr-FR');
+  const todayWorkouts = (state.workouts||[]).filter(w => w.date === today);
+  switch(dq.type) {
+    case 'run':      return (state.workouts||[]).filter(w=>w.date===today&&w.type==='run').reduce((s,w)=>s+(parseFloat(w.details)||0),0) >= dq.target;
+    case 'session':  return (state.allSessionDays||[]).includes(new Date().toDateString());
+    case 'exos':     return todayWorkouts.length >= dq.target;
+    case 'squat':    return todayWorkouts.filter(w=>w.name&&w.name.toLowerCase().includes('squat')).length >= dq.target;
+    case 'pushups':  return todayWorkouts.filter(w=>w.name&&w.name.toLowerCase().includes('pompe')).length >= dq.target;
+    case 'duration': {
+      const sessions = (state.sessionLog||[]).filter(s=>s.dateKey===new Date().toDateString());
+      return sessions.reduce((s,x)=>s+(x.durationMin||0),0) >= dq.target;
+    }
+    case 'combo_day': {
+      const hasRun  = todayWorkouts.some(w=>w.type==='run');
+      const hasLift = todayWorkouts.some(w=>w.type==='lift');
+      return hasRun && hasLift;
+    }
+    default: return false;
+  }
+}
+
+function checkDailyQuestProgress() {
+  if(state.dailyQuestDone) return;
+  const dq = DAILY_QUESTS[state.dailyQuestIndex >= 0 ? state.dailyQuestIndex : 0];
+  if(isDailyQuestAchieved(dq)) {
+    // Ne réclame pas automatiquement — laisse l'utilisateur cliquer
+    const btn = document.getElementById('daily-q-btn');
+    if(btn && !btn.disabled) {
+      btn.textContent = '🏆 RÉCLAMER';
+      btn.style.background = 'linear-gradient(135deg,var(--accent3),#ff8c00)';
+      btn.style.color = '#000';
+      btn.disabled = false;
+    }
+  }
+}
+
+function claimDailyQuest() {
+  if(state.dailyQuestDone) return;
+  const dq = DAILY_QUESTS[state.dailyQuestIndex >= 0 ? state.dailyQuestIndex : 0];
+  if(!isDailyQuestAchieved(dq)) {
+    showToast('info', '⚠️ Complète d\'abord la quête du jour !');
+    return;
+  }
+  state.dailyQuestDone = true;
+  saveState();
+  addXP(dq.xp, '⚡ Quête du jour');
+  addGold(Math.round(dq.xp * 0.5), 'Quête du jour');
+  showToast('success', '🏆 Quête du jour accomplie ! +' + dq.xp + ' XP');
+  haptic('levelup');
+  renderDashboard();
+}
+
 function goQuests() {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -2440,13 +2499,40 @@ function renderDashboard() {
     state.dailyQuestDone = false;
     saveState();
   }
-  const dq = DAILY_QUESTS[state.dailyQuestIndex];
-  document.getElementById('daily-icon').textContent = state.dailyQuestDone ? '✅' : dq.icon;
-  document.getElementById('daily-q-name').textContent = (state.dailyQuestDone ? '✓ ' : '') + dq.name;
-  document.getElementById('daily-q-reward').textContent = 'Récompense: ' + dq.reward + (state.dailyQuestDone ? ' — Réclamé !' : '');
+  const dq = DAILY_QUESTS[state.dailyQuestIndex >= 0 ? state.dailyQuestIndex : 0];
+  const dqDone = state.dailyQuestDone;
+
+  // Auto-check si la quête est déjà accomplie
+  if(!dqDone) checkDailyQuestProgress();
+
+  document.getElementById('daily-icon').textContent = dqDone ? '✅' : dq.icon;
+  document.getElementById('daily-q-name').textContent = dq.name;
+  document.getElementById('daily-q-reward').textContent = dqDone ? '✅ Réclamé ! ' + dq.reward : 'Récompense: ' + dq.reward;
+  const btn = document.getElementById('daily-q-btn');
+  if(btn) {
+    if(dqDone) {
+      btn.textContent = '✅ FAIT';
+      btn.style.background = 'rgba(57,255,20,0.15)';
+      btn.style.color = 'var(--accent4)';
+      btn.style.border = '1px solid rgba(57,255,20,0.4)';
+      btn.disabled = true;
+    } else if(isDailyQuestAchieved(dq)) {
+      btn.textContent = '🏆 RÉCLAMER';
+      btn.style.background = 'linear-gradient(135deg,var(--accent3),#ff8c00)';
+      btn.style.color = '#000';
+      btn.style.border = 'none';
+      btn.disabled = false;
+    } else {
+      btn.textContent = 'EN COURS';
+      btn.style.background = 'var(--bg3)';
+      btn.style.color = 'var(--text2)';
+      btn.style.border = '1px solid var(--border)';
+      btn.disabled = true;
+    }
+  }
 
   document.getElementById('s-km').textContent = state.totalKm.toFixed(1);
-  document.getElementById('s-seances').textContent = state.totalSessions;
+  document.getElementById('s-seances').textContent = state.totalSessions || 0;
   document.getElementById('s-quests').textContent = state.questsDone;
 
   // Streak
@@ -2472,17 +2558,22 @@ function renderDashboard() {
 }
 
 function renderStreak() {
-  const days = ['L','M','M','J','V','S','D'];
-  const today = new Date().getDay();
+  const labels = ['L','M','M','J','V','S','D'];
   const wrap = document.getElementById('streak-days');
   wrap.innerHTML = '';
+
+  const now = new Date();
+  // getDay(): 0=dim, 1=lun... → on veut 0=lun
+  const todayIdx = (now.getDay() + 6) % 7; // 0=lun, 1=mar, ..., 6=dim
+
   for(let i = 0; i < 7; i++) {
     const d = document.createElement('div');
-    const dayIdx = (today - 6 + i + 7) % 7;
     d.className = 'streak-day';
-    d.textContent = days[dayIdx];
-    if(i < state.streak && state.streak > 0) d.classList.add('done');
-    if(i === 6) d.classList.add('today');
+    d.textContent = labels[i];
+    // Ce jour est "fait" si dans notre série et avant ou = aujourd'hui
+    const daysAgo = todayIdx - i;
+    if(daysAgo >= 0 && daysAgo < state.streak) d.classList.add('done');
+    if(i === todayIdx) d.classList.add('today');
     wrap.appendChild(d);
   }
   document.getElementById('streak-count').textContent = state.streak;
