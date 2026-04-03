@@ -1608,8 +1608,14 @@ body::after {
 
   <!-- MÉTÉO EVENT -->
   <div class="weather-banner" id="weather-banner" style="display:none">
-    <div class="weather-icon" id="weather-icon">🌤️</div>
-    <div class="weather-event-name" id="weather-event-name">Conditions Standard</div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div class="weather-icon" id="weather-icon">🌤️</div>
+      <div style="flex:1">
+        <div class="weather-event-name" id="weather-event-name">Conditions Standard</div>
+        <div id="weather-temp" style="font-family:'Share Tech Mono',monospace;font-size:20px;color:var(--text);margin:2px 0"></div>
+        <div id="weather-detail" style="font-size:11px;color:var(--text2)"></div>
+      </div>
+    </div>
     <div class="weather-bonus" id="weather-bonus">Entraîne-toi !</div>
   </div>
 
@@ -2132,14 +2138,16 @@ const CRAFT_RECIPES = [
 ];
 
 const WEATHER_EVENTS = [
-  {condition:'clear',  name:'Journée Ensoleillée', icon:'☀️', bonus:'XP course +50%',         xpMult:1.5, type:'run'},
-  {condition:'clouds', name:'Ciel Couvert',         icon:'☁️', bonus:'XP muscu +30%',          xpMult:1.3, type:'lift'},
-  {condition:'rain',   name:'Pluie Guerrière',      icon:'🌧️', bonus:'XP x2 (défi pluvieux !)', xpMult:2.0, type:'all'},
-  {condition:'snow',   name:'Blizzard d\'Acier',    icon:'❄️', bonus:'Or +100% cette séance',  xpMult:1.0, goldMult:2.0, type:'all'},
-  {condition:'thunder',name:'Tempête de Foudre',    icon:'⛈️', bonus:'XP x3 (courage ultime!)', xpMult:3.0, type:'all'},
-  {condition:'mist',   name:'Brume Mystérieuse',    icon:'🌫️', bonus:'Chance de succès secret', xpMult:1.2, type:'all'},
-  {condition:'wind',   name:'Vent du Guerrier',     icon:'💨', bonus:'XP endurance +40%',      xpMult:1.4, type:'run'},
-  {condition:'default',name:'Conditions Standard',  icon:'🌤️', bonus:'Entraîne-toi !',         xpMult:1.0, type:'all'},
+  {condition:'clear_day',   name:'Journée Ensoleillée', icon:'☀️', bonus:'XP course +50%',         xpMult:1.5, type:'run'},
+  {condition:'clear_night', name:'Nuit Étoilée',        icon:'🌙', bonus:'XP nocturne +40%',       xpMult:1.4, type:'all'},
+  {condition:'clouds_day',  name:'Ciel Couvert',        icon:'☁️', bonus:'XP muscu +30%',          xpMult:1.3, type:'lift'},
+  {condition:'clouds_night',name:'Nuit Nuageuse',       icon:'🌥️', bonus:'XP muscu +30%',          xpMult:1.3, type:'lift'},
+  {condition:'rain',        name:'Pluie Guerrière',     icon:'🌧️', bonus:'XP x2 (défi pluvieux !)', xpMult:2.0, type:'all'},
+  {condition:'snow',        name:'Blizzard d\'Acier',   icon:'❄️', bonus:'Or +100% cette séance',  xpMult:1.0, goldMult:2.0, type:'all'},
+  {condition:'thunder',     name:'Tempête de Foudre',   icon:'⛈️', bonus:'XP x3 (courage ultime!)', xpMult:3.0, type:'all'},
+  {condition:'mist',        name:'Brume Mystérieuse',   icon:'🌫️', bonus:'Chance de succès secret', xpMult:1.2, type:'all'},
+  {condition:'wind',        name:'Vent du Guerrier',    icon:'💨', bonus:'XP endurance +40%',      xpMult:1.4, type:'run'},
+  {condition:'default',     name:'Conditions Standard', icon:'🌤️', bonus:'Entraîne-toi !',         xpMult:1.0, type:'all'},
 ];
 
 
@@ -2305,6 +2313,7 @@ function loadState() {
     lastWeekReset: null,
     weeklyDaysLog: [], // dates des jours d'entraînement cette semaine
     sessionLog: [],
+    allSessionDays: [],
     restDays: [],
     activeProgram: null,
     programDay: 0,
@@ -2318,6 +2327,7 @@ function loadState() {
     totalBossKills: 0,
     nightWorkout: false,
     weatherCache: null,
+    weatherCacheData: null,
     weatherCacheTime: 0,
     legendaire: false,
   };
@@ -2354,7 +2364,10 @@ function isDailyQuestAchieved(dq) {
   const todayWorkouts = (state.workouts||[]).filter(w => w.date === today);
   switch(dq.type) {
     case 'run':      return (state.workouts||[]).filter(w=>w.date===today&&w.type==='run').reduce((s,w)=>s+(parseFloat(w.details)||0),0) >= dq.target;
-    case 'session':  return (state.allSessionDays||[]).includes(new Date().toDateString());
+    case 'session':  {
+      const todayStr = new Date().toDateString();
+      return (state.allSessionDays||[]).includes(todayStr) || (state.weeklyDaysLog||[]).includes(todayStr);
+    }
     case 'exos':     return todayWorkouts.length >= dq.target;
     case 'squat':    return todayWorkouts.filter(w=>w.name&&w.name.toLowerCase().includes('squat')).length >= dq.target;
     case 'pushups':  return todayWorkouts.filter(w=>w.name&&w.name.toLowerCase().includes('pompe')).length >= dq.target;
@@ -2566,13 +2579,23 @@ function renderStreak() {
   // getDay(): 0=dim, 1=lun... → on veut 0=lun
   const todayIdx = (now.getDay() + 6) % 7; // 0=lun, 1=mar, ..., 6=dim
 
+  // Calculer les dates de chaque jour de cette semaine (lundi à dimanche)
+  const weekDates = [];
+  for(let i = 0; i < 7; i++) {
+    const diff = i - todayIdx; // jours relatifs à aujourd'hui
+    const d = new Date(now);
+    d.setDate(d.getDate() + diff);
+    weekDates.push(d.toDateString());
+  }
+
+  // Jours réellement entraînés (depuis weeklyDaysLog + allSessionDays)
+  const trainedDays = new Set([...(state.weeklyDaysLog || []), ...(state.allSessionDays || [])]);
+
   for(let i = 0; i < 7; i++) {
     const d = document.createElement('div');
     d.className = 'streak-day';
     d.textContent = labels[i];
-    // Ce jour est "fait" si dans notre série et avant ou = aujourd'hui
-    const daysAgo = todayIdx - i;
-    if(daysAgo >= 0 && daysAgo < state.streak) d.classList.add('done');
+    if(trainedDays.has(weekDates[i])) d.classList.add('done');
     if(i === todayIdx) d.classList.add('today');
     wrap.appendChild(d);
   }
@@ -2742,7 +2765,6 @@ function logRun() {
 
   state.totalKm += dist;
   state.runSessions++;
-  state.totalSessions++;
 
   // types
   if(type === 'interval') state.run_interval++;
@@ -2816,7 +2838,6 @@ function logLift() {
 
 
   state.liftSessions++;
-  state.totalSessions++;
 
   // track specific exercises
   const exoLow = exo.toLowerCase();
@@ -3182,6 +3203,10 @@ function stopSession() {
   // Sauvegarder la durée dans l'historique
   if(elapsed > 30) { // au moins 30 secondes pour compter
     if(!state.sessionLog) state.sessionLog = [];
+    state.totalSessions++;
+    if(!state.allSessionDays) state.allSessionDays = [];
+    const todayStr = new Date().toDateString();
+    if(!state.allSessionDays.includes(todayStr)) state.allSessionDays.push(todayStr);
     const now = new Date();
     state.sessionLog.push({
       date: now.toLocaleDateString('fr-FR'),
@@ -3207,28 +3232,41 @@ function stopSession() {
 // ============================================================
 function requestNotificationPermission() {
   if(!('Notification' in window)) {
-    showToast('info', '⚠️ Notifications non supportées');
+    showToast('info', '⚠️ Notifications non supportées sur ce navigateur');
     return;
   }
   Notification.requestPermission().then(permission => {
     if(permission === 'granted') {
       localStorage.setItem('fq_notif', 'true');
       showToast('success', '🔔 Notifications activées !');
-      setTimeout(() => {
-        try {
-          new Notification('🔔 FitQuest — Notifications activées !', {
-            body: 'Bravo ! Tu vas pouvoir te donner à fond. On te rappellera chaque jour à 9h et 18h 💪🔥',
-            icon: '/FITQUEST/icon-192.png'
-          });
-        } catch(e) {
-          new Notification('🔔 FitQuest', { body: 'Notifications activées ! On te rappellera chaque jour 💪' });
-        }
-      }, 500);
+      // Envoyer une notif de confirmation via SW (mobile) ou Notification (desktop)
+      setTimeout(() => sendNotification('🔔 FitQuest — Rappels activés !', 'Tu recevras des rappels à 9h et 18h pour ne rien lâcher 💪🔥'), 500);
       scheduleReminderNotification();
     } else {
-      showToast('info', '🔕 Notifications refusées — active-les dans les paramètres Android');
+      showToast('info', '🔕 Notifications refusées — active-les dans les paramètres de ton navigateur/Android');
     }
   });
+}
+
+function sendNotification(title, body) {
+  if(Notification.permission !== 'granted') return;
+  // Préférer ServiceWorker (fonctionne sur mobile)
+  if('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.ready.then(reg => {
+      reg.showNotification(title, {
+        body,
+        icon: '/FITQUEST/icon-192.png',
+        badge: '/FITQUEST/icon-192.png',
+        vibrate: [200, 100, 200],
+        tag: 'fitquest-' + Date.now(),
+        renotify: true
+      });
+    }).catch(() => {
+      try { new Notification(title, { body, icon: '/FITQUEST/icon-192.png' }); } catch(e) {}
+    });
+  } else {
+    try { new Notification(title, { body, icon: '/FITQUEST/icon-192.png' }); } catch(e) {}
+  }
 }
 
 function scheduleReminderNotification() {
@@ -3242,7 +3280,7 @@ function scheduleReminderNotification() {
   setTimeout(() => {
     if(Notification.permission==='granted' && localStorage.getItem('fq_notif')==='true') {
       const msgs = ["Bonne journée ! Une séance ce matin ? 💪","Le meilleur moment c'est maintenant ! 🏃","Tes familiers t'attendent 🐾","Démarre fort avec FitQuest ⚡","Les champions s'entraînent le matin 👑"];
-      new Notification('☀️ FitQuest', {body:msgs[Math.floor(Math.random()*msgs.length)],icon:'/FITQUEST/icon-192.png'});
+      sendNotification('☀️ FitQuest', msgs[Math.floor(Math.random()*msgs.length)]);
       scheduleReminderNotification();
     }
   }, morning - now);
@@ -3253,11 +3291,12 @@ function scheduleReminderNotification() {
   setTimeout(() => {
     if(Notification.permission==='granted' && localStorage.getItem('fq_notif')==='true') {
       const today = new Date().toDateString();
-      const didTrain = (state.allSessionDays||[]).includes(today);
+      const didTrain = (state.allSessionDays||[]).includes(today) || (state.weeklyDaysLog||[]).includes(today);
       if(!didTrain) {
         const msgs = ["Tu n'as pas encore bougé aujourd'hui 💪","Le boss de la semaine t'attend !","Ta série est en danger !","Un peu de sport ce soir ? 🏃","Tes familiers s'ennuient 🐾"];
-        new Notification('⚡ FitQuest', {body:msgs[Math.floor(Math.random()*msgs.length)],icon:'/FITQUEST/icon-192.png'});
+        sendNotification('⚡ FitQuest', msgs[Math.floor(Math.random()*msgs.length)]);
       }
+      scheduleReminderNotification();
     }
   }, evening - now);
 }
@@ -3990,51 +4029,74 @@ function haptic(type) {
 // ============================================================
 async function fetchWeather() {
   const now = Date.now();
-  if(state.weatherCache && (now - state.weatherCacheTime) < 3600000) {
-    applyWeatherEvent(state.weatherCache);
+  if(state.weatherCache && state.weatherCacheData && (now - state.weatherCacheTime) < 1800000) {
+    applyWeatherEvent(state.weatherCache, state.weatherCacheData);
     return;
   }
   try {
     const pos = await new Promise((res, rej) =>
-      navigator.geolocation.getCurrentPosition(res, rej, {timeout:5000})
+      navigator.geolocation.getCurrentPosition(res, rej, {timeout:8000})
     );
     const {latitude, longitude} = pos.coords;
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,weather_code,wind_speed_10m`;
     const r = await fetch(url);
     const data = await r.json();
-    const code = data.current_weather?.weathercode;
-    const windspeed = data.current_weather?.windspeed || 0;
+    const current = data.current;
+    const code = current?.weather_code ?? null;
+    const windspeed = current?.wind_speed_10m || 0;
+    const isDay = current?.is_day === 1;
+    const temp = current?.temperature_2m;
+    const feelsLike = current?.apparent_temperature;
+    const humidity = current?.relative_humidity_2m;
+
     let condition = 'default';
-    if(code === 0 || code === 1) condition = 'clear';
-    else if(code >= 2 && code <= 3) condition = 'clouds';
+    if(code === 0 || code === 1) condition = isDay ? 'clear_day' : 'clear_night';
+    else if(code >= 2 && code <= 3) condition = isDay ? 'clouds_day' : 'clouds_night';
     else if(code >= 51 && code <= 67) condition = 'rain';
     else if(code >= 71 && code <= 77) condition = 'snow';
     else if(code >= 80 && code <= 82) condition = 'rain';
     else if(code >= 95) condition = 'thunder';
     else if(code >= 45 && code <= 48) condition = 'mist';
-    // Vent fort (>30 km/h) même si ciel clair
-    if(windspeed > 30 && condition === 'clear') condition = 'wind';
-    if(windspeed > 30 && condition === 'clouds') condition = 'wind';
+    if(windspeed > 30 && (condition === 'clear_day' || condition === 'clear_night' || condition === 'clouds_day' || condition === 'clouds_night')) condition = 'wind';
+
+    const weatherData = { temp, feelsLike, humidity, windspeed, isDay };
     state.weatherCache = condition;
+    state.weatherCacheData = weatherData;
     state.weatherCacheTime = now;
     saveState();
-    applyWeatherEvent(condition);
+    applyWeatherEvent(condition, weatherData);
   } catch(e) {
-    applyWeatherEvent('default');
+    applyWeatherEvent('default', null);
   }
 }
 
-function applyWeatherEvent(condition) {
+function applyWeatherEvent(condition, weatherData) {
   const event = WEATHER_EVENTS.find(w => w.condition === condition) || WEATHER_EVENTS.find(w => w.condition === 'default');
   state.currentWeatherEvent = event;
   const banner = document.getElementById('weather-banner');
   const icon = document.getElementById('weather-icon');
   const name = document.getElementById('weather-event-name');
   const bonus = document.getElementById('weather-bonus');
+  const tempEl = document.getElementById('weather-temp');
+  const detailEl = document.getElementById('weather-detail');
   if(banner) banner.style.display = 'block';
   if(icon) icon.textContent = event.icon;
   if(name) name.textContent = event.name;
   if(bonus) bonus.textContent = '🎯 ' + event.bonus;
+  if(weatherData && tempEl) {
+    tempEl.textContent = Math.round(weatherData.temp) + '°C';
+  } else if(tempEl) {
+    tempEl.textContent = '';
+  }
+  if(weatherData && detailEl) {
+    const parts = [];
+    if(weatherData.feelsLike != null) parts.push('Ressenti ' + Math.round(weatherData.feelsLike) + '°C');
+    if(weatherData.humidity != null) parts.push('Humidité ' + weatherData.humidity + '%');
+    if(weatherData.windspeed != null) parts.push('Vent ' + Math.round(weatherData.windspeed) + ' km/h');
+    detailEl.textContent = parts.join(' · ');
+  } else if(detailEl) {
+    detailEl.textContent = '';
+  }
 }
 
 // ============================================================
@@ -4938,6 +5000,23 @@ function renderSessionHistory() {
 
 function init() {
   hideSplash();
+
+  // Migration : recalculer totalSessions depuis sessionLog (corrige le bug comptage par exo)
+  if(state.sessionLog && state.sessionLog.length > 0) {
+    state.totalSessions = state.sessionLog.length;
+  } else if(state.totalSessions > 0 && (!state.sessionLog || state.sessionLog.length === 0)) {
+    // Pas de sessionLog mais totalSessions > 0 : on reset à 0
+    state.totalSessions = 0;
+  }
+  // Migration : reconstruire allSessionDays depuis sessionLog
+  if(!state.allSessionDays) state.allSessionDays = [];
+  if(state.sessionLog && state.sessionLog.length > 0) {
+    const days = new Set(state.allSessionDays);
+    state.sessionLog.forEach(s => { if(s.dateKey) days.add(s.dateKey); });
+    state.allSessionDays = [...days];
+  }
+  saveState();
+
   checkWeeklyReset();
   updateHeader();
   renderDashboard();
@@ -4961,7 +5040,7 @@ function init() {
   // Météo — forcer refresh si le cache date de plus de 30 min
   try {
     const cacheAge = Date.now() - (state.weatherCacheTime || 0);
-    if(cacheAge > 1800000) state.weatherCache = null; // reset cache 30min
+    if(cacheAge > 1800000) { state.weatherCache = null; state.weatherCacheData = null; }
     fetchWeather();
   } catch(e) {}
 
