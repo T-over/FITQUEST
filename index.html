@@ -1852,8 +1852,8 @@ body::after {
       <div class="big-stat-label">KM TOTAL</div>
     </div>
     <div class="big-stat">
-      <div class="big-stat-val lift-col" id="st-total-seances">0</div>
-      <div class="big-stat-label">SÉANCES MUSCU</div>
+      <div class="big-stat-val lift-col" id="st-total-exos">0</div>
+      <div class="big-stat-label">EXOS MUSCU</div>
     </div>
     <div class="big-stat">
       <div class="big-stat-val gold-col" id="st-total-xp">0</div>
@@ -2115,16 +2115,16 @@ const QUESTS_DATA = [
   // ═══════════════════════════════════════════════════════════════
   // MUSCU — 35 quêtes
   // ═══════════════════════════════════════════════════════════════
-  {id:'lift1', cat:'muscu', name:'Initiation Fer', desc:'Réalise ta première séance de muscu.', icon:'🏋️', type:'lift_sessions', target:1, unit:'séances', xp:60, diff:'easy', reward:'Titre: Forgeron'},
-  {id:'lift2', cat:'muscu', name:'Routine Béton', desc:'Fais 5 séances de muscu.', icon:'💪', type:'lift_sessions', target:5, unit:'séances', xp:200, diff:'medium', reward:'Badge: Habitué'},
+  {id:'lift1', cat:'muscu', name:'Premier Exercice', desc:'Logue ton premier exercice.', icon:'🏋️', type:'lift_exos', target:1, unit:'exos', xp:60, diff:'easy', reward:'Titre: Forgeron'},
+  {id:'lift2', cat:'muscu', name:'5 Exercices', desc:'Logue 5 exercices au total.', icon:'💪', type:'lift_exos', target:5, unit:'exos', xp:150, diff:'easy', reward:'Badge: Débutant'},
   {id:'lift3', cat:'muscu', name:'Roi du Squat', desc:'Effectue 10 séries de squats.', icon:'🦵', type:'squat_sets', target:10, unit:'séries', xp:180, diff:'medium', reward:'Badge: Squatting'},
-  {id:'lift4', cat:'muscu', name:'King Press', desc:'Bench press 10 fois.', icon:'🤜', type:'bench_sets', target:10, unit:'séries', xp:180, diff:'medium', reward:'Badge: Poitrine'},
-  {id:'lift5', cat:'muscu', name:'Iron Man', desc:'20 séances de muscu totales.', icon:'🔩', type:'lift_sessions', target:20, unit:'séances', xp:500, diff:'epic', reward:'Titre: Iron Man'},
-  {id:'lift6', cat:'muscu', name:'Soulève Tout', desc:'Fais du soulevé de terre 5 fois.', icon:'🏗️', type:'deadlift_sets', target:5, unit:'séries', xp:220, diff:'hard', reward:'Badge: Deadlifter'},
-  {id:'lift7', cat:'muscu', name:'10 Séances', desc:'Fais 10 séances de muscu.', icon:'🔟', type:'lift_sessions', target:10, unit:'séances', xp:300, diff:'medium', reward:'+60 or'},
-  {id:'lift8', cat:'muscu', name:'15 Séances', desc:'Fais 15 séances de muscu.', icon:'💎', type:'lift_sessions', target:15, unit:'séances', xp:400, diff:'hard', reward:'+100 or'},
-  {id:'lift9', cat:'muscu', name:'30 Séances', desc:'Fais 30 séances de muscu.', icon:'⚔️', type:'lift_sessions', target:30, unit:'séances', xp:700, diff:'epic', reward:'Titre: Guerrier'},
-  {id:'lift10', cat:'muscu', name:'50 Séances', desc:'Fais 50 séances de muscu.', icon:'👹', type:'lift_sessions', target:50, unit:'séances', xp:1200, diff:'epic', reward:'Titre: Titan'},
+  {id:'lift4', cat:'muscu', name:'King Press', desc:'Bench press 10 séries.', icon:'🤜', type:'bench_sets', target:10, unit:'séries', xp:180, diff:'medium', reward:'Badge: Poitrine'},
+  {id:'lift5', cat:'muscu', name:'10 Exercices', desc:'Logue 10 exercices au total.', icon:'🔟', type:'lift_exos', target:10, unit:'exos', xp:200, diff:'medium', reward:'+40 or'},
+  {id:'lift6', cat:'muscu', name:'Soulève Tout', desc:'Fais du soulevé de terre 5 séries.', icon:'🏗️', type:'deadlift_sets', target:5, unit:'séries', xp:220, diff:'hard', reward:'Badge: Deadlifter'},
+  {id:'lift7', cat:'muscu', name:'25 Exercices', desc:'Logue 25 exercices au total.', icon:'💎', type:'lift_exos', target:25, unit:'exos', xp:300, diff:'medium', reward:'+60 or'},
+  {id:'lift8', cat:'muscu', name:'50 Exercices', desc:'Logue 50 exercices au total.', icon:'🔩', type:'lift_exos', target:50, unit:'exos', xp:400, diff:'hard', reward:'Badge: Habitué'},
+  {id:'lift9', cat:'muscu', name:'100 Exercices', desc:'Logue 100 exercices au total.', icon:'⚔️', type:'lift_exos', target:100, unit:'exos', xp:700, diff:'epic', reward:'Titre: Iron Man'},
+  {id:'lift10', cat:'muscu', name:'200 Exercices', desc:'Logue 200 exercices au total.', icon:'👹', type:'lift_exos', target:200, unit:'exos', xp:1200, diff:'epic', reward:'Titre: Titan'},
   {id:'lift11', cat:'muscu', name:'Squat Master', desc:'Fais 25 séries de squats.', icon:'🦿', type:'squat_sets', target:25, unit:'séries', xp:350, diff:'hard', reward:'Badge: Squat Lord'},
   {id:'lift12', cat:'muscu', name:'Squat Legend', desc:'Fais 50 séries de squats.', icon:'👑', type:'squat_sets', target:50, unit:'séries', xp:600, diff:'epic', reward:'Titre: Roi des Squats'},
   {id:'lift13', cat:'muscu', name:'Bench Warrior', desc:'Fais 25 séries de bench.', icon:'🛡️', type:'bench_sets', target:25, unit:'séries', xp:350, diff:'hard', reward:'Badge: Bench Boss'},
@@ -2139,9 +2139,9 @@ const QUESTS_DATA = [
   {id:'lift22', cat:'muscu', name:'Heavy Lifter', desc:'Soulève 50 kg ou plus.', icon:'🏆', type:'heavy_lift', target:50, unit:'kg', xp:300, diff:'hard', reward:'Badge: Lourd'},
   {id:'lift23', cat:'muscu', name:'Titan Lifter', desc:'Soulève 80 kg ou plus.', icon:'💀', type:'heavy_lift', target:80, unit:'kg', xp:500, diff:'epic', reward:'Badge: Titan'},
   {id:'lift24', cat:'muscu', name:'Beast Mode', desc:'Soulève 100 kg ou plus.', icon:'👹', type:'heavy_lift', target:100, unit:'kg', xp:800, diff:'epic', reward:'Titre: Beast'},
-  {id:'lift25', cat:'muscu', name:'5 Exos Différents', desc:'Fais 5 exercices différents au total.', icon:'🎯', type:'unique_exos', target:5, unit:'exos', xp:200, diff:'medium', reward:'+40 or'},
-  {id:'lift26', cat:'muscu', name:'10 Exos Différents', desc:'Fais 10 exercices différents au total.', icon:'🌟', type:'unique_exos', target:10, unit:'exos', xp:350, diff:'hard', reward:'Badge: Polyvalent'},
-  {id:'lift27', cat:'muscu', name:'15 Exos Différents', desc:'Fais 15 exercices différents au total.', icon:'💫', type:'unique_exos', target:15, unit:'exos', xp:500, diff:'epic', reward:'Titre: Maître'},
+  {id:'lift25', cat:'muscu', name:'5 Exos Différents', desc:'Fais 5 exercices différents.', icon:'🎯', type:'unique_exos', target:5, unit:'exos', xp:200, diff:'medium', reward:'+40 or'},
+  {id:'lift26', cat:'muscu', name:'10 Exos Différents', desc:'Fais 10 exercices différents.', icon:'🌟', type:'unique_exos', target:10, unit:'exos', xp:350, diff:'hard', reward:'Badge: Polyvalent'},
+  {id:'lift27', cat:'muscu', name:'15 Exos Différents', desc:'Fais 15 exercices différents.', icon:'💫', type:'unique_exos', target:15, unit:'exos', xp:500, diff:'epic', reward:'Titre: Maître'},
   {id:'lift28', cat:'muscu', name:'Pompes Champion', desc:'Fais 100 pompes au total.', icon:'💪', type:'pushup_total', target:100, unit:'reps', xp:300, diff:'hard', reward:'Badge: Push Master'},
   {id:'lift29', cat:'muscu', name:'Pompes Legend', desc:'Fais 500 pompes au total.', icon:'🔥', type:'pushup_total', target:500, unit:'reps', xp:800, diff:'epic', reward:'Titre: Push Legend'},
   {id:'lift30', cat:'muscu', name:'1000 Pompes', desc:'Fais 1000 pompes au total.', icon:'👑', type:'pushup_total', target:1000, unit:'reps', xp:1500, diff:'epic', reward:'Titre: Immortel Push'},
@@ -2254,11 +2254,11 @@ const ACHIEVEMENTS = [
   // ═══════════════════════════════════════════════════════════════
   // MUSCU — 12 succès
   // ═══════════════════════════════════════════════════════════════
-  {id:'first_lift', name:'Premier Acier',     desc:'Ta première séance muscu',     icon:'🏋️', secret:false, condition: s => s.liftSessions >= 1},
-  {id:'lift5',      name:'Forgeron',          desc:'5 séances muscu',              icon:'🔨', secret:false, condition: s => s.liftSessions >= 5},
-  {id:'lift10',     name:'Maître du Fer',     desc:'10 séances muscu',             icon:'⚒️', secret:false, condition: s => s.liftSessions >= 10},
-  {id:'lift25',     name:'Iron Warrior',      desc:'25 séances muscu',             icon:'🛡️', secret:false, condition: s => s.liftSessions >= 25},
-  {id:'lift50',     name:'Iron Legend',       desc:'50 séances muscu',             icon:'⚔️', secret:false, condition: s => s.liftSessions >= 50},
+  {id:'first_lift', name:'Premier Acier',     desc:'Ton premier exercice muscu',   icon:'🏋️', secret:false, condition: s => (s.liftExos||s.liftSessions||0) >= 1},
+  {id:'lift5',      name:'Forgeron',          desc:'5 exercices muscu',            icon:'🔨', secret:false, condition: s => (s.liftExos||s.liftSessions||0) >= 5},
+  {id:'lift10',     name:'Maître du Fer',     desc:'10 exercices muscu',           icon:'⚒️', secret:false, condition: s => (s.liftExos||s.liftSessions||0) >= 10},
+  {id:'lift25',     name:'Iron Warrior',      desc:'25 exercices muscu',           icon:'🛡️', secret:false, condition: s => (s.liftExos||s.liftSessions||0) >= 25},
+  {id:'lift50',     name:'Iron Legend',       desc:'50 exercices muscu',           icon:'⚔️', secret:false, condition: s => (s.liftExos||s.liftSessions||0) >= 50},
   {id:'heavy50',    name:'Heavy Lifter',      desc:'Soulever 50 kg',               icon:'💪', secret:false, condition: s => (s.records?.heaviestLift||0) >= 50},
   {id:'heavy80',    name:'Titan Lifter',      desc:'Soulever 80 kg',               icon:'🏋️', secret:false, condition: s => (s.records?.heaviestLift||0) >= 80},
   {id:'heavy100',   name:'Beast Mode',        desc:'Soulever 100 kg',              icon:'👹', secret:false, condition: s => (s.records?.heaviestLift||0) >= 100},
@@ -2279,7 +2279,7 @@ const ACHIEVEMENTS = [
   {id:'days25',     name:'25 Jours',          desc:'25 jours d\'entraînement',     icon:'📆', secret:false, condition: s => (s.allSessionDays?.length||0) >= 25},
   {id:'days50',     name:'Demi-Centurion',    desc:'50 jours d\'entraînement',     icon:'🗓️', secret:false, condition: s => (s.allSessionDays?.length||0) >= 50},
   {id:'days100',    name:'Centurion Days',    desc:'100 jours d\'entraînement',    icon:'💯', secret:false, condition: s => (s.allSessionDays?.length||0) >= 100},
-  {id:'hybrid',     name:'Hybride',           desc:'10km + 5 séances muscu',       icon:'🌀', secret:false, condition: s => s.totalKm >= 10 && s.liftSessions >= 5},
+  {id:'hybrid',     name:'Hybride',           desc:'10km + 5 exos muscu',          icon:'🌀', secret:false, condition: s => s.totalKm >= 10 && (s.liftExos||s.liftSessions||0) >= 5},
 
   // ═══════════════════════════════════════════════════════════════
   // PROGRESSION — 8 succès
@@ -2479,9 +2479,10 @@ function loadState() {
     level: 0,
     totalXP: 0,
     totalKm: 0,
-    liftSessions: 0,
-    runSessions: 0,
-    totalSessions: 0,
+    liftSessions: 0,  // Vraies séances muscu (via Start/Stop)
+    liftExos: 0,      // Exercices muscu logués
+    runSessions: 0,   // Sorties course
+    totalSessions: 0, // Vraies séances totales
     questsDone: 0,
     streak: 0,
     maxStreak: 0,
@@ -2872,6 +2873,7 @@ function getQuestProgress(q) {
     
     // MUSCU
     case 'lift_sessions': return state.liftSessions || 0;
+    case 'lift_exos': return state.liftExos || 0;
     case 'squat_sets': return state.squat_sets || 0;
     case 'bench_sets': return state.bench_sets || 0;
     case 'deadlift_sets': return state.deadlift_sets || 0;
@@ -2914,7 +2916,7 @@ function getQuestProgress(q) {
     
     // ÉPIQUES
     case 'total_sessions': return state.totalSessions || 0;
-    case 'combo': return (state.totalKm >= 10 && state.liftSessions >= 5) ? 1 : 0;
+    case 'combo': return (state.totalKm >= 10 && (state.liftExos||state.liftSessions||0) >= 5) ? 1 : 0;
     case 'level': return state.level || 1;
     case 'gold': return state.totalGoldEarned || 0;
     case 'boss_kills': return state.totalBossKills || 0;
@@ -3119,7 +3121,11 @@ function logLift() {
 
   if(!sets || !reps) { showToast('info', '⚠️ Remplis les séries et répétitions'); return; }
 
-  state.liftSessions++;
+  // Compter l'exercice (pas la séance)
+  state.liftExos = (state.liftExos||0) + 1;
+  
+  // Marquer que cette session contient des exos muscu
+  window.sessionHasLifts = true;
 
   // Track specific exercises par catégorie
   const exoLow = exo.toLowerCase();
@@ -3271,7 +3277,7 @@ function renderWorkoutHistory() {
 // ============================================================
 function renderStats() {
   document.getElementById('st-total-km').textContent = state.totalKm.toFixed(1);
-  document.getElementById('st-total-seances').textContent = state.liftSessions;
+  document.getElementById('st-total-exos').textContent = state.liftExos || 0;
   document.getElementById('st-total-xp').textContent = state.totalXP;
   document.getElementById('st-quests-done').textContent = state.questsDone;
 
@@ -3572,6 +3578,12 @@ function stopSession() {
     if(!state.sessionLog) state.sessionLog = [];
     state.totalSessions++;
     state.weeklySessionsThisWeek = (state.weeklySessionsThisWeek || 0) + 1;
+    
+    // Compter comme séance muscu si des exos ont été faits pendant cette session
+    if(window.sessionHasLifts) {
+      state.liftSessions = (state.liftSessions || 0) + 1;
+      window.sessionHasLifts = false;
+    }
     
     // Tracker la durée pour les quêtes d'endurance
     state.lastSessionDuration = minutes;
@@ -4424,7 +4436,7 @@ function updateCoach() {
   const totalKm = state.totalKm || 0;
   const streak = state.streak || 0;
   const level = state.level || 0;
-  const liftSessions = state.liftSessions || 0;
+  const liftExos = state.liftExos || 0;
   const runSessions = state.runSessions || 0;
 
   let message = '';
@@ -4436,21 +4448,21 @@ function updateCoach() {
   } else if(streak === 0) {
     message = 'Tu n\'as pas encore de série active. Reviens régulièrement — la constance est la clé du progrès !';
     advice = '💡 Une séance courte vaut mieux que pas de séance. Même 20 minutes comptent !';
-  } else if(runSessions > liftSessions * 2) {
+  } else if(runSessions > liftExos * 2 && runSessions > 3) {
     message = `Tu cours beaucoup (${totalKm.toFixed(1)} km) mais ton ratio muscu est faible. Ajoute du renforcement pour équilibrer.`;
     advice = '💡 La muscu améliore tes performances en course. Essaie 1 séance muscu pour 2 courses.';
-  } else if(liftSessions > runSessions * 3) {
-    message = `Excellente progression en muscu ! Mais ton cardio est en retrait. ${liftSessions} séances muscu, ${runSessions} courses.`;
+  } else if(liftExos > 0 && runSessions === 0) {
+    message = `Excellente progression en muscu ! Mais ton cardio est en retrait. ${liftExos} exos muscu, ${runSessions} courses.`;
     advice = '💡 30 min de cardio par semaine améliore ta récupération et ton endurance générale.';
   } else if(streak >= 7) {
     message = `🔥 INCROYABLE ! ${streak} jours de série. Tu es une machine. Attention à la récupération.`;
     advice = '💡 Après 7 jours consécutifs, offre-toi 1 jour de récup active (marche, stretching).';
   } else if(level >= 10) {
-    message = `Niveau ${level+1} — tu es dans l\'élite. Tes stats parlent d\'elles-mêmes : ${totalKm.toFixed(0)} km, ${liftSessions} séances muscu.`;
+    message = `Niveau ${level+1} — tu es dans l\'élite. Tes stats : ${totalKm.toFixed(0)} km, ${liftExos} exos muscu.`;
     advice = '💡 À ce niveau, travaille la qualité plutôt que la quantité. Augmente les charges progressivement.';
   } else {
     message = `Bonne progression, ${state.name} ! ${totalSessions} séances au total, série actuelle : ${streak} jours.`;
-    advice = '💡 Objectif semaine : ' + (runSessions < liftSessions ? 'ajoute une course pour équilibrer.' : 'maintiens ta régularité !');
+    advice = '💡 Objectif semaine : ' + (runSessions < 1 && liftExos > 0 ? 'ajoute une course pour équilibrer.' : 'maintiens ta régularité !');
   }
 
   msg.textContent = message;
@@ -5336,6 +5348,15 @@ function init() {
     state.sessionLog.forEach(s => { if(s.dateKey) days.add(s.dateKey); });
     state.allSessionDays = [...days];
   }
+  
+  // Migration : liftExos (exercices) vs liftSessions (séances)
+  // Si liftExos n'existe pas mais liftSessions oui, copier la valeur
+  if(!state.liftExos && state.liftSessions > 0) {
+    state.liftExos = state.liftSessions;
+    // Recalculer liftSessions basé sur le nombre de vraies séances
+    state.liftSessions = state.sessionLog ? state.sessionLog.length : 0;
+  }
+  
   saveState();
 
   checkWeeklyReset();
