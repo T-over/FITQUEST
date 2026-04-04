@@ -1980,7 +1980,6 @@ body::after {
 
   <div class="card" style="margin-top:14px">
     <div class="card-title"><span style="color:var(--red)">⚠️</span> DANGER ZONE</div>
-    <button class="submit-btn" style="background:var(--accent);color:#000;margin-top:0;margin-bottom:8px" onclick="requestNotificationPermission()">🔔 ACTIVER LES RAPPELS</button>
     <button class="submit-btn" style="background:var(--accent4);color:#000;margin-top:0;margin-bottom:8px" onclick="exportData()">📥 EXPORTER MES DONNÉES</button>
     <label class="submit-btn" style="background:var(--accent3);color:#000;margin-top:0;margin-bottom:8px;display:block;text-align:center;cursor:pointer">
       📤 IMPORTER MES DONNÉES
@@ -3227,79 +3226,6 @@ function stopSession() {
   showToast('success', '✅ Session terminée ! Durée : ' + durationStr);
 }
 
-// ============================================================
-// NOTIFICATIONS
-// ============================================================
-function requestNotificationPermission() {
-  if(!('Notification' in window)) {
-    showToast('info', '⚠️ Notifications non supportées sur ce navigateur');
-    return;
-  }
-  Notification.requestPermission().then(permission => {
-    if(permission === 'granted') {
-      localStorage.setItem('fq_notif', 'true');
-      showToast('success', '🔔 Notifications activées !');
-      // Envoyer une notif de confirmation via SW (mobile) ou Notification (desktop)
-      setTimeout(() => sendNotification('🔔 FitQuest — Rappels activés !', 'Tu recevras des rappels à 9h et 18h pour ne rien lâcher 💪🔥'), 500);
-      scheduleReminderNotification();
-    } else {
-      showToast('info', '🔕 Notifications refusées — active-les dans les paramètres de ton navigateur/Android');
-    }
-  });
-}
-
-function sendNotification(title, body) {
-  if(Notification.permission !== 'granted') return;
-  // Préférer ServiceWorker (fonctionne sur mobile)
-  if('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-    navigator.serviceWorker.ready.then(reg => {
-      reg.showNotification(title, {
-        body,
-        icon: '/FITQUEST/icon-192.png',
-        badge: '/FITQUEST/icon-192.png',
-        vibrate: [200, 100, 200],
-        tag: 'fitquest-' + Date.now(),
-        renotify: true
-      });
-    }).catch(() => {
-      try { new Notification(title, { body, icon: '/FITQUEST/icon-192.png' }); } catch(e) {}
-    });
-  } else {
-    try { new Notification(title, { body, icon: '/FITQUEST/icon-192.png' }); } catch(e) {}
-  }
-}
-
-function scheduleReminderNotification() {
-  if(Notification.permission !== 'granted') return;
-  if(localStorage.getItem('fq_notif') !== 'true') return;
-  const now = new Date();
-
-  // Rappel matin 9h
-  const morning = new Date(); morning.setHours(9,0,0,0);
-  if(morning <= now) morning.setDate(morning.getDate()+1);
-  setTimeout(() => {
-    if(Notification.permission==='granted' && localStorage.getItem('fq_notif')==='true') {
-      const msgs = ["Bonne journée ! Une séance ce matin ? 💪","Le meilleur moment c'est maintenant ! 🏃","Tes familiers t'attendent 🐾","Démarre fort avec FitQuest ⚡","Les champions s'entraînent le matin 👑"];
-      sendNotification('☀️ FitQuest', msgs[Math.floor(Math.random()*msgs.length)]);
-      scheduleReminderNotification();
-    }
-  }, morning - now);
-
-  // Rappel soir 18h
-  const evening = new Date(); evening.setHours(18,0,0,0);
-  if(evening <= now) evening.setDate(evening.getDate()+1);
-  setTimeout(() => {
-    if(Notification.permission==='granted' && localStorage.getItem('fq_notif')==='true') {
-      const today = new Date().toDateString();
-      const didTrain = (state.allSessionDays||[]).includes(today) || (state.weeklyDaysLog||[]).includes(today);
-      if(!didTrain) {
-        const msgs = ["Tu n'as pas encore bougé aujourd'hui 💪","Le boss de la semaine t'attend !","Ta série est en danger !","Un peu de sport ce soir ? 🏃","Tes familiers s'ennuient 🐾"];
-        sendNotification('⚡ FitQuest', msgs[Math.floor(Math.random()*msgs.length)]);
-      }
-      scheduleReminderNotification();
-    }
-  }, evening - now);
-}
 
 
 // ============================================================
@@ -5043,15 +4969,6 @@ function init() {
     if(cacheAge > 1800000) { state.weatherCache = null; state.weatherCacheData = null; }
     fetchWeather();
   } catch(e) {}
-
-  // Notifications — demander permission au démarrage si pas encore répondu
-  setTimeout(() => {
-    if('Notification' in window && Notification.permission === 'default') {
-      requestNotificationPermission();
-    } else if(Notification.permission === 'granted' && localStorage.getItem('fq_notif') === 'true') {
-      scheduleReminderNotification();
-    }
-  }, 3000); // après 3s pour ne pas spammer dès l'ouverture
 
   document.querySelectorAll('.nav-btn').forEach((btn, i) => {
     btn.addEventListener('click', () => {
